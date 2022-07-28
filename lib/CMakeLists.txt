@@ -1,4 +1,6 @@
+add_subdirectory(Analysis)
 add_subdirectory(Misc)
 add_subdirectory(Dialect)
 add_subdirectory(Conversion)
 add_subdirectory(CAPI)
+add_subdirectory(Transforms)

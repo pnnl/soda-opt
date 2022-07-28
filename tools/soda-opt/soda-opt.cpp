@@ -31,6 +31,10 @@ void registerTestLoopPermutationPass();
 namespace test {
 
 int registerTestLinalgCodegenStrategy();
+void registerTestForwardResultsPass();
+void registerTestIfConversionPass();
+void registerTestDataFlowGraphPass();
+void registerTestLoopSchedulingPass();
 } // namespace test
 } // namespace mlir
 
@@ -56,6 +60,13 @@ inline void registerAffinePassesForSoda() {
   mlir::registerTestLoopPermutationPass();
 }
 
+inline void registerLoopPipeliningPasses() {
+  mlir::test::registerTestForwardResultsPass();
+  mlir::test::registerTestIfConversionPass();
+  mlir::test::registerTestDataFlowGraphPass();
+  mlir::test::registerTestLoopSchedulingPass();
+}
+
 int main(int argc, char **argv) {
   // mlir::registerAllDialects();
   // mlir::registerAllPasses();
@@ -71,6 +82,7 @@ int main(int argc, char **argv) {
 
   registerLinalgPassesForSoda();
   registerAffinePassesForSoda();
+  registerLoopPipeliningPasses();
   mlir::bufferization::registerPromoteBuffersToStackPass();
 
   mlir::registerConvertLinalgToStandardPass();

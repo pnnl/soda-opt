@@ -1,0 +1,7 @@
+# II 1
+# graph dfg.graphml
+# resourceModel resources.xml
+# vertex;cycle;fu
+affine.load_1;0;0
+arith.muli_2;1;0
+affine.store_3;2;1

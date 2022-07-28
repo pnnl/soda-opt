@@ -36,6 +36,7 @@ set(LIBS
   # Test Passes
   MLIRLinalgTestPasses
   MLIRAffineTransformsTestPasses
+  SODATestTransforms
   
   # Conversion
   MLIRAffineToStandard

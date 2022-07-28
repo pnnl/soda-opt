@@ -33,3 +33,4 @@ set_target_properties(check-soda PROPERTIES FOLDER "Tests")
 add_lit_testsuites(SODA_OPT ${CMAKE_CURRENT_SOURCE_DIR} DEPENDS ${SODA_TEST_DEPENDS})
 
 add_subdirectory(CAPI)
+add_subdirectory(lib)
