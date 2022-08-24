@@ -66,8 +66,8 @@ void mlir::conditionLoopExecution(AffineForOp *forOp,
       range = forOp->getLowerBound().getOperands();
   }
 
-  ArrayRef<AffineExpr> constraints{setExpression};
-  ArrayRef<bool> eqFlags{false};
+  SmallVector<AffineExpr, 1> constraints{setExpression};
+  SmallVector<bool, 1> eqFlags{false};
   IntegerSet set = IntegerSet::get(mapDims, mapSyms,
                                    constraints, eqFlags);
 
