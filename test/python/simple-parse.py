@@ -2,7 +2,6 @@
 
 from mlir_soda.ir import *
 from mlir_soda.dialects import (
-  builtin as builtin_d,
   soda as soda_d
 )
 
