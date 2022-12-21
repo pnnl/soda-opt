@@ -56,9 +56,9 @@ struct ConvertAllToSODAPass
     Location loc = funcOp.front().front().getLoc();
     builder.setInsertionPointToStart(&funcOp.front());
     auto launchOp = builder.create<soda::LaunchOp>(loc);
-    builder.setInsertionPointToEnd(&launchOp.body().front());
+    builder.setInsertionPointToEnd(&launchOp.getBody().front());
     builder.create<soda::TerminatorOp>(loc);
-    builder.setInsertionPointToStart(&launchOp.body().front());
+    builder.setInsertionPointToStart(&launchOp.getBody().front());
 
     for (Operation *op : opsToClone) {
       Operation *newOp = Operation::create(

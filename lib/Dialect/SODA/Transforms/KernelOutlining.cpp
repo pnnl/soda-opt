@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "mlir/Dialect/Arithmetic/IR/Arithmetic.h"
+#include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
@@ -81,7 +81,7 @@ extractBeneficiaryOps(Operation *op,
 }
 
 LogicalResult mlir::sinkOperationsIntoLaunchOp(soda::LaunchOp launchOp) {
-  Region &launchOpBody = launchOp.body();
+  Region &launchOpBody = launchOp.getBody();
 
   // Identify uses from values defined outside of the scope of the launch
   // operation.
@@ -105,7 +105,7 @@ LogicalResult mlir::sinkOperationsIntoLaunchOp(soda::LaunchOp launchOp) {
     // Only replace uses within the launch op.
     for (auto pair : llvm::zip(op->getResults(), clonedOp->getResults()))
       replaceAllUsesInRegionWith(std::get<0>(pair), std::get<1>(pair),
-                                 launchOp.body());
+                                 launchOp.getBody());
   }
   return success();
 }
@@ -120,7 +120,7 @@ outlineKernelFuncImpl(soda::LaunchOp launchOp, StringRef kernelFnName,
   // due to symbol table manipulation
   OpBuilder builder(launchOp.getContext());
   // Contains the region of code that will be outlined
-  Region &launchOpBody = launchOp.body();
+  Region &launchOpBody = launchOp.getBody();
 
   // Identify uses from values defined outside of the scope of the launch
   // operation.
@@ -141,7 +141,7 @@ outlineKernelFuncImpl(soda::LaunchOp launchOp, StringRef kernelFnName,
 
   // Map the arguments corresponding to the launch parameter like blockIdx,
   // threadIdx, etc.
-  Region &outlinedFuncBody = outlinedFunc.body();
+  Region &outlinedFuncBody = outlinedFunc.getBody();
   // This is a good area to add preamble operations
 
   // Map arguments from soda.launch region to the argument of the soda.func

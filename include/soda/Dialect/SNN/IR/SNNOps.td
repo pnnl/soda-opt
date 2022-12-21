@@ -25,7 +25,7 @@ class SNN_Op<string mnemonic, list<Trait> traits = []> :
 // DummyOp
 //===----------------------------------------------------------------------===//
 
-def SNN_DummyOp : SNN_Op<"dummy", [ NoSideEffect
+def SNN_DummyOp : SNN_Op<"dummy", [ NoMemoryEffect
   ]> {
   let summary = "snn dummy operation";
   let description = [{
@@ -50,7 +50,7 @@ def SNN_DummyOp : SNN_Op<"dummy", [ NoSideEffect
 // EncodeSpikeTrainOp
 //===----------------------------------------------------------------------===//
 
-def SNN_EncodeSpikeTrainOp : SNN_Op<"encode_spike_train", [ NoSideEffect
+def SNN_EncodeSpikeTrainOp : SNN_Op<"encode_spike_train", [ NoMemoryEffect
   ]> {
   let summary = "Transform a tensor of times into a spike train";
   let description = [{

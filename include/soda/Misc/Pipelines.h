@@ -13,6 +13,9 @@
 #include "mlir/Pass/PassManager.h"
 #include "soda/Misc/Passes.h"
 
+#include "mlir/Conversion/Passes.h"
+#include "mlir/Transforms/Passes.h"
+
 // TODO include for soda custom passes
 // #include "soda/Misc/Passes.h"
 
@@ -217,8 +220,8 @@ void registerPassManagerMiscPass() {
         pm.addPass(createMemRefToLLVMPass());
         pm.addPass(createConvertMathToLLVMPass());
         pm.addPass(createConvertMathToLibmPass());
-        pm.addPass(arith::createArithmeticExpandOpsPass());
-        pm.addPass(arith::createConvertArithmeticToLLVMPass());
+        pm.addPass(arith::createArithExpandOpsPass());
+        pm.addPass(arith::createConvertArithToLLVMPass());
         pm.addPass(memref::createExpandOpsPass());
         if (options.useBarePtrCallConv) {
           pm.addPass(createCustomFuncToLLVMPass(options.useBarePtrCallConv));
@@ -247,8 +250,8 @@ void registerSimpleLoweringPass() {
         pm.addPass(createCSEPass()); // Only has impact outside linalg ops
         pm.addPass(createConvertMathToLLVMPass());
         pm.addPass(createConvertMathToLibmPass());
-        pm.addPass(arith::createArithmeticExpandOpsPass());
-        pm.addPass(arith::createConvertArithmeticToLLVMPass());
+        pm.addPass(arith::createArithExpandOpsPass());
+        pm.addPass(arith::createConvertArithToLLVMPass());
         pm.addPass(memref::createExpandOpsPass());
         pm.addPass(createMemRefToLLVMPass());
         if (options.useBarePtrCallConv) {
@@ -322,8 +325,8 @@ void registerOptimizedForBambuPass() {
         pm.addPass(createMemRefToLLVMPass());
         pm.addPass(createConvertMathToLLVMPass());
         pm.addPass(createConvertMathToLibmPass());
-        pm.addPass(arith::createArithmeticExpandOpsPass());
-        pm.addPass(arith::createConvertArithmeticToLLVMPass());
+        pm.addPass(arith::createArithExpandOpsPass());
+        pm.addPass(arith::createConvertArithToLLVMPass());
         pm.addPass(memref::createExpandOpsPass());
         if (options.useBarePtrCallConv) {
           pm.addPass(createCustomFuncToLLVMPass(options.useBarePtrCallConv));
@@ -397,8 +400,8 @@ void registerOptimizedForVitisHLSPass() {
         pm.addPass(createMemRefToLLVMPass());
         pm.addPass(createConvertMathToLLVMPass());
         pm.addPass(createConvertMathToLibmPass());
-        pm.addPass(arith::createArithmeticExpandOpsPass());
-        pm.addPass(arith::createConvertArithmeticToLLVMPass());
+        pm.addPass(arith::createArithExpandOpsPass());
+        pm.addPass(arith::createConvertArithToLLVMPass());
         pm.addPass(memref::createExpandOpsPass());
         if (options.useBarePtrCallConv || options.emitCWrappers) {
           pm.addPass(createCustomFuncToLLVMPass(options.useBarePtrCallConv));

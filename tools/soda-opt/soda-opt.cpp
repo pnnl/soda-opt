@@ -22,7 +22,10 @@
 #include "soda/Misc/Passes.h"
 #include "soda/Misc/Pipelines.h"
 
-#include "mlir/Dialect/Arithmetic/Transforms/Passes.h"
+#include "mlir/Dialect/MemRef/Transforms/Passes.h"
+#include "mlir/Dialect/Affine/Passes.h"
+#include "mlir/Dialect/Linalg/Passes.h"
+#include "mlir/Dialect/Arith/Transforms/Passes.h"
 #include "mlir/Dialect/Func/Transforms/Passes.h"
 
 // Defined in the test directory, no public header.
@@ -85,8 +88,8 @@ int main(int argc, char **argv) {
   mlir::registerConvertAffineToStandardPass();
   mlir::registerConvertMathToLLVMPass();
   mlir::registerConvertMathToLibmPass();
-  mlir::registerConvertArithmeticToLLVMPass();
-  mlir::arith::registerArithmeticExpandOpsPass();
+  mlir::registerConvertArithToLLVMPass();
+  mlir::arith::registerArithExpandOpsPass();
   mlir::memref::registerExpandOpsPass();
   mlir::registerReconcileUnrealizedCastsPass();
 
@@ -102,7 +105,7 @@ int main(int argc, char **argv) {
                   mlir::scf::SCFDialect,
                   mlir::cf::ControlFlowDialect,
                   mlir::vector::VectorDialect,
-                  mlir::arith::ArithmeticDialect,
+                  mlir::arith::ArithDialect,
                   mlir::AffineDialect>();
   // clang-format on
   // mlir::registerAllDialects(registry);

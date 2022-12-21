@@ -14,7 +14,7 @@ template <typename ConcreteDialect>
 void registerDialect(DialectRegistry &registry);
 
 namespace arith {
-class ArithmeticDialect;
+class ArithDialect;
 } // namespace arith
 
 namespace memref {

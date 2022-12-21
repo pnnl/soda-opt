@@ -89,7 +89,7 @@ LogicalResult SODADialect::verifyOperationAttribute(Operation *op,
     // Ignore launch ops with missing attributes here. The errors will be
     // reported by the verifiers of those ops.
     if (!launchOp->getAttrOfType<SymbolRefAttr>(
-            LaunchFuncOp::getKernelAttrName()))
+            LaunchFuncOp::getKernelAttrName(launchOp->getName())))
       return success();
 
     // Check that `launch_func` refers to a well-formed SODA kernel module.
@@ -101,12 +101,12 @@ LogicalResult SODADialect::verifyOperationAttribute(Operation *op,
              << "' is undefined";
 
     // Check that `launch_func` refers to a well-formed kernel function.
-    Operation *kernelFunc = module.lookupSymbol(launchOp.kernelAttr());
+    Operation *kernelFunc = module.lookupSymbol(launchOp.getKernelAttr());
     auto kernelSODAFunction = dyn_cast_or_null<soda::SODAFuncOp>(kernelFunc);
     auto kernelLLVMFunction = dyn_cast_or_null<LLVM::LLVMFuncOp>(kernelFunc);
     if (!kernelSODAFunction && !kernelLLVMFunction)
       return launchOp.emitOpError("kernel function '")
-             << launchOp.kernel() << "' is undefined";
+             << launchOp.getKernel() << "' is undefined";
     if (!kernelFunc->getAttrOfType<mlir::UnitAttr>(
             SODADialect::getKernelFuncAttrName()))
       return launchOp.emitOpError("kernel function is missing the '")
@@ -200,15 +200,15 @@ LogicalResult LaunchOp::verify() {
   //  operands for grid/block sizes and transforms them into
   //  kNumConfigRegionAttributes region arguments for block/thread identifiers
   //  and grid/block sizes.
-  // if (!op.body().empty()) {
-  //   if (op.body().getNumArguments() !=
+  // if (!op.getBody().empty()) {
+  //   if (op.getBody().getNumArguments() !=
   //       LaunchOp::kNumConfigOperands + op.getNumOperands())
   //     return op.emitOpError("unexpected number of region arguments");
   // }
 
   // Block terminators without successors are expected to exit the kernel region
   // and must be `soda.terminator`.
-  for (Block &block : body()) {
+  for (Block &block : getBody()) {
     if (block.empty())
       continue;
     if (block.back().getNumSuccessors() != 0)
@@ -228,7 +228,7 @@ LogicalResult LaunchOp::verify() {
 
 void LaunchOp::print(OpAsmPrinter &p) {
   p << ' ';
-  p.printRegion(body(), /*printEntryBlockArgs=*/false);
+  p.printRegion(getBody(), /*printEntryBlockArgs=*/false);
   p.printOptionalAttrDict((*this)->getAttrs());
 }
 
@@ -286,7 +286,7 @@ void LaunchFuncOp::build(OpBuilder &builder, OperationState &result,
   auto kernelSymbol =
       SymbolRefAttr::get(kernelModule.getNameAttr(),
                          {SymbolRefAttr::get(kernelFunc.getNameAttr())});
-  result.addAttribute(getKernelAttrName(), kernelSymbol);
+  result.addAttribute(getKernelAttrName(result.name), kernelSymbol);
   SmallVector<int32_t, 2> segmentSizes(2, 1);
   segmentSizes.front() = asyncDependencies.size();
   segmentSizes.back() = static_cast<int32_t>(kernelOperands.size());
@@ -294,16 +294,20 @@ void LaunchFuncOp::build(OpBuilder &builder, OperationState &result,
                       builder.getDenseI32ArrayAttr(segmentSizes));
 }
 
-unsigned LaunchFuncOp::getNumKernelOperands() { return operands().size(); }
-
 StringAttr LaunchFuncOp::getKernelModuleName() {
-  return kernel().getRootReference();
+  return getKernel().getRootReference();
 }
 
-StringAttr LaunchFuncOp::getKernelName() { return kernel().getLeafReference(); }
+StringAttr LaunchFuncOp::getKernelName() {
+  return getKernel().getLeafReference();
+}
+
+unsigned LaunchFuncOp::getNumKernelOperands() {
+  return getKernelOperands().size();
+}
 
 Value LaunchFuncOp::getKernelOperand(unsigned i) {
-  return getOperand(asyncDependencies().size() + kNumConfigOperands + i);
+  return getKernelOperands()[i];
 }
 
 LogicalResult LaunchFuncOp::verify() {
@@ -316,11 +320,6 @@ LogicalResult LaunchFuncOp::verify() {
     return emitOpError("expected the closest surrounding module to have the '" +
                        SODADialect::getContainerModuleAttrName() +
                        "'attribute");
-
-  auto kernelAttr = (*this)->getAttrOfType<SymbolRefAttr>(getKernelAttrName());
-  if (!kernelAttr)
-    return emitOpError("symbol reference attribute '" + getKernelAttrName() +
-                       "' must be specified");
 
   return success();
 }
@@ -387,7 +386,8 @@ void SODAFuncOp::build(OpBuilder &builder, OperationState &result,
                        ArrayRef<NamedAttribute> attrs) {
   result.addAttribute(SymbolTable::getSymbolAttrName(),
                       builder.getStringAttr(name));
-  result.addAttribute(getTypeAttrName(), TypeAttr::get(type));
+  result.addAttribute(getFunctionTypeAttrName(result.name),
+                      TypeAttr::get(type));
   result.addAttribute(getNumWorkgroupAttributionsAttrName(),
                       builder.getI64IntegerAttr(workgroupAttributions.size()));
   result.addAttributes(attrs);
@@ -459,10 +459,12 @@ ParseResult SODAFuncOp::parse(OpAsmParser &parser, OperationState &result) {
   for (auto &arg : entryArgs)
     argTypes.push_back(arg.type);
   auto type = builder.getFunctionType(argTypes, resultTypes);
-  result.addAttribute(SODAFuncOp::getTypeAttrName(), TypeAttr::get(type));
+  result.addAttribute(getFunctionTypeAttrName(result.name),
+                      TypeAttr::get(type));
 
-  function_interface_impl::addArgAndResultAttrs(builder, result, entryArgs,
-                                                resultAttrs);
+  function_interface_impl::addArgAndResultAttrs(
+      builder, result, entryArgs, resultAttrs, getArgAttrsAttrName(result.name),
+      getResAttrsAttrName(result.name));
 
   // Parse workgroup memory attributions.
   if (failed(parseAttributions(parser, SODAFuncOp::getWorkgroupKeyword(),
@@ -522,19 +524,16 @@ void SODAFuncOp::print(OpAsmPrinter &p) {
     p << ' ' << getKernelKeyword();
 
   function_interface_impl::printFunctionAttributes(
-      p, *this, type.getNumInputs(), type.getNumResults(),
+      p, *this,
       {getNumWorkgroupAttributionsAttrName(),
-       SODADialect::getKernelFuncAttrName()});
+       SODADialect::getKernelFuncAttrName(), getFunctionTypeAttrName(),
+       getArgAttrsAttrName(), getResAttrsAttrName()});
+  p << ' ';
   p.printRegion(getBody(), /*printEntryBlockArgs=*/false);
 }
 
 /// Hook for FunctionLike verifier.
 LogicalResult SODAFuncOp::verifyType() {
-  Type type = getFunctionTypeAttr().getValue();
-  if (!type.isa<FunctionType>())
-    return emitOpError("requires '" + getTypeAttrName() +
-                       "' attribute of function type");
-
   if (isKernel() && getFunctionType().getNumResults() != 0)
     return emitOpError() << "expected void return type for kernel function";
 
@@ -596,14 +595,14 @@ LogicalResult soda::ReturnOp::verify() {
 
   FunctionType funType = function.getFunctionType();
 
-  if (funType.getNumResults() != operands().size())
+  if (funType.getNumResults() != getOperands().size())
     return emitOpError()
         .append("expected ", funType.getNumResults(), " result operands")
         .attachNote(function.getLoc())
         .append("return type declared here");
 
   for (const auto &pair : llvm::enumerate(
-           llvm::zip(function.getFunctionType().getResults(), operands()))) {
+           llvm::zip(function.getFunctionType().getResults(), getOperands()))) {
     auto [type, operand] = pair.value();
     if (type != operand.getType())
       return emitOpError() << "unexpected type `" << operand.getType()

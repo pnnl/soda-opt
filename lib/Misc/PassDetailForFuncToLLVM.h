@@ -31,7 +31,7 @@ class OpenACCDialect;
 } // namespace acc
 
 namespace arith {
-class ArithmeticDialect;
+class ArithDialect;
 } // namespace arith
 
 namespace cf {
