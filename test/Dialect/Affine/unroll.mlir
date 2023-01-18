@@ -25,21 +25,21 @@ func.func @unroll_inner(%A: memref<2x2xf32>, %B: memref<2x2xf32>, %C: memref<2x2
 // CHECK-NEXT:        mulf %{{.*}}, %{{.*}} : f32
 // CHECK-NEXT:        addf %{{.*}}, %{{.*}} : f32
 // CHECK-NEXT:        affine.store %{{.*}}, %{{.*}}[%{{.*}}, %{{.*}}] : memref<2x2xf32>
-// CHECK-NEXT:        affine.apply #map0(%c0)
+// CHECK-NEXT:        affine.apply #{{.*}}(%c0)
 // CHECK-NEXT:        affine.load %{{.*}}[%{{.*}}, %{{.*}}] : memref<2x2xf32>
 // CHECK-NEXT:        affine.load %{{.*}}[%{{.*}}, %{{.*}}] : memref<2x2xf32>
 // CHECK-NEXT:        affine.load %{{.*}}[%{{.*}}, %{{.*}}] : memref<2x2xf32>
 // CHECK-NEXT:        mulf %{{.*}}, %{{.*}} : f32
 // CHECK-NEXT:        addf %{{.*}}, %{{.*}} : f32
 // CHECK-NEXT:        affine.store %{{.*}}, %{{.*}}[%{{.*}}, %{{.*}}] : memref<2x2xf32>
-// CHECK-NEXT:        affine.apply #map1(%c0)
+// CHECK-NEXT:        affine.apply #{{.*}}(%c0)
 // CHECK-NEXT:        affine.load %{{.*}}[%{{.*}}, %{{.*}}] : memref<2x2xf32>
 // CHECK-NEXT:        affine.load %{{.*}}[%{{.*}}, %{{.*}}] : memref<2x2xf32>
 // CHECK-NEXT:        affine.load %{{.*}}[%{{.*}}, %{{.*}}] : memref<2x2xf32>
 // CHECK-NEXT:        mulf %{{.*}}, %{{.*}} : f32
 // CHECK-NEXT:        addf %{{.*}}, %{{.*}} : f32
 // CHECK-NEXT:        affine.store %{{.*}}, %{{.*}}[%{{.*}}, %{{.*}}] : memref<2x2xf32>
-// CHECK-NEXT:        affine.apply #map2(%c0)
+// CHECK-NEXT:        affine.apply #{{.*}}(%c0)
 // CHECK-NEXT:        affine.load %{{.*}}[%{{.*}}, %{{.*}}] : memref<2x2xf32>
 // CHECK-NEXT:        affine.load %{{.*}}[%{{.*}}, %{{.*}}] : memref<2x2xf32>
 // CHECK-NEXT:        affine.load %{{.*}}[%{{.*}}, %{{.*}}] : memref<2x2xf32>

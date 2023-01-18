@@ -7,8 +7,6 @@
 //===----------------------------------------------------------------------===//
 // This file was modified based on:
 //  llvm-project/mlir/lib/Conversion/FuncToLLVM/FuncToLLVM.cpp
-// Adding the functionality to create loop tiling passes based on a static
-// number instead of size in KiB
 //
 // This file implements a pass to convert MLIR standard and builtin dialects
 // into the LLVM IR dialect.
@@ -18,8 +16,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "PassDetailForFuncToLLVM.h"
-#include "soda/Misc/Passes.h"
+#include "soda/Conversion/CustomFuncToLLVM/ConvertCustomFuncToLLVMPass.h"
 
 #include "mlir/Analysis/DataLayoutAnalysis.h"
 #include "mlir/Conversion/ArithToLLVM/ArithToLLVM.h"
@@ -33,13 +30,18 @@
 #include "mlir/Pass/Pass.h"
 #include "mlir/Transforms/Passes.h"
 
+namespace mlir {
+#define GEN_PASS_DEF_CONVERTFUNCTOLLVM
+#include "mlir/Conversion/Passes.h.inc"
+} // namespace mlir
+
 using namespace mlir;
 
 #define PASS_NAME "soda-convert-func-to-llvm"
 
 namespace {
 /// A pass converting MLIR operations into the LLVM IR dialect.
-struct LLVMLoweringPass : public ConvertFuncToLLVMBase<LLVMLoweringPass> {
+struct LLVMLoweringPass : public impl::ConvertFuncToLLVMBase<LLVMLoweringPass> {
   LLVMLoweringPass() = default;
 
   LLVMLoweringPass(bool useBarePtrCallConv) {

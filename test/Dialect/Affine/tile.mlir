@@ -16,11 +16,11 @@ func.func @tile(%A: memref<4x4xf32>, %B: memref<4x4xf32>, %C: memref<4x4xf32>) -
   return %C : memref<4x4xf32>
 }
 
-// CHECK:       #map0 = affine_map<(d0) -> (d0)>
-// CHECK-NEXT:  #map1 = affine_map<(d0) -> (d0 + 2)>
+// CHECK:       #[[vmap0:.*]] = affine_map<(d0) -> (d0)>
+// CHECK-NEXT:  #[[vmap1:.*]] = affine_map<(d0) -> (d0 + 2)>
 // CHECK:       affine.for %{{.*}} = 0 to 4 step 2
 // CHECK-NEXT:    affine.for %{{.*}} = 0 to 4 step 2
 // CHECK-NEXT:      affine.for %{{.*}} = 0 to 4 step 2
-// CHECK-NEXT:        affine.for %{{.*}} = #map0(%arg3) to #map1(%arg3)
-// CHECK-NEXT:          affine.for %{{.*}} = #map0(%arg4) to #map1(%arg4)
-// CHECK-NEXT:            affine.for %{{.*}} = #map0(%arg5) to #map1(%arg5)
+// CHECK-NEXT:        affine.for %{{.*}} = #[[vmap0]](%arg3) to #[[vmap1]](%arg3)
+// CHECK-NEXT:          affine.for %{{.*}} = #[[vmap0]](%arg4) to #[[vmap1]](%arg4)
+// CHECK-NEXT:            affine.for %{{.*}} = #[[vmap0]](%arg5) to #[[vmap1]](%arg5)

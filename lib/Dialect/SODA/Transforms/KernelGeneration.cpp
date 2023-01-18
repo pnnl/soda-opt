@@ -73,7 +73,7 @@ void SodaKernelGenerationPass::runOnOperation() {
     }
 
     BlockAndValueMapping map;
-    sodaOp.getBody()->cloneInto(&(mop.getRegion()), map);
+    sodaOp.getRegion().cloneInto(&(mop.getRegion()), map);
     sodaOp.erase();
 
     modified = true;

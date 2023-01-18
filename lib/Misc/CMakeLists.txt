@@ -6,7 +6,6 @@ add_mlir_dialect_library(SODAMisc
     MemrefEraseDealloc.cpp
     ForwardMemrefAlloc.cpp
     ForwardLinalgOps.cpp
-    FuncToLLVM.cpp
 
     ADDITIONAL_HEADER_DIRS
     ${PROJECT_SOURCE_DIR}/include/
@@ -14,7 +13,7 @@ add_mlir_dialect_library(SODAMisc
     DEPENDS
     MLIRSODAMiscPassesIncGen
 
-	LINK_LIBS PUBLIC
-	MLIRIR
+    LINK_LIBS PUBLIC
+    MLIRIR
     MLIRPass
-	)
+)

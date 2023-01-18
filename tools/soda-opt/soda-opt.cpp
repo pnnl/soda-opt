@@ -22,30 +22,25 @@
 #include "soda/Misc/Passes.h"
 #include "soda/Misc/Pipelines.h"
 
-#include "mlir/Dialect/MemRef/Transforms/Passes.h"
 #include "mlir/Dialect/Affine/Passes.h"
-#include "mlir/Dialect/Linalg/Passes.h"
 #include "mlir/Dialect/Arith/Transforms/Passes.h"
 #include "mlir/Dialect/Func/Transforms/Passes.h"
+#include "mlir/Dialect/Linalg/Passes.h"
+#include "mlir/Dialect/MemRef/Transforms/Passes.h"
 
 // Defined in the test directory, no public header.
 namespace mlir {
 void registerTestLoopPermutationPass();
 namespace test {
-
-int registerTestLinalgCodegenStrategy();
+void registerTestLinalgTransforms();
 } // namespace test
 } // namespace mlir
 
 // Register important linalg passes
 inline void registerLinalgPassesForSoda() {
 
-  // TODO: MLIR removed the promotion pass. Expose it to the command line.
-  // mlir::registerLinalgPromotionPass();
-  // Test passes
-  // mlir::test::registerTestLinalgCodegenStrategy();
-
   mlir::registerLinalgPasses();
+  mlir::test::registerTestLinalgTransforms();
 }
 
 // Register important affine passes
@@ -83,12 +78,12 @@ int main(int argc, char **argv) {
   // mlir::registerConvertLinalgToLLVMPass(); // This pass maps linalg to blas
   mlir::registerLinalgLowerToAffineLoopsPass();
   mlir::registerConvertFuncToLLVMPass();
-  mlir::registerConvertMemRefToLLVMPass();
+  mlir::registerMemRefToLLVMConversionPass();
   mlir::registerSCFToControlFlowPass();
   mlir::registerConvertAffineToStandardPass();
   mlir::registerConvertMathToLLVMPass();
   mlir::registerConvertMathToLibmPass();
-  mlir::registerConvertArithToLLVMPass();
+  mlir::registerArithToLLVMConversionPass();
   mlir::arith::registerArithExpandOpsPass();
   mlir::memref::registerExpandOpsPass();
   mlir::registerReconcileUnrealizedCastsPass();

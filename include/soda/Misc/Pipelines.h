@@ -128,7 +128,8 @@ struct OptForBambuOptions : public PassPipelineOptions<OptForBambuOptions> {
       llvm::cl::init(false)};
 };
 
-struct OptForVitisHLSOptions : public PassPipelineOptions<OptForVitisHLSOptions> {
+struct OptForVitisHLSOptions
+    : public PassPipelineOptions<OptForVitisHLSOptions> {
   Option<uint64_t> tileSize{
       *this, "affine-tile-size",
       llvm::cl::desc("Set the unified tiled size, used for all affine.for ops. "
@@ -217,11 +218,11 @@ void registerPassManagerMiscPass() {
         pm.addPass(createConvertSCFToCFPass());
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass()); // Only has impact outside linalg ops
-        pm.addPass(createMemRefToLLVMPass());
+        pm.addPass(createMemRefToLLVMConversionPass());
         pm.addPass(createConvertMathToLLVMPass());
         pm.addPass(createConvertMathToLibmPass());
         pm.addPass(arith::createArithExpandOpsPass());
-        pm.addPass(arith::createConvertArithToLLVMPass());
+        pm.addPass(createArithToLLVMConversionPass());
         pm.addPass(memref::createExpandOpsPass());
         if (options.useBarePtrCallConv) {
           pm.addPass(createCustomFuncToLLVMPass(options.useBarePtrCallConv));
@@ -251,9 +252,9 @@ void registerSimpleLoweringPass() {
         pm.addPass(createConvertMathToLLVMPass());
         pm.addPass(createConvertMathToLibmPass());
         pm.addPass(arith::createArithExpandOpsPass());
-        pm.addPass(arith::createConvertArithToLLVMPass());
+        pm.addPass(createArithToLLVMConversionPass());
         pm.addPass(memref::createExpandOpsPass());
-        pm.addPass(createMemRefToLLVMPass());
+        pm.addPass(createMemRefToLLVMConversionPass());
         if (options.useBarePtrCallConv) {
           pm.addPass(createCustomFuncToLLVMPass(options.useBarePtrCallConv));
         } else {
@@ -322,11 +323,11 @@ void registerOptimizedForBambuPass() {
         pm.addPass(createConvertSCFToCFPass());
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass());
-        pm.addPass(createMemRefToLLVMPass());
+        pm.addPass(createMemRefToLLVMConversionPass());
         pm.addPass(createConvertMathToLLVMPass());
         pm.addPass(createConvertMathToLibmPass());
         pm.addPass(arith::createArithExpandOpsPass());
-        pm.addPass(arith::createConvertArithToLLVMPass());
+        pm.addPass(createArithToLLVMConversionPass());
         pm.addPass(memref::createExpandOpsPass());
         if (options.useBarePtrCallConv) {
           pm.addPass(createCustomFuncToLLVMPass(options.useBarePtrCallConv));
@@ -397,11 +398,11 @@ void registerOptimizedForVitisHLSPass() {
         pm.addPass(createConvertSCFToCFPass());
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass());
-        pm.addPass(createMemRefToLLVMPass());
+        pm.addPass(createMemRefToLLVMConversionPass());
         pm.addPass(createConvertMathToLLVMPass());
         pm.addPass(createConvertMathToLibmPass());
         pm.addPass(arith::createArithExpandOpsPass());
-        pm.addPass(arith::createConvertArithToLLVMPass());
+        pm.addPass(createArithToLLVMConversionPass());
         pm.addPass(memref::createExpandOpsPass());
         if (options.useBarePtrCallConv || options.emitCWrappers) {
           pm.addPass(createCustomFuncToLLVMPass(options.useBarePtrCallConv));

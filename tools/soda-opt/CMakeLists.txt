@@ -5,8 +5,8 @@ get_property(conversion_libs GLOBAL PROPERTY MLIR_CONVERSION_LIBS)
 
 # message(PUBLIC "${dialect_libs}")
 # message(PUBLIC "${conversion_libs}")
-
 set(LIBS
+
   # ${dialect_libs}
   # ${conversion_libs}
 
@@ -14,17 +14,17 @@ set(LIBS
   MLIRIR
   MLIRTransforms
   MLIROptLib
-  
+
   # Dialects
   MLIRLLVMDialect
   MLIRLinalgDialect
   MLIRMemRefDialect
   MLIRAffineDialect
-  MLIRArithmeticDialect
+  MLIRArithDialect
   MLIRMathDialect
   MLIRFuncDialect
   MLIRSCFDialect
- 
+
   # Transforms
   MLIRFuncTransforms
   MLIRLinalgTransforms
@@ -36,20 +36,21 @@ set(LIBS
   # Test Passes
   MLIRLinalgTestPasses
   MLIRAffineTransformsTestPasses
-  
+
   # Conversion
   MLIRAffineToStandard
   MLIRSCFToControlFlow
   MLIRMemRefToLLVM
   MLIRMathToLLVM
   MLIRMathToLibm
-  MLIRArithmeticToLLVM
+  MLIRArithToLLVM
   MLIRFuncToLLVM
   MLIRLinalgToLLVM
   MLIRLinalgToStandard
 
   # Conversion SODA
   SODAKERNELToSODA
+  SODAFuncToLLVM
 
   # SODA
   SODAMisc
