@@ -5,8 +5,8 @@ mlir-opt \
   -pass-pipeline="any( tosa-to-arith, tosa-to-linalg-named, tosa-to-linalg)" \
   --canonicalize \
   -convert-tensor-to-linalg \
-  -linalg-init-tensor-to-alloc-tensor \
-  -eliminate-alloc-tensors \
+  -empty-tensor-to-alloc-tensor \
+  -eliminate-empty-tensors \
   -linalg-bufferize -arith-bufferize \
   -tensor-bufferize -func-bufferize \
   -finalizing-bufferize -buffer-deallocation \
