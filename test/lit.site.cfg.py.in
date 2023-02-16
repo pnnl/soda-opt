@@ -2,6 +2,8 @@
 
 import sys
 
+# TODO: Check if this can be simplified: llvm-project/mlir/examples/standalone/test/lit.site.cfg.py.in
+
 config.host_triple = "@LLVM_HOST_TRIPLE@"
 config.target_triple = "@TARGET_TRIPLE@"
 config.llvm_src_root = "@LLVM_SOURCE_DIR@"
