@@ -2,11 +2,11 @@
 
 Part of the *SODA Synthesizer: Accelerating Data Science Applications with an end-to-end Silicon Compiler* toturial in the HPCA2023 conference: 
 
-* [Tutorial website - TODO](https://hpca-conf.org/2023/workshop-tutorial/)
+* [Tutorial website](https://hpc.pnl.gov/SODA/tutorials/2023/HPCA.html/)
 
 
-* Presentation date: Sunday, Feb 25, 2023
-* Time: 9:00 AM to 12 PM (EST)
+* Presentation date: Sunday, Feb 26, 2023
+* Time: 8:15 AM to 12:20 PM (EST)
 
 In this section you will learn how to use our compiler frontend to perform hardware software partitioning of high-level applications and automatic optimization of selected kernels.
 

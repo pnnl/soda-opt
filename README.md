@@ -220,9 +220,26 @@ two mechanisms:
 
 # Publications
 
-[IEEE Micro 2022 (Early Access)](https://ieeexplore.ieee.org/abstract/document/9786533)
+[ICCAD 2022](https://dl.acm.org/doi/abs/10.1145/3508352.3549424)
+[IEEE Micro 2022)](https://ieeexplore.ieee.org/abstract/document/9786533)
 
 ```
+@inproceedings{10.1145/3508352.3549424,
+  author = {Bohm Agostini, Nicolas and Curzel, Serena and Amatya, Vinay and Tan, Cheng and Minutoli, Marco and Castellana, Vito Giovanni and Manzano, Joseph and Kaeli, David and Tumeo, Antonino},
+  title = {An MLIR-Based Compiler Flow for System-Level Design and Hardware Acceleration},
+  year = {2022},
+  isbn = {9781450392174},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  doi = {10.1145/3508352.3549424},
+  booktitle = {Proceedings of the 41st IEEE/ACM International Conference on Computer-Aided Design},
+  articleno = {6},
+  numpages = {9},
+  keywords = {high-level optimizations, compilers, MLIR, HLS},
+  location = {San Diego, California},
+  series = {ICCAD '22}
+}
+
 @ARTICLE{9786533,
   author={Bohm Agostini, Nicolas and Curzel, Serena and Zhang, Jeff and Limaye, Ankur and Tan, Cheng and Amatya, Vinay and Minutoli, Marco and Castellana, Vito Giovanni and Manzano, Joseph and Brooks, David and Wei, Gu-Yeon and Tumeo, Antonino},
   journal={IEEE Micro}, 
