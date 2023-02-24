@@ -2,7 +2,7 @@
 
 Part of the *SODA Synthesizer: Accelerating Data Science Applications with an end-to-end Silicon Compiler* toturial in the HPCA2023 conference: 
 
-* [Tutorial website](https://hpc.pnl.gov/SODA/tutorials/2023/HPCA.html/)
+* [Tutorial website](https://hpc.pnl.gov/SODA/tutorials/2023/HPCA.html)
 
 
 * Presentation date: Sunday, Feb 26, 2023
