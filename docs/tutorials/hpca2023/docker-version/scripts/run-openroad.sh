@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -e
+set -o pipefail
+
 BAMBUDIR=output/$1
 pushd $BAMBUDIR
 

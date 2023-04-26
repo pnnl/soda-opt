@@ -59,7 +59,7 @@ public:
     if (!func) {
 
       // Get callee
-      Operation *kernelFunc = module.lookupSymbol(op.kernelAttr());
+      Operation *kernelFunc = module.lookupSymbol(op.getKernelAttr());
       auto kernelSODAFunction = dyn_cast_or_null<soda::SODAFuncOp>(kernelFunc);
 
       // Add a private function with same prototype on the top of parent module

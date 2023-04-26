@@ -39,9 +39,9 @@ void LinalgToSodaConverter::createLaunch(T rootLinalgOp) {
   // Create a launch op and move target op into the region
   Location loc = rootLinalgOp.getLoc();
   auto launchOp = builder.create<soda::LaunchOp>(loc);
-  builder.setInsertionPointToEnd(&launchOp.body().front());
+  builder.setInsertionPointToEnd(&launchOp.getBody().front());
   builder.create<soda::TerminatorOp>(loc);
-  builder.setInsertionPointToStart(&launchOp.body().front());
+  builder.setInsertionPointToStart(&launchOp.getBody().front());
 
   // Clone the linalg op.
   auto *newOp = Operation::create(

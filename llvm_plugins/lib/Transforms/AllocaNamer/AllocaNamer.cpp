@@ -5,7 +5,9 @@
 #include "llvm/IR/Type.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/raw_ostream.h"
-#include "llvm/Transforms/IPO/PassManagerBuilder.h"
+
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Passes/PassPlugin.h"
 
 using namespace llvm;
 
@@ -36,14 +38,9 @@ struct AllocaNamerPass : public FunctionPass {
 }; // end of struct AllocaNamerPass
 } // end of anonymous namespace
 
+/* Legacy PM Registration */
 char AllocaNamerPass::ID = 0;
 static RegisterPass<AllocaNamerPass>
     X("name-allocas-for-xml-gen",
       "Assign metadata representing names for memory allocation operations.",
       false /* Only looks at CFG */, false /* Analysis Pass */);
-
-static RegisterStandardPasses Y(PassManagerBuilder::EP_EarlyAsPossible,
-                                [](const PassManagerBuilder &Builder,
-                                   legacy::PassManagerBase &PM) {
-                                  PM.add(new AllocaNamerPass());
-                                });

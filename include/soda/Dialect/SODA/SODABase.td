@@ -82,24 +82,22 @@ def SODA_AsyncOpInterface : OpInterface<"AsyncOpInterface"> {
       }],
       "OperandRange", "getAsyncDependencies", (ins), [{}], [{
         ConcreteOp op = cast<ConcreteOp>(this->getOperation());
-        return op.asyncDependencies();
+        return op.getAsyncDependencies();
       }]
     >,
     InterfaceMethod<[{
-        Adds a new token to the list of async dependencies.
+        Adds a new token to the list of async dependencies if it is not already there.
       }],
       "void", "addAsyncDependency", (ins "Value":$token),
       [{}], [{
-        ::mlir::soda::addAsyncDependency(this->getOperation(), token);
+        if (!::llvm::is_contained(this->getAsyncDependencies(), token))
+          ::mlir::soda::addAsyncDependency(this->getOperation(), token);
       }]
     >,
     InterfaceMethod<[{
         Query the result that represents the async token to depend on.
       }],
-      "OpResult", "getAsyncToken", (ins), [{}], [{
-        ConcreteOp op = cast<ConcreteOp>(this->getOperation());
-        return op.asyncToken().template dyn_cast_or_null<OpResult>();
-      }]
+      "Value", "getAsyncToken"
     >
   ];
 }

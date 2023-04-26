@@ -71,21 +71,6 @@ std::unique_ptr<OperationPass<func::FuncOp>>
 createAffineLoopPermutationPass(const ArrayRef<unsigned> &permList);
 
 //===----------------------------------------------------------------------===//
-// Lowerings
-//===----------------------------------------------------------------------===//
-
-// TODO: Move this pass out of the Misc directory into the Conversion directory
-/// Perform lowering from std operations to LLVM dialect.
-/// Exposing the options of barePtrCallConv or emitCWrappers without the need
-/// to know the mlir context during pass (pipeline) creation. MLIR context is
-/// obtained at runtime.
-///
-/// This pass is based on:
-///    llvm-project/mlir/lib/Conversion/FuncToLLVM/FuncToLLVM.cpp
-std::unique_ptr<OperationPass<ModuleOp>>
-createCustomFuncToLLVMPass(bool useBarePtrCallConv);
-
-//===----------------------------------------------------------------------===//
 // Register passes
 //===----------------------------------------------------------------------===//
 

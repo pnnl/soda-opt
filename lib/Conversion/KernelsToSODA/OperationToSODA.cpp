@@ -37,9 +37,9 @@ void OperationToSodaConverter::createLaunch(Operation *rootOp) {
   // Create a launch op and move target op into the region
   Location loc = rootOp->getLoc();
   auto launchOp = builder.create<soda::LaunchOp>(loc);
-  builder.setInsertionPointToEnd(&launchOp.body().front());
+  builder.setInsertionPointToEnd(&launchOp.getBody().front());
   builder.create<soda::TerminatorOp>(loc);
-  builder.setInsertionPointToStart(&launchOp.body().front());
+  builder.setInsertionPointToStart(&launchOp.getBody().front());
 
   // Clone the op.
   auto *newOp = Operation::create(

@@ -7,9 +7,10 @@
 #include "llvm/IR/Type.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/raw_ostream.h"
-#include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include <fcntl.h>
 
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Passes/PassPlugin.h"
 #include "llvm/Support/CommandLine.h"
 
 // completely arbitrary, will need something that makes sense eventually
@@ -92,7 +93,8 @@ struct XMLWriterPass : public ModulePass {
                 uint64_t total_size = 0;
                 uint64_t array_size = 0;
                 DataLayout *d = new DataLayout(&M);
-                if (cast<AllocaInst>(*I).getAllocationSizeInBits(*d) == None) {
+                if (cast<AllocaInst>(*I).getAllocationSizeInBits(*d) ==
+                    std::nullopt) {
                   Value *v = cast<AllocaInst>(*I).getArraySize();
                   Value *first_op = dyn_cast<ConstantExpr>(v)->getOperand(0);
                   Value *first_op_second_op =
@@ -120,6 +122,7 @@ struct XMLWriterPass : public ModulePass {
     return false;
   }
 }; // end of struct Namer
+} // end of anonymous namespace
 
 char XMLWriterPass::ID = 0;
 static RegisterPass<XMLWriterPass>
@@ -127,11 +130,3 @@ static RegisterPass<XMLWriterPass>
       "Generates an XML file for bambu that allocates memory instructions to "
       "internal and external storage.",
       true /* Only looks at CFG */, true /* Analysis Pass */);
-
-static RegisterStandardPasses Y(PassManagerBuilder::EP_EarlyAsPossible,
-                                [](const PassManagerBuilder &Builder,
-                                   legacy::PassManagerBase &PM) {
-                                  PM.add(new XMLWriterPass());
-                                });
-
-} // end of anonymous namespace

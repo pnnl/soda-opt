@@ -6,6 +6,7 @@
 
 #include "Utils.h"
 
+#include "llvm/ADT/Optional.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/Analysis/LoopInfo.h"
 #include "llvm/IR/Constants.h"
@@ -134,7 +135,7 @@ struct StripInvalidAttributes : public ModulePass {
       F.removeFnAttr(Attribute::AttrKind::Speculatable);
       F.removeFnAttr(Attribute::AttrKind::WillReturn);
       F.removeFnAttr(Attribute::AttrKind::ImmArg);
-      for (auto &P : F.args()){
+      for (auto &P : F.args()) {
         P.removeAttr(Attribute::AttrKind::ImmArg);
         P.removeAttr(Attribute::AttrKind::NoUndef);
       }
@@ -262,7 +263,7 @@ static void unrollLoop(Loop *loop, int alreadyUnrolled, int maxUnrolled,
 
     // Reserve operand 0 for loop id self reference.
     LLVMContext &Context = loop->getHeader()->getContext();
-    auto TempNode = MDNode::getTemporary(Context, None);
+    auto TempNode = MDNode::getTemporary(Context, std::nullopt);
     Args.push_back(TempNode.get());
 
     // Keep the original loop metadata
@@ -361,7 +362,7 @@ struct XilinxArrayPartitionPass : public ModulePass {
     mod->getOrInsertFunction("llvm.sideeffect",
                              FunctionType::get(voidTy, {}, false));
     auto arrayPartitionFunc = mod->getFunction("llvm.sideeffect");
-    arrayPartitionFunc->addFnAttr(llvm::Attribute::InaccessibleMemOnly);
+    arrayPartitionFunc->addFnAttr(llvm::Attribute::Memory);
     arrayPartitionFunc->addFnAttr(llvm::Attribute::NoUnwind);
 
     for (auto &F : M)
@@ -555,31 +556,33 @@ static void generateXlnTBTcl(Function &F, StringRef fileName,
            << "set_top " << F.getName().str() << "\n"
            << "open_solution -reset solution1\n"
            << "set_part " << getTargetBoard() << "\n"
-           << "create_clock -period " << std::to_string(getClockPeriod()) << "\n"
+           << "create_clock -period " << std::to_string(getClockPeriod())
+           << "\n"
            //  << "config_compile -pipeline_loops 16\n"
            << '\n';
 
-  //for (unsigned i = 0; i < F.arg_size(); i++) {
-  //  auto arg = F.getArg(i);
-  //  if (isPointerToArray(arg->getType())) {
-  //    auto arrayTy =
-  //        dyn_cast<ArrayType>(arg->getType()->getPointerElementType());
-  //    if (arrayPartitionEnabled) {
-  //      auto partitions = getArrayDimensionInfo(arrayTy);
-  //      // dbgs() << "Partition size: " << partitions.size() << '\n';
-  //      if (partitions.size() != 1) { // won't handle 1-dim array
-  //        if (arrayPartitionFlattened)
-  //          partitions.pop_back_n(partitions.size() - 1);
-  //        else {
-  //          assert(
-  //              partitions.size() % 2 == 0 &&
-  //              "The number of dims should be divisble by 2 if the partition "
-  //              "dims are not flattened");
-  //          partitions.pop_back_n(partitions.size() / 2);
-  //        }
-//
+  // for (unsigned i = 0; i < F.arg_size(); i++) {
+  //   auto arg = F.getArg(i);
+  //   if (isPointerToArray(arg->getType())) {
+  //     auto arrayTy =
+  //         dyn_cast<ArrayType>(arg->getType()->getPointerElementType());
+  //     if (arrayPartitionEnabled) {
+  //       auto partitions = getArrayDimensionInfo(arrayTy);
+  //       // dbgs() << "Partition size: " << partitions.size() << '\n';
+  //       if (partitions.size() != 1) { // won't handle 1-dim array
+  //         if (arrayPartitionFlattened)
+  //           partitions.pop_back_n(partitions.size() - 1);
+  //         else {
+  //           assert(
+  //               partitions.size() % 2 == 0 &&
+  //               "The number of dims should be divisble by 2 if the partition
+  //               " "dims are not flattened");
+  //           partitions.pop_back_n(partitions.size() / 2);
+  //         }
+  //
   //        for (auto partition : partitions)
-  //          XlnTBTcl << "set_directive_array_partition -dim " << partition.first
+  //          XlnTBTcl << "set_directive_array_partition -dim " <<
+  //          partition.first
   //                   << " -factor " << partition.second << " -type block \""
   //                   << getXlnTop() << "\" " << arg->getName() << "\n";
   //      }
@@ -589,17 +592,15 @@ static void generateXlnTBTcl(Function &F, StringRef fileName,
   //  }
   //}
 
-  XlnTBTcl << "set ::LLVM_CUSTOM_OPT "
-           << getXlnFEPath()
+  XlnTBTcl << "set ::LLVM_CUSTOM_OPT " << getXlnFEPath()
            << "/hls-build/bin/opt\n"
-           << "set ::LLVM_CUSTOM_CMD {$LLVM_CUSTOM_OPT "
-           << getXlnLLVMIn()
+           << "set ::LLVM_CUSTOM_CMD {$LLVM_CUSTOM_OPT " << getXlnLLVMIn()
            << " -o $LLVM_CUSTOM_OUTPUT}\n"
            //  << "config_bind -effort high\n"
            << "csynth_design\n"
            << "cosim_design\n";
-           //<< "config_export -version 2.0.1\n"
-  if(!getSimulationOnly()){
+  //<< "config_export -version 2.0.1\n"
+  if (!getSimulationOnly()) {
     XlnTBTcl << "export_design -format syn_dcp -flow impl\n";
   }
 }
@@ -637,7 +638,7 @@ static void nameLoop(Loop *loop, int &loopCounter) {
 
   // Reserve operand 0 for loop id self reference.
   LLVMContext &Context = loop->getHeader()->getContext();
-  auto TempNode = MDNode::getTemporary(Context, None);
+  auto TempNode = MDNode::getTemporary(Context, std::nullopt);
   Args.push_back(TempNode.get());
 
   // Loop name

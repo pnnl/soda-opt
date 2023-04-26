@@ -27,11 +27,11 @@ func.func @forward_allocations() {
 }
 
 // CHECK-LABEL: func.func @forward_allocations 
-// CHECK-NEXT:  %0 = memref.alloc() : memref<4x1xf32>
-// CHECK-NEXT:  %1 = memref.alloc() : memref<4x2xf32>
-// CHECK-NEXT:  %2 = memref.alloc() : memref<4x3xf32>
-// CHECK-NEXT:  %3 = memref.alloca() : memref<4x4xf32>
-// CHECK-NEXT:  call @do_something1(%0) : (memref<4x1xf32>) -> ()
-// CHECK-NEXT:  call @do_something2(%1) : (memref<4x2xf32>) -> ()
-// CHECK-NEXT:  call @do_something4(%3) : (memref<4x4xf32>) -> ()
-// CHECK-NEXT:  call @do_something3(%2) : (memref<4x3xf32>) -> ()
+// CHECK-NEXT:  %[[v0:.*]] = memref.alloc() : memref<4x1xf32>
+// CHECK-NEXT:  %[[v1:.*]] = memref.alloc() : memref<4x2xf32>
+// CHECK-NEXT:  %[[v2:.*]] = memref.alloc() : memref<4x3xf32>
+// CHECK-NEXT:  %[[v3:.*]] = memref.alloca() : memref<4x4xf32>
+// CHECK-NEXT:  call @do_something1(%[[v0]]) : (memref<4x1xf32>) -> ()
+// CHECK-NEXT:  call @do_something2(%[[v1]]) : (memref<4x2xf32>) -> ()
+// CHECK-NEXT:  call @do_something4(%[[v3]]) : (memref<4x4xf32>) -> ()
+// CHECK-NEXT:  call @do_something3(%[[v2]]) : (memref<4x3xf32>) -> ()

@@ -3,4 +3,4 @@ add_llvm_library(AllocaNamer MODULE
 
   PLUGIN_TOOL
   opt
-  )
+)

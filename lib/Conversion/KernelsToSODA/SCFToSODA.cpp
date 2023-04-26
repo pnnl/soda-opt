@@ -44,14 +44,14 @@ void AffineLoopToSodaConverter::createLaunch(AffineForOp rootForOp) {
   // launch op.
   Location loc = rootForOp.getLoc();
   auto launchOp = builder.create<soda::LaunchOp>(loc);
-  builder.setInsertionPointToEnd(&launchOp.body().front());
+  builder.setInsertionPointToEnd(&launchOp.getBody().front());
   builder.create<soda::TerminatorOp>(loc);
-  builder.setInsertionPointToStart(&launchOp.body().front());
+  builder.setInsertionPointToStart(&launchOp.getBody().front());
 
   // Copy root loop and its operations into the soda launch function
   auto &ops = rootForOp.getBody()->getOperations();
-  launchOp.body().front().getOperations().splice(
-      launchOp.body().front().begin(), ops, Block::iterator(rootForOp));
+  launchOp.getBody().front().getOperations().splice(
+      launchOp.getBody().front().begin(), ops, Block::iterator(rootForOp));
 }
 
 static LogicalResult convertAffineLoopNestToSODALaunch(AffineForOp forOp) {
@@ -78,14 +78,14 @@ void SCFLoopToSodaConverter::createLaunch(scf::ForOp rootForOp) {
   // launch op.
   Location loc = rootForOp.getLoc();
   auto launchOp = builder.create<soda::LaunchOp>(loc);
-  builder.setInsertionPointToEnd(&launchOp.body().front());
+  builder.setInsertionPointToEnd(&launchOp.getBody().front());
   builder.create<soda::TerminatorOp>(loc);
-  builder.setInsertionPointToStart(&launchOp.body().front());
+  builder.setInsertionPointToStart(&launchOp.getBody().front());
 
   // Copy root loop and its operations into the soda launch function
   auto &ops = rootForOp.getBody()->getOperations();
-  launchOp.body().front().getOperations().splice(
-      launchOp.body().front().begin(), ops, Block::iterator(rootForOp));
+  launchOp.getBody().front().getOperations().splice(
+      launchOp.getBody().front().begin(), ops, Block::iterator(rootForOp));
 }
 
 static LogicalResult convertSCFLoopNestToSODALaunch(scf::ForOp forOp) {

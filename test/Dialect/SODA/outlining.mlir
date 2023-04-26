@@ -196,7 +196,7 @@ func.func @recursive_device_function() {
 // CHECK:     llvm.mlir.addressof @global : !llvm.ptr<i64>
 // CHECK:     soda.return
 //
-// CHECK:   llvm.mlir.global internal @global(42 : i64) : i64
+// CHECK:   llvm.mlir.global internal @global(42 : i64)
 //
 // CHECK:   func.func @device_function()
 // CHECK:   func.func @recursive_device_function()

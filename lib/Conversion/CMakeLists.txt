@@ -1,1 +1,2 @@
 add_subdirectory(KernelsToSODA)
+add_subdirectory(CustomFuncToLLVM)

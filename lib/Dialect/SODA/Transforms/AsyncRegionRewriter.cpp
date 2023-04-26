@@ -54,9 +54,11 @@ struct SodaAsyncRegionPass::Callback {
       return rewriteAsyncOp(asyncOp); // Replace SODA op with async version.
     if (!currentToken)
       return success();
-    if (!op->hasTrait<OpTrait::IsTerminator>() &&
-        MemoryEffectOpInterface::hasNoEffect(op))
-      return success();
+
+    // TODO: MemoryEffectOpInterface::hasNoEffect is not static
+    // if (!op->hasTrait<OpTrait::IsTerminator>() &&
+    //     MemoryEffectOpInterface::hasNoEffect(op))
+    //   return success();
     // Insert host synchronization before terminator or op with side effects.
     currentToken = createWaitOp(op->getLoc(), Type(), {currentToken});
     return success();
@@ -96,7 +98,8 @@ struct SodaAsyncRegionPass::Callback {
   }
 
   Value createWaitOp(Location loc, Type resultType, ValueRange operands) {
-    return builder.create<soda::WaitOp>(loc, resultType, operands).asyncToken();
+    return builder.create<soda::WaitOp>(loc, resultType, operands)
+        .getAsyncToken();
   }
 
   OpBuilder builder;

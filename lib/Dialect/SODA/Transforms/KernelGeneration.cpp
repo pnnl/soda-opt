@@ -73,7 +73,7 @@ void SodaKernelGenerationPass::runOnOperation() {
     }
 
     BlockAndValueMapping map;
-    sodaOp.body().cloneInto(&(mop.getRegion()), map);
+    sodaOp.getRegion().cloneInto(&(mop.getRegion()), map);
     sodaOp.erase();
 
     modified = true;
@@ -98,7 +98,7 @@ void SodaKernelGenerationPass::runOnOperation() {
     func::FuncOp dstFunc = replacer.create<func::FuncOp>(
         funcOp.getLoc(), funcOp.getName(), funcOp.getFunctionType());
 
-    dstFunc.getRegion().takeBody(funcOp.body());
+    dstFunc.getRegion().takeBody(funcOp.getBody());
     funcOp.erase();
 
     // Set all memref arguments to noalias

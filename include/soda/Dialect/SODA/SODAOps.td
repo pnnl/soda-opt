@@ -42,7 +42,7 @@ def SODA_Dimension : I32EnumAttr<"Dimension",
 def SODA_DimensionAttr : EnumAttr<SODA_Dialect, SODA_Dimension, "dim">;
 
 class SODA_IndexOp<string mnemonic, list<Trait> traits = []> :
-    SODA_Op<mnemonic, !listconcat(traits, [NoSideEffect])>,
+    SODA_Op<mnemonic, !listconcat(traits, [Pure])>,
     Arguments<(ins StrAttr:$dimension)>, Results<(outs Index)> {
 }
 
@@ -107,7 +107,9 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
     attribution.
   }];
 
-  let arguments = (ins TypeAttrOf<FunctionType>:$function_type);
+  let arguments = (ins TypeAttrOf<FunctionType>:$function_type,
+                       OptionalAttr<DictArrayAttr>:$arg_attrs,
+                       OptionalAttr<DictArrayAttr>:$res_attrs);
   let regions = (region AnyRegion:$body);
 
   let skipDefaultBuilders = 1;
@@ -127,20 +129,11 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
              nullptr;
     }
 
-    /// Change the type of this function in place. This is an extremely
-    /// dangerous operation and it is up to the caller to ensure that this is
-    /// legal for this function, and to restore invariants:
-    ///  - the entry block args must be updated to match the function params.
-    ///  - the argument/result attributes may need an update: if the new type
-    ///  has less parameters we drop the extra attributes, if there are more
-    ///  parameters they won't have any attributes.
-    // TODO: consider removing this function thanks to rewrite patterns.
-    void setType(FunctionType newType);
-
     /// Returns the number of buffers located in the workgroup memory.
     unsigned getNumWorkgroupAttributions() {
-      return (*this)->getAttrOfType<IntegerAttr>(getNumWorkgroupAttributionsAttrName())
-          .getInt();
+      auto attr = (*this)->getAttrOfType<IntegerAttr>(
+          getNumWorkgroupAttributionsAttrName());
+      return attr ? attr.getInt() : 0;
     }
 
     /// Returns a list of block arguments that correspond to buffers located in
@@ -183,10 +176,6 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
       return "workgroup_attributions";
     }
 
-    /// Returns the type of this function.
-    /// FIXME: We should drive this via the ODS `type` param.
-    FunctionType getFunctionType() { return function_type(); }
-
     /// Returns the argument types of this function.
     ArrayRef<Type> getArgumentTypes() { return getFunctionType().getInputs(); }
 
@@ -216,7 +205,7 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func", [SODA_AsyncOpInterface,
                                                 AttrSizedOperandSegments]>,
     Arguments<(ins Variadic<SODA_AsyncToken>:$asyncDependencies,
                    SymbolRefAttr:$kernel,
-                   Variadic<AnyType>:$operands)>,
+                   Variadic<AnyType>:$kernelOperands)>,
     Results<(outs Optional<SODA_AsyncToken>:$asyncToken)> {
   let summary = "Launches a function as a SODA kernel";
 
@@ -280,7 +269,9 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func", [SODA_AsyncOpInterface,
   let skipDefaultBuilders = 1;
 
   let builders = [
-    OpBuilder<(ins "SODAFuncOp":$kernelFunc, "ValueRange":$kernelOperands)>
+    OpBuilder<(ins "SODAFuncOp":$kernelFunc, "ValueRange":$kernelOperands,
+      CArg<"Type", "nullptr">:$asyncTokenType,
+      CArg<"ValueRange", "{}">:$asyncDependencies)>
   ];
 
   let extraClassDeclaration = [{
@@ -305,23 +296,20 @@ def SODA_LaunchFuncOp : SODA_Op<"launch_func", [SODA_AsyncOpInterface,
     // present since it is run before the verifier of this op.
     friend LogicalResult SODADialect::verifyOperationAttribute(Operation *,
                                                               NamedAttribute);
-
-    /// The name of the symbol reference attribute specifying the kernel to launch.
-    static StringRef getKernelAttrName() { return "kernel"; }
   }];
 
   let assemblyFormat = [{
       custom<AsyncDependencies>(type($asyncToken), $asyncDependencies)
       $kernel
-      custom<LaunchFuncOperands>($operands, type($operands))
+      custom<LaunchFuncOperands>($kernelOperands, type($kernelOperands))
       attr-dict
   }];
   let hasVerifier = 1;
 }
 
-def SODA_LaunchOp : SODA_Op<"launch">,
-    Arguments<(ins)>,
-    Results<(outs)> {
+def SODA_LaunchOp : SODA_Op<"launch", [SODA_AsyncOpInterface]>,
+    Arguments<(ins Variadic<SODA_AsyncToken>:$asyncDependencies)>,
+    Results<(outs Optional<SODA_AsyncToken>:$asyncToken)> {
   let summary = "SODA kernel launch operation";
 
   let description = [{
@@ -354,7 +342,8 @@ def SODA_LaunchOp : SODA_Op<"launch">,
   let skipDefaultBuilders = 1;
 
   let builders = [
-    OpBuilder<(ins)>
+    OpBuilder<(ins CArg<"Type", "nullptr">:$asyncTokenType,
+      CArg<"ValueRange", "{}">:$asyncDependencies)>
   ];
   
   let extraClassDeclaration = [{
@@ -374,7 +363,7 @@ def SODA_LaunchOp : SODA_Op<"launch">,
   let hasVerifier = 1;
 }
 
-def SODA_ReturnOp : SODA_Op<"return", [HasParent<"SODAFuncOp">, NoSideEffect,
+def SODA_ReturnOp : SODA_Op<"return", [HasParent<"SODAFuncOp">, Pure,
                                      Terminator]>,
     Arguments<(ins Variadic<AnyType>:$operands)>, Results<(outs)> {
   let summary = "Terminator for SODA functions.";
@@ -391,7 +380,7 @@ def SODA_ReturnOp : SODA_Op<"return", [HasParent<"SODAFuncOp">, NoSideEffect,
 }
 
 def SODA_TerminatorOp : SODA_Op<"terminator", [HasParent<"LaunchOp">,
-                                             NoSideEffect, Terminator]>,
+                                             Pure, Terminator]>,
     Arguments<(ins)>, Results<(outs)> {
   let summary = "Terminator for SODA launch regions.";
   let description = [{
@@ -403,7 +392,7 @@ def SODA_TerminatorOp : SODA_Op<"terminator", [HasParent<"LaunchOp">,
   let assemblyFormat = "attr-dict";
 }
 
-def SODA_YieldOp : SODA_Op<"yield", [NoSideEffect, Terminator]>,
+def SODA_YieldOp : SODA_Op<"yield", [Pure, Terminator]>,
     Arguments<(ins Variadic<AnyType>:$values)> {
   let summary = "SODA yield operation";
   let description = [{
@@ -476,7 +465,7 @@ def SODA_SODAModuleOp : SODA_Op<"module", [
   }];
   
   let builders = [OpBuilder<(ins "StringRef":$name)>];
-  let regions = (region SizedRegion<1>:$body);
+  let regions = (region SizedRegion<1>:$bodyRegion);
   let hasCustomAssemblyFormat = 1;
 
   // We need to ensure the block inside the region is properly terminated;
