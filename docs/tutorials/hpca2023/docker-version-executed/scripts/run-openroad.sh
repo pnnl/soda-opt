@@ -1,11 +1,5 @@
 #!/bin/bash
 
-<<<<<<< HEAD
-set -e
-set -o pipefail
-
-=======
->>>>>>> origin/main
 BAMBUDIR=output/$1
 pushd $BAMBUDIR
 
