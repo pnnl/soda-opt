@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -e
+set -o pipefail
+
 docker run -u $(id -u):$(id -g) -v $(pwd):/working_dir --rm agostini01/soda \
 tf-mlir-translate \
   --graphdef-to-mlir \

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -e
+set -o pipefail
+
 if [ -d output/$1 ] 
 then
     rm -rf output/$1
