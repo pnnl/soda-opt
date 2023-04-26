@@ -5,7 +5,7 @@ set -o pipefail
 
 docker run -u $(id -u):$(id -g) -v $(pwd):/working_dir --rm agostini01/soda \
 mlir-opt \
-  -pass-pipeline="any(tosa-to-tensor, tosa-to-linalg-named, tosa-to-linalg, tosa-to-arith)" \
+  -pass-pipeline="builtin.module(func.func(tosa-to-tensor, tosa-to-linalg-named, tosa-to-linalg, tosa-to-arith))" \
   $1 \
   -o ${2}-inter
 
