@@ -1,11 +1,8 @@
 #!/bin/bash
 
-<<<<<<< HEAD
 set -e
 set -o pipefail
 
-=======
->>>>>>> origin/main
 if [ -d output/$1 ] 
 then
     rm -rf output/$1
