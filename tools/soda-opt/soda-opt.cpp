@@ -133,6 +133,7 @@ int main(int argc, char **argv) {
   mlir::soda::registerForwardMemrefAllocPass();
   mlir::soda::registerForwardLinalgFillPass();
   mlir::soda::registerForwardMemrefCopyPass();
+  mlir::soda::registerGenerateLinalgSummaryPass();
   
   // Temporary passes to trigger transformations using the transform dialect
   mlir::soda::trans::registerTransformDialectEraseSchedule();

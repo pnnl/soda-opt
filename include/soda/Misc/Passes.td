@@ -53,6 +53,18 @@ def TestArgumentsToXML : Pass<"soda-extract-arguments-to-xml", "ModuleOp"> {
   ];
 }
 
+def GenerateLinalgSummary : Pass<"soda-generate-linalg-summary", "ModuleOp"> {
+  let summary = "Generate a summary of linalg operations in the module";
+  let description = [{
+      Generate a summary of linalg operations in the module.
+  }];
+  let constructor = "mlir::soda::createGenerateLinalgSummaryPass()";
+  let options = [
+    Option<"writeToTerminal", "write-to-terminal", "bool", /*default=*/"false",
+           "If set, write to terminal instead of a file (default: false)">
+  ];
+}
+
 //===----------------------------------------------------------------------===//
 // Basic Pattern-Match and Rewrite
 //===----------------------------------------------------------------------===//
