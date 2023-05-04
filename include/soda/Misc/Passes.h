@@ -79,10 +79,10 @@ createAffineLoopPermutationPass(const ArrayRef<unsigned> &permList);
 // TODO: only the registration call is necessary. Move pass class decls to
 // another file
 #define GEN_PASS_CLASSES
-#include "soda/Misc/SODAMiscPasses.h.inc"
+#include "soda/Misc/Passes.h.inc"
 
 #define GEN_PASS_REGISTRATION
-#include "soda/Misc/SODAMiscPasses.h.inc"
+#include "soda/Misc/Passes.h.inc"
 
 } // namespace soda
 } // namespace mlir
