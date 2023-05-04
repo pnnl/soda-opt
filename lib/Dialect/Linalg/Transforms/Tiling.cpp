@@ -29,7 +29,7 @@
 namespace mlir {
 namespace soda {
 #define GEN_PASS_DEF_LINALGTILING
-#include "soda/Dialect/Linalg/Passes.h.inc"
+#include "soda/Dialect/Linalg/Transforms/Passes.h.inc"
 } // namespace soda
 } // namespace mlir
 

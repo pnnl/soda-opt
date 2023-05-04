@@ -15,8 +15,8 @@
 #include "llvm/Support/ToolOutputFile.h"
 
 #include "soda/Conversion/Passes.h"
-#include "soda/Dialect/Linalg/Passes.h"
 #include "soda/Dialect/Linalg/Reports/Passes.h"
+#include "soda/Dialect/Linalg/Transforms/Passes.h"
 #include "soda/Dialect/SNN/IR/SNN.h"
 #include "soda/Dialect/SNN/Transforms/Passes.h"
 #include "soda/Dialect/SODA/Passes.h"
