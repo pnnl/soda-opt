@@ -15,11 +15,12 @@
 #include "llvm/Support/ToolOutputFile.h"
 
 #include "soda/Conversion/Passes.h"
+#include "soda/Dialect/Linalg/Passes.h"
+#include "soda/Dialect/Linalg/Reports/Passes.h"
 #include "soda/Dialect/SNN/IR/SNN.h"
 #include "soda/Dialect/SNN/Transforms/Passes.h"
 #include "soda/Dialect/SODA/Passes.h"
 #include "soda/Dialect/SODA/SODADialect.h"
-#include "soda/Dialect/Linalg/Passes.h"
 #include "soda/Dialect/Transform/Transforms/Passes.h"
 #include "soda/Misc/Passes.h"
 #include "soda/Misc/Pipelines.h"
@@ -89,7 +90,6 @@ int main(int argc, char **argv) {
   mlir::memref::registerExpandOpsPass();
   mlir::registerReconcileUnrealizedCastsPass();
 
-
   // Add the following to selectively include the necessary dialects. You only
   // need to register dialects that will be *parsed* by the tool, not the one
   // generated
@@ -133,8 +133,8 @@ int main(int argc, char **argv) {
   mlir::soda::registerForwardMemrefAllocPass();
   mlir::soda::registerForwardLinalgFillPass();
   mlir::soda::registerForwardMemrefCopyPass();
-  mlir::soda::registerGenerateLinalgSummaryPass();
-  
+  mlir::soda::linalg::reports::registerGenerateLinalgSummaryPass();
+
   // Temporary passes to trigger transformations using the transform dialect
   mlir::soda::trans::registerTransformDialectEraseSchedule();
   mlir::soda::trans::registerTransformDialectInterpreter();

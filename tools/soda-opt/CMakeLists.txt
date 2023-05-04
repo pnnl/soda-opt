@@ -73,6 +73,7 @@ set(LIBS
   # SODA
   SODALinalgTransforms
   SODATransformTransforms
+  SODALinalgReports
   SODAMisc
   MLIRSODAOps
   MLIRSODATransforms

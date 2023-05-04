@@ -8,24 +8,24 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "mlir/Dialect/Arith/IR/Arith.h"
-#include "mlir/Dialect/LLVMIR/LLVMDialect.h"
-#include "mlir/Dialect/Linalg/IR/Linalg.h"
-#include "mlir/Pass/Pass.h"
-#include "soda/Misc/Passes.h"
+#include "soda/Dialect/Linalg/Reports/Passes.h"
 
 #include "mlir/Dialect/Func/IR/FuncOps.h"
-#include "mlir/IR/BuiltinTypes.h"
+#include "mlir/Dialect/Linalg/IR/Linalg.h"
 
 #include "mlir/Support/FileUtilities.h"
-#include "llvm/IR/IRBuilder.h"
 #include "llvm/Support/ToolOutputFile.h"
 #include "llvm/Support/raw_ostream.h"
 
-#define DEBUG_TYPE "misc-passes"
+#define DEBUG_TYPE "test-passes"
+
+namespace mlir::soda::linalg::reports {
+#define GEN_PASS_DEF_GENERATELINALGSUMMARY
+#include "soda/Dialect/Linalg/Reports/Passes.h.inc"
+} // namespace mlir::soda::linalg::reports
 
 using namespace mlir;
-using namespace soda;
+using namespace mlir::soda;
 
 namespace {
 
@@ -184,7 +184,7 @@ static void getNumMemoryOpsInKernel(mlir::linalg::GenericOp op,
   }
 
   auto yieldOp = op.getBody()->getTerminator();
-  assert(isa<linalg::YieldOp>(yieldOp));
+  assert(isa<mlir::linalg::YieldOp>(yieldOp));
   numStoreOps = yieldOp->getNumOperands();
 
   numMemoryOps = numLoadOps + numStoreOps;
@@ -345,7 +345,8 @@ static void collectLinaglOperationInfo(LinalgOpInfo &opInfo,
 }
 
 class GenerateLinalgSummaryPass
-    : public mlir::soda::GenerateLinalgSummaryBase<GenerateLinalgSummaryPass> {
+    : public mlir::soda::linalg::reports::impl::GenerateLinalgSummaryBase<
+          GenerateLinalgSummaryPass> {
 
   void runOnOperation() override {
 
@@ -479,6 +480,7 @@ class GenerateLinalgSummaryPass
 } // end anonymous namespace
 
 // Generate linalg summary pass
-std::unique_ptr<mlir::Pass> mlir::soda::createGenerateLinalgSummaryPass() {
+std::unique_ptr<mlir::Pass>
+mlir::soda::linalg::reports::createGenerateLinalgSummary() {
   return std::make_unique<GenerateLinalgSummaryPass>();
 }
