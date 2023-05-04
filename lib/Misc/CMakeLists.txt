@@ -11,7 +11,7 @@ add_mlir_dialect_library(SODAMisc
     ${PROJECT_SOURCE_DIR}/include/
 
     DEPENDS
-    MLIRSODAMiscPassesIncGen
+    MLIRSODAMiscPassIncGen
 
     LINK_LIBS PUBLIC
     MLIRIR

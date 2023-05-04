@@ -5,7 +5,7 @@ add_mlir_dialect_library(SODAFuncToLLVM
   ${PROJ_INCLUDE_DIR}/soda/Conversion/CustomFuncToLLVM
 
   DEPENDS
-  MLIRSODAMiscPassesIncGen
+  MLIRSODAMiscPassIncGen
 
   LINK_LIBS PUBLIC
   MLIRIR
