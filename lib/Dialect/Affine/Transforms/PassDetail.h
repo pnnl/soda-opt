@@ -1,8 +1,8 @@
-//===- PassDetail.h - SODA MISC Pass class details ------------*- C++ //-*-===//
+//===- PassDetail.h - SODA Affine Pass class details --------*- C++ ////-*-===//
 //===----------------------------------------------------------------------===//
 
-#ifndef DIALECT_SODA_MISC_PASSDETAIL_H_
-#define DIALECT_SODA_MISC_PASSDETAIL_H_
+#ifndef DIALECT_SODA_AFFINE_PASSDETAIL_H_
+#define DIALECT_SODA_AFFINE_PASSDETAIL_H_
 
 #include "mlir/Dialect/Affine/Passes.h"
 #include "mlir/IR/Dialect.h"
@@ -31,4 +31,4 @@ class VectorDialect;
 
 } // end namespace mlir
 
-#endif // DIALECT_SODA_MISC_PASSDETAIL_H_
+#endif // DIALECT_SODA_AFFINE_PASSDETAIL_H_

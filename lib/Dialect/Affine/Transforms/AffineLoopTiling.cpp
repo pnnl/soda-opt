@@ -16,6 +16,8 @@
 //===----------------------------------------------------------------------===//
 
 #include "PassDetail.h"
+#include "soda/Dialect/Affine/Transforms/Passes.h"
+
 #include "mlir/Dialect/Affine/Analysis/AffineAnalysis.h"
 #include "mlir/Dialect/Affine/Analysis/AffineStructures.h"
 #include "mlir/Dialect/Affine/Analysis/LoopAnalysis.h"
@@ -29,8 +31,6 @@
 #include "mlir/IR/Builders.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/Debug.h"
-
-#include "soda/Misc/Passes.h"
 
 using namespace mlir;
 using namespace soda;

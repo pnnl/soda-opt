@@ -14,7 +14,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "soda/Misc/Passes.h"
+#include "soda/Dialect/Affine/Transforms/Passes.h"
 
 #include "mlir/Dialect/Affine/Analysis/Utils.h"
 #include "mlir/Dialect/Affine/IR/AffineOps.h"

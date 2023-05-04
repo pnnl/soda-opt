@@ -72,6 +72,7 @@ set(LIBS
 
   # SODA
   SODALinalgTransforms
+  SODAAffineTransforms
   SODATransformTransforms
   SODALinalgReports
   SODAMisc

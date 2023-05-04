@@ -24,6 +24,8 @@
 //===----------------------------------------------------------------------===//
 
 #include "PassDetail.h"
+#include "soda/Dialect/Affine/Transforms/Passes.h"
+
 #include "mlir/Dialect/Affine/Analysis/Utils.h"
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
 #include "mlir/Dialect/Affine/LoopUtils.h"
@@ -37,7 +39,6 @@
 #include "llvm/Support/Debug.h"
 #include <algorithm>
 
-#include "soda/Misc/Passes.h"
 
 #define DEBUG_TYPE "soda-affine-data-copy-gen"
 

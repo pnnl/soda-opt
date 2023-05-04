@@ -11,6 +11,7 @@
 
 #include "mlir/Pass/Pass.h"
 #include "mlir/Pass/PassManager.h"
+#include "soda/Dialect/Affine/Passes.h"
 #include "soda/Misc/Passes.h"
 
 #include "mlir/Conversion/Passes.h"
