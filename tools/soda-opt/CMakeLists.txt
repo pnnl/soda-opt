@@ -58,6 +58,8 @@ set(LIBS
 
   # Conversion
   MLIRAffineToStandard
+  MLIRComplexToStandard
+  MLIRComplexToLLVM
   MLIRSCFToControlFlow
   MLIRMemRefToLLVM
   MLIRMathToLLVM
