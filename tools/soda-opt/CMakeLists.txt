@@ -19,6 +19,7 @@ set(LIBS
   MLIRAsyncDialect
   MLIRBufferizationDialect
   MLIRLLVMDialect
+  MLIRMLProgramDialect
   # MLIRTosaDialect
   # MLIRTensorDialect
   MLIRLinalgDialect

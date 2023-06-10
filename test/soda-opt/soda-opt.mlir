@@ -8,9 +8,12 @@
 // CHECK: func
 // CHECK: linalg
 // CHECK: llvm
+// CHECK: ml_program
+// CHECK: pdl
 // CHECK: scf
 // CHECK: snn
 // CHECK: soda
+// CHECK: transform
 // CHECK: vector
 
 // CHECKHELP: convert-linalg-matmul-to-soda

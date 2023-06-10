@@ -97,6 +97,7 @@ int main(int argc, char **argv) {
   registry.insert<mlir::func::FuncDialect,
                   mlir::memref::MemRefDialect,
                   mlir::LLVM::LLVMDialect,
+                  mlir::ml_program::MLProgramDialect,
                   mlir::linalg::LinalgDialect,
                   mlir::math::MathDialect,
                   // mlir::tensor::TensorDialect,
