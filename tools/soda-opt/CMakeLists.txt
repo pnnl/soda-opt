@@ -21,7 +21,8 @@ set(LIBS
   MLIRLLVMDialect
   MLIRMLProgramDialect
   # MLIRTosaDialect
-  # MLIRTensorDialect
+  MLIRSparseTensorDialect
+  MLIRTensorDialect
   MLIRLinalgDialect
   MLIRMemRefDialect
   # MLIRShapeDialect
@@ -35,8 +36,10 @@ set(LIBS
   MLIRPDLDialect
   MLIRPDLInterpDialect
   MLIRTilingInterfaceTestPasses
+  MLIRTensorInferTypeOpInterfaceImpl
   
   # TransformOps 
+  MLIRShapeOpsTransforms
   MLIRLinalgTransformOps
   MLIRSCFTransformOps
   
@@ -68,6 +71,7 @@ set(LIBS
   MLIRFuncToLLVM
   MLIRLinalgToLLVM
   MLIRLinalgToStandard
+  MLIRSparseTensorPipelines
 
   # Conversion SODA
   SODAKERNELToSODA

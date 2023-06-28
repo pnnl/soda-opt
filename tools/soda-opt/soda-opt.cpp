@@ -30,6 +30,8 @@
 #include "mlir/Dialect/Func/Transforms/Passes.h"
 #include "mlir/Dialect/Linalg/Passes.h"
 #include "mlir/Dialect/MemRef/Transforms/Passes.h"
+#include "mlir/Dialect/SparseTensor/Pipelines/Passes.h"
+
 
 // Defined in the test directory, no public header.
 namespace mlir {
@@ -90,6 +92,9 @@ int main(int argc, char **argv) {
   mlir::memref::registerExpandOpsPass();
   mlir::registerReconcileUnrealizedCastsPass();
 
+  // Pipelines
+  mlir::sparse_tensor::registerSparseTensorPipelines();
+
   // Add the following to selectively include the necessary dialects. You only
   // need to register dialects that will be *parsed* by the tool, not the one
   // generated
@@ -100,7 +105,9 @@ int main(int argc, char **argv) {
                   mlir::ml_program::MLProgramDialect,
                   mlir::linalg::LinalgDialect,
                   mlir::math::MathDialect,
-                  // mlir::tensor::TensorDialect,
+                  mlir::bufferization::BufferizationDialect,
+                  mlir::sparse_tensor::SparseTensorDialect,
+                  mlir::tensor::TensorDialect,
                   mlir::scf::SCFDialect,
                   mlir::cf::ControlFlowDialect,
                   mlir::vector::VectorDialect,
@@ -116,7 +123,18 @@ int main(int argc, char **argv) {
   linalg::registerTransformDialectExtension(registry);
 
   // Register external models
+  arith::registerBufferizableOpInterfaceExternalModels(registry);
+  bufferization::func_ext::registerBufferizableOpInterfaceExternalModels(
+      registry);
+  linalg::registerBufferizableOpInterfaceExternalModels(registry);
   linalg::registerTilingInterfaceExternalModels(registry);
+  scf::registerBufferizableOpInterfaceExternalModels(registry);
+  shape::registerBufferizableOpInterfaceExternalModels(registry);
+  sparse_tensor::registerBufferizableOpInterfaceExternalModels(registry);
+  tensor::registerBufferizableOpInterfaceExternalModels(registry);
+  tensor::registerInferTypeOpInterfaceExternalModels(registry);
+  tensor::registerTilingInterfaceExternalModels(registry);
+  vector::registerBufferizableOpInterfaceExternalModels(registry);
 
   //===--------------------------------------------------------------------===//
   // Register SODA dialects and passes

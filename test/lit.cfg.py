@@ -33,6 +33,9 @@ config.substitutions.append(('%PATH%', config.environment['PATH']))
 config.substitutions.append(('%sodashlibdir', config.soda_lib_root))
 config.substitutions.append(('%shlibext', config.llvm_shlib_ext))
 
+# MLIR runner libraries are installed in the llvm project lib dir.
+config.substitutions.append(("%mlir_lib_dir", config.llvm_lib_dir))
+
 llvm_config.with_system_environment(
     ['HOME', 'INCLUDE', 'LIB', 'TMP', 'TEMP'])
 
@@ -59,7 +62,9 @@ tools = [
     'soda-translate',
     'soda-capi-test',
     'mlir-runner',
+    # Tools from llvm-project
     'opt',
+    'mlir-cpu-runner',
     ToolSubst('%PYTHON', config.python_executable, unresolved='ignore'),
 ]
 
