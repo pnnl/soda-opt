@@ -85,6 +85,9 @@ set(LIBS
   # SNN
   MLIRSNNOps
   MLIRSNNTransforms
+
+  # ACCEL
+  SODAAccelOps
 )
 
 set(SOURCES
