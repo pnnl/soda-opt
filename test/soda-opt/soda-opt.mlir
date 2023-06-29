@@ -1,6 +1,7 @@
 // RUN: soda-opt --show-dialects | FileCheck %s
 // RUN: soda-opt --h | FileCheck %s -check-prefix=CHECKHELP
 //
+// CHECK: accel
 // CHECK: affine
 // CHECK: arith
 // CHECK: builtin
