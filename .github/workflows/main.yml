@@ -4,9 +4,9 @@ name: build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "ci-setup" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "ci-setup" ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
