@@ -61,10 +61,8 @@ jobs:
         pip3.9 install -r ./mlir/python/requirements.txt
 
         export LLVM_SRC_DIR="/tmp/src/llvm-project"
-        export LLVM_BUILD_DIR="/builds/llvm-project/build"
-        export LLVM_INSTALL_DIR="/installs/llvm-project/install"
-        mkdir -p /builds /installs
-        set -x
+        export LLVM_BUILD_DIR="/tmp/builds/llvm-project/build"
+        export LLVM_INSTALL_DIR="/tmp/installs/llvm-project/install"
         cmake -GNinja  \
           "-H$LLVM_SRC_DIR/llvm" \
           "-B$LLVM_BUILD_DIR" \
@@ -77,7 +75,6 @@ jobs:
           -DLLVM_ENABLE_ASSERTIONS=OFF \
           -DLLVM_BUILD_EXAMPLES=OFF 
 
-        set +x
         cmake --build $LLVM_BUILD_DIR --target opt mlir-opt mlir-translate mlir-cpu-runner install -j $(nproc)
         
     # setup soda-opt
@@ -85,8 +82,8 @@ jobs:
       working-directory: ${{github.workspace}}
       run: |
         export SODA_OPT_SOURCE_DIR="${{github.workspace}}"
-        export SODA_OPT_BUILD_DIR="/builds/soda-opt/build"
-        export SODA_OPT_INSTALL_DIR="/installs/soda-opt/install"
+        export SODA_OPT_BUILD_DIR="/tmp/builds/soda-opt/build"
+        export SODA_OPT_INSTALL_DIR="/tmp/installs/soda-opt/install"
 
         cmake -GNinja \
           "-H$SODA_OPT_SOURCE_DIR" \
