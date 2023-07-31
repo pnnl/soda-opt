@@ -1,6 +1,7 @@
-name: build
+name: Build and Test
 
 # Adapted from: https://github.com/tancheng/mlir-cgra/blob/main/.github/workflows/main.yml
+# Adapted from: https://github.com/llvm/circt/blob/main/.github/workflows/buildAndTest.yml
 
 on:
   push:
@@ -8,13 +9,15 @@ on:
   pull_request:
     branches: [ "ci-setup" ]
 
-
 env:
   BUILD_TYPE: Release
   LLVM_COMMIT: 339a7687e1c036a5f91c9d5391523b93e2e76cd3
   LLVM_SRC_DIR: /tmp/src/llvm-project
   LLVM_BUILD_DIR: /tmp/builds/llvm-project/build
   LLVM_INSTALL_DIR: /tmp/installs/llvm-project/install
+        
+  SODA_OPT_BUILD_DIR: /tmp/builds/soda-opt/build
+  SODA_OPT_INSTALL_DIR: /tmp/installs/soda-opt/install
 
 jobs:
   build:
@@ -29,7 +32,7 @@ jobs:
       with:
         fetch-depth: 2
     
-    # install transformers and specific versions of torch and torch-mlir
+    # Install python and build dependencies.
     - name: Install dependencies
       working-directory: ${{github.workspace}}
       run: |
@@ -37,8 +40,9 @@ jobs:
         curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
         python3.9 get-pip.py
         sudo apt-get install ninja-build
-        
-    - name: Clone a specific verion of llvm-project and install python dependencies
+    
+    # Clone a specific verion of llvm-project and install python dependencies.
+    - name: Setup LLVM
       id: clone-llvm
       run: |
         mkdir -p /tmp/src/ && cd /tmp/src
@@ -93,14 +97,11 @@ jobs:
         cmake --build $LLVM_BUILD_DIR --target opt mlir-opt mlir-translate mlir-cpu-runner install -j $(nproc)
         
     - name: Compile and Test soda-opt
-      working-directory: ${{github.workspace}}
+      working-directory: ${{ github.workspace }}
       run: |
-        export SODA_OPT_SOURCE_DIR="${{github.workspace}}"
-        export SODA_OPT_BUILD_DIR="/tmp/builds/soda-opt/build"
-        export SODA_OPT_INSTALL_DIR="/tmp/installs/soda-opt/install"
-
+        export SODA_OPT_SRC_DIR=${{ github.workspace }}
         cmake -GNinja \
-          "-H$SODA_OPT_SOURCE_DIR" \
+          "-H$SODA_OPT_SRC_DIR" \
           "-B$SODA_OPT_BUILD_DIR" \
           -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
           -DLLVM_EXTERNAL_LIT=$LLVM_BUILD_DIR/bin/llvm-lit \
