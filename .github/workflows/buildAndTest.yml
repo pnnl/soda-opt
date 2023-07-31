@@ -66,6 +66,36 @@ jobs:
       run: echo "hash=$(md5sum $GITHUB_WORKSPACE/.github/workflows/buildAndTest.yml | awk '{print $1}')" >> $GITHUB_OUTPUT
     
     # Try to fetch LLVM from the cache.
+    # - name: Cache LLVM
+    #   id: cache-llvm
+    #   uses: actions/cache@v3
+    #   with:
+    #     path: |
+    #       $LLVM_BUILD_DIR/bin/llvm-lit
+    #       $LLVM_INSTALL_DIR
+    #     key: ${{ runner.os }}-llvm-${{ steps.get-llvm-hash.outputs.hash }}-${{ steps.get-workflow-hash.outputs.hash }}
+    
+    # # Build LLVM if we didn't hit in the cache. Even though we build it in
+    # # the previous job, there is a low chance that it'll have been evicted by
+    # # the time we get here.
+    # - name: Compile and Install LLVM
+    #   if: steps.cache-llvm.outputs.cache-hit != 'true'
+    #   run: |
+    #     cd /tmp/src/llvm-project
+    #     cmake -GNinja  \
+    #       "-H$LLVM_SRC_DIR/llvm" \
+    #       "-B$LLVM_BUILD_DIR" \
+    #       -DCMAKE_INSTALL_PREFIX=$LLVM_INSTALL_DIR  \
+    #       -DLLVM_ENABLE_PROJECTS=mlir \
+    #       -DLLVM_TARGETS_TO_BUILD="host" \
+    #       -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+    #       -DLLVM_INSTALL_UTILS=ON \
+    #       -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
+    #       -DLLVM_ENABLE_ASSERTIONS=OFF \
+    #       -DLLVM_BUILD_EXAMPLES=OFF 
+
+    #     cmake --build $LLVM_BUILD_DIR --target opt mlir-opt mlir-translate mlir-cpu-runner install -j $(nproc)
+
     - name: Cache LLVM
       id: cache-llvm
       uses: actions/cache@v3
@@ -81,20 +111,12 @@ jobs:
     - name: Compile and Install LLVM
       if: steps.cache-llvm.outputs.cache-hit != 'true'
       run: |
-        cd /tmp/src/llvm-project
-        cmake -GNinja  \
-          "-H$LLVM_SRC_DIR/llvm" \
-          "-B$LLVM_BUILD_DIR" \
-          -DCMAKE_INSTALL_PREFIX=$LLVM_INSTALL_DIR  \
-          -DLLVM_ENABLE_PROJECTS=mlir \
-          -DLLVM_TARGETS_TO_BUILD="host" \
-          -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
-          -DLLVM_INSTALL_UTILS=ON \
-          -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
-          -DLLVM_ENABLE_ASSERTIONS=OFF \
-          -DLLVM_BUILD_EXAMPLES=OFF 
+        mkdir -p $LLVM_BUILD_DIR/bin
+        echo "Test" > $LLVM_BUILD_DIR/bin/llvm-lit
+        mkdir -p $LLVM_INSTALL_DIR
+        echo "Test" > $LLVM_INSTALL_DIR/test.txt
+      
 
-        cmake --build $LLVM_BUILD_DIR --target opt mlir-opt mlir-translate mlir-cpu-runner install -j $(nproc)
         
     - name: Compile and Test soda-opt
       working-directory: ${{ github.workspace }}
