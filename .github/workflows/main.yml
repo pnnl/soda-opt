@@ -31,7 +31,7 @@ jobs:
     - name: install dependencies
       working-directory: ${{github.workspace}}
       run: |
-        sudo apt-get install python3.9
+        sudo apt-get install python3.9 python3.9-dev
         curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
         python3.9 get-pip.py
         # pip3.9 --version
@@ -53,7 +53,7 @@ jobs:
       run: |
         git clone https://github.com/llvm/llvm-project.git
         cd llvm-project
-        git checkout 339a7687e1c036a5f91c9d5391523b93e2e76cd3
+        pip3.9 install -r ./mlir/python/requirements.txt
         mkdir build
         cd build
         cmake -G Ninja ../llvm \
@@ -70,8 +70,8 @@ jobs:
 
         cmake --build . --target check-mlir
         
-    # setup mlir-cgra
-    - name: setup mlir-cgra
+    # setup soda-opt
+    - name: setup soda-opt
       working-directory: ${{github.workspace}}
       run: |
         export BUILD_DIR="${{github.workspace}}/llvm-project/build"
@@ -86,12 +86,12 @@ jobs:
 
         cmake --build . --target check-soda
 
-    # install clang-12/opt-12
-    - name: install LLVM and Clang for scripts/experiment
-      uses: egor-tensin/setup-clang@v1
-      with:
-        version: 12
-        platform: x64
+    # # install clang-12/opt-12
+    # - name: install LLVM and Clang for scripts/experiment
+    #   uses: egor-tensin/setup-clang@v1
+    #   with:
+    #     version: 12
+    #     platform: x64
         
     # # add path
     # - name: add paths
