@@ -10,47 +10,36 @@ on:
 
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
   LLVM_COMMIT: 339a7687e1c036a5f91c9d5391523b93e2e76cd3
+  LLVM_SRC_DIR: /tmp/src/llvm-project
+  LLVM_BUILD_DIR: /tmp/builds/llvm-project/build
+  LLVM_INSTALL_DIR: /tmp/installs/llvm-project/install
 
 jobs:
   build:
-    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
-    # You can convert this to a matrix build if you need cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ubuntu-20.04
     strategy:
-      fail-fast: false
       matrix:
         python-version: ["3.9.16"]
 
     steps:
+    # Clone the SODA-OPT repo. Do shallow clone to save clone time.
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 2
     
     # install transformers and specific versions of torch and torch-mlir
-    - name: install dependencies
+    - name: Install dependencies
       working-directory: ${{github.workspace}}
       run: |
         sudo apt-get install python3.9 python3.9-dev
         curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
         python3.9 get-pip.py
-        # pip3.9 --version
-        # pip3.9 install transformers
+        sudo apt-get install ninja-build
         
-        # wget https://github.com/llvm/torch-mlir/releases/download/snapshot-20221015.627/torch-1.14.0.dev20221014+cpu-cp39-cp39-linux_x86_64.whl
-        # wget https://github.com/llvm/torch-mlir/releases/download/snapshot-20221015.627/torch_mlir-20221015.627-cp39-cp39-linux_x86_64.whl
-
-        # pip3.9 install torch-1.14.0.dev20221014+cpu-cp39-cp39-linux_x86_64.whl
-        # pip3.9 install torch_mlir-20221015.627-cp39-cp39-linux_x86_64.whl
-        
-    # install ninja
-    - name: install ninja for LLVM build
-      run: sudo apt-get install ninja-build
-    
-    # setup LLVM
-    - name: install a specific version of LLVM
-      working-directory: ${{github.workspace}}
+    - name: Clone a specific verion of llvm-project and install python dependencies
+      id: clone-llvm
       run: |
         mkdir -p /tmp/src/ && cd /tmp/src
         git init llvm-project
@@ -60,16 +49,42 @@ jobs:
         git reset --hard $LLVM_COMMIT
         pip3.9 install -r ./mlir/python/requirements.txt
 
-        export LLVM_SRC_DIR="/tmp/src/llvm-project"
-        export LLVM_BUILD_DIR="/tmp/builds/llvm-project/build"
-        export LLVM_INSTALL_DIR="/tmp/installs/llvm-project/install"
+    # ----------------------------------
+    # Try to fetch LLVM from the cache.
+
+    # Extract the LLVM submodule hash for use in the cache key.
+    - name: Get LLVM Hash
+      id: get-llvm-hash
+      run: echo "hash=$LLVM_COMMIT" >> $GITHUB_OUTPUT
+
+    - name: Get workflow spec hash
+      id: get-workflow-hash
+      run: echo "hash=$(md5sum $GITHUB_WORKSPACE/.github/workflows/buildAndTest.yml | awk '{print $1}')" >> $GITHUB_OUTPUT
+    
+    # Try to fetch LLVM from the cache.
+    - name: Cache LLVM
+      id: cache-llvm
+      uses: actions/cache@v3
+      with:
+        path: |
+          $LLVM_BUILD_DIR/bin/llvm-lit
+          $LLVM_INSTALL_DIR
+        key: ${{ runner.os }}-llvm-${{ steps.get-llvm-hash.outputs.hash }}-${{ steps.get-workflow-hash.outputs.hash }}
+    
+    # Build LLVM if we didn't hit in the cache. Even though we build it in
+    # the previous job, there is a low chance that it'll have been evicted by
+    # the time we get here.
+    - name: Compile and Install LLVM
+      if: steps.cache-llvm.outputs.cache-hit != 'true'
+      run: |
+        cd /tmp/src/llvm-project
         cmake -GNinja  \
           "-H$LLVM_SRC_DIR/llvm" \
           "-B$LLVM_BUILD_DIR" \
           -DCMAKE_INSTALL_PREFIX=$LLVM_INSTALL_DIR  \
           -DLLVM_ENABLE_PROJECTS=mlir \
           -DLLVM_TARGETS_TO_BUILD="host" \
-          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
           -DLLVM_INSTALL_UTILS=ON \
           -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
           -DLLVM_ENABLE_ASSERTIONS=OFF \
@@ -77,8 +92,7 @@ jobs:
 
         cmake --build $LLVM_BUILD_DIR --target opt mlir-opt mlir-translate mlir-cpu-runner install -j $(nproc)
         
-    # setup soda-opt
-    - name: setup soda-opt
+    - name: Compile and Test soda-opt
       working-directory: ${{github.workspace}}
       run: |
         export SODA_OPT_SOURCE_DIR="${{github.workspace}}"
@@ -88,7 +102,7 @@ jobs:
         cmake -GNinja \
           "-H$SODA_OPT_SOURCE_DIR" \
           "-B$SODA_OPT_BUILD_DIR" \
-          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
           -DLLVM_EXTERNAL_LIT=$LLVM_BUILD_DIR/bin/llvm-lit \
           -DMLIR_DIR=$LLVM_INSTALL_DIR/lib/cmake/mlir \
           -DLLVM_DIR=$LLVM_INSTALL_DIR/lib/cmake/llvm \
