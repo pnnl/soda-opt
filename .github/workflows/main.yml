@@ -12,6 +12,7 @@ on:
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
+  LLVM_COMMIT: 339a7687e1c036a5f91c9d5391523b93e2e76cd3
 
 jobs:
   build:
@@ -51,66 +52,46 @@ jobs:
     - name: install a specific version of LLVM
       working-directory: ${{github.workspace}}
       run: |
-        # git clone https://github.com/llvm/llvm-project.git
-        # cd llvm-project
-        # git checkout 339a7687e1c036a5f91c9d5391523b93e2e76cd3
-
+        mkdir -p /tmp/src/ && cd /tmp/src
         git init llvm-project
-        cd llvm-project
+        cd /tmp/src/llvm-project
         git remote add origin https://github.com/llvm/llvm-project.git
-        git fetch --depth=1 origin 339a7687e1c036a5f91c9d5391523b93e2e76cd3
-        git reset --hard 339a7687e1c036a5f91c9d5391523b93e2e76cd3
+        git fetch --depth=1 origin $LLVM_COMMIT
+        git reset --hard $LLVM_COMMIT
         pip3.9 install -r ./mlir/python/requirements.txt
-        mkdir build
-        cd build
-        cmake -G Ninja ../llvm \
+
+        export LLVM_SRC_DIR="/tmp/src/llvm-project"
+        export LLVM_BUILD_DIR="/builds/llvm-project/build"
+        export LLVM_INSTALL_DIR="/installs/llvm-project/install"
+        cmake -GNinja  \
+          "-H$LLVM_SRC_DIR/llvm" \
+          "-B$LLVM_BUILD_DIR" \
+          -DCMAKE_INSTALL_PREFIX=$LLVM_INSTALL_DIR  \
           -DLLVM_ENABLE_PROJECTS=mlir \
-          -DLLVM_BUILD_EXAMPLES=ON \
           -DLLVM_TARGETS_TO_BUILD="host" \
           -DCMAKE_BUILD_TYPE=Release \
-          -DLLVM_ENABLE_ASSERTIONS=ON \
           -DLLVM_INSTALL_UTILS=ON \
           -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
-          -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-          -DLLVM_ENABLE_ASSERTIONS=On \
+          -DLLVM_ENABLE_ASSERTIONS=OFF \
           -DLLVM_BUILD_EXAMPLES=OFF 
 
-        cmake --build . --target check-mlir -j $(nproc)
+        cmake --build $LLVM_BUILD_DIR --target opt mlir-opt mlir-translate mlir-cpu-runner install -j $(nproc)
         
     # setup soda-opt
     - name: setup soda-opt
       working-directory: ${{github.workspace}}
       run: |
-        export BUILD_DIR="${{github.workspace}}/llvm-project/build"
-        export PREFIX="${{github.workspace}}/llvm-project/build"
-        mkdir build && cd build
-        cmake -G Ninja .. \
+        export SODA_OPT_SOURCE_DIR="${{github.workspace}}"
+        export SODA_OPT_BUILD_DIR="/builds/soda-opt/build"
+        export SODA_OPT_INSTALL_DIR="/installs/soda-opt/install"
+
+        cmake -GNinja \
+          "-H$SODA_OPT_SOURCE_DIR" \
+          "-B$SODA_OPT_BUILD_DIR" \
           -DCMAKE_BUILD_TYPE=Release \
-          -DLLVM_EXTERNAL_LIT=$BUILD_DIR/bin/llvm-lit \
-          -DLLVM_DIR=$PREFIX/lib/cmake/llvm \
-          -DMLIR_DIR=$PREFIX/lib/cmake/mlir \
+          -DLLVM_EXTERNAL_LIT=$LLVM_BUILD_DIR/bin/llvm-lit \
+          -DMLIR_DIR=$LLVM_INSTALL_DIR/lib/cmake/mlir \
+          -DLLVM_DIR=$LLVM_INSTALL_DIR/lib/cmake/llvm \
           -DMLIR_ENABLE_BINDINGS_PYTHON=ON
 
-        cmake --build . --target check-soda -j $(nproc)
-
-    # # install clang-12/opt-12
-    # - name: install LLVM and Clang for scripts/experiment
-    #   uses: egor-tensin/setup-clang@v1
-    #   with:
-    #     version: 12
-    #     platform: x64
-        
-    # # add path
-    # - name: add paths
-    #   working-directory: ${{github.workspace}}
-    #   run: |
-    #     echo "${{github.workspace}}/llvm-project/build/bin" >> $GITHUB_PATH
-    #     echo "${{github.workspace}}/build/bin" >> $GITHUB_PATH
-
-    # # run demo baseline
-    # - name: run demo baseline
-    #   working-directory: ${{github.workspace}}
-    #   run: |
-    #     cd ./experiments/demo/baseline
-    #     sh script.sh
-    #     ./simulate
+        cmake --build $SODA_OPT_BUILD_DIR --target check-soda -j $(nproc)
