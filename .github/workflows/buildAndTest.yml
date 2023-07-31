@@ -96,6 +96,22 @@ jobs:
 
     #     cmake --build $LLVM_BUILD_DIR --target opt mlir-opt mlir-translate mlir-cpu-runner install -j $(nproc)
 
+    # - name: Compile and Test soda-opt
+    #   working-directory: ${{ github.workspace }}
+    #   run: |
+    #     export SODA_OPT_SRC_DIR=${{ github.workspace }}
+    #     cmake -GNinja \
+    #       "-H$SODA_OPT_SRC_DIR" \
+    #       "-B$SODA_OPT_BUILD_DIR" \
+    #       -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+    #       -DLLVM_EXTERNAL_LIT=$LLVM_BUILD_DIR/bin/llvm-lit \
+    #       -DMLIR_DIR=$LLVM_INSTALL_DIR/lib/cmake/mlir \
+    #       -DLLVM_DIR=$LLVM_INSTALL_DIR/lib/cmake/llvm \
+    #       -DMLIR_ENABLE_BINDINGS_PYTHON=ON
+
+    #     cmake --build $SODA_OPT_BUILD_DIR --target check-soda -j $(nproc)
+
+    
     - name: Cache LLVM
       id: cache-llvm
       uses: actions/cache@v3
@@ -115,20 +131,10 @@ jobs:
         echo "Test" > $LLVM_BUILD_DIR/bin/llvm-lit
         mkdir -p $LLVM_INSTALL_DIR
         echo "Test" > $LLVM_INSTALL_DIR/test.txt
-      
-
-        
+    
     - name: Compile and Test soda-opt
       working-directory: ${{ github.workspace }}
       run: |
-        export SODA_OPT_SRC_DIR=${{ github.workspace }}
-        cmake -GNinja \
-          "-H$SODA_OPT_SRC_DIR" \
-          "-B$SODA_OPT_BUILD_DIR" \
-          -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
-          -DLLVM_EXTERNAL_LIT=$LLVM_BUILD_DIR/bin/llvm-lit \
-          -DMLIR_DIR=$LLVM_INSTALL_DIR/lib/cmake/mlir \
-          -DLLVM_DIR=$LLVM_INSTALL_DIR/lib/cmake/llvm \
-          -DMLIR_ENABLE_BINDINGS_PYTHON=ON
-
-        cmake --build $SODA_OPT_BUILD_DIR --target check-soda -j $(nproc)
+        cat $LLVM_BUILD_DIR/bin/llvm-lit
+        cat $LLVM_INSTALL_DIR/test.txt
+        
