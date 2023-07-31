@@ -22,7 +22,7 @@ from mlir import execution_engine
 from mlir import ir
 from mlir import runtime
 import tools.mlir_pytaco as mlir_pytaco
-from tools.mlir_pytaco import Tensor, IndexVar, IndexExpr, Format
+from tools.mlir_pytaco import Tensor, IndexVar, IndexExpr, Format, Access
 from tools.mlir_pytaco_api import dense, compressed
 
 # =================================================================
@@ -30,6 +30,7 @@ from tools.mlir_pytaco_api import dense, compressed
 def _emit_entry_point_and_kernel(
     self, 
     module: ir.Module, 
+    input_accesses: List["Access"],
     add_timing: bool = False,
     print_frostt: bool = False) -> Tuple[str, List[List[int]]]:
     """Inserts @main as an entry point to the kernel function with
@@ -39,6 +40,7 @@ def _emit_entry_point_and_kernel(
 
     Args:
         module: The MLIR module to insert the kernel function.
+        input_accesses: The list of input accesses to the kernel, matching function args.
         add_timing: Flag to control timing instrumentation to the kernel.
         print_frostt: Flag to insert sparse_tensor.out to dump tensors in FROSTT format.
 
@@ -53,7 +55,8 @@ def _emit_entry_point_and_kernel(
     # 2. Kernels have only tensor inputs and outputs
     # 3. Each tensor is marked with a sparse encoding, even
     #    for dense tensors.
-    # 4. All tensor dimensions are known at compile time.
+    # 4. All tensor dimensions are known at compile time.'
+    # 5. @input_accesses must match kernel function args.
 
     # Fetch the kernel function from @module
     kernel_func = module.body.operations[0]
@@ -71,13 +74,16 @@ def _emit_entry_point_and_kernel(
             func.func private @rtclock() -> (f64)\n\
             func.func private @rtclock_interval(f64, f64) -> ()\n" + main_func
 
-    # Parse the kernel function arguments and return value
+    # Parse the kernel function arguments and return value; recreate
+    # the input tensor types to use ir.RankedTensorType.
     arg_shapes = []
     arg_types = []
-    for i, arg in enumerate(kernel_func.arguments):
-        # Get the tensor type, shape, encoding, and internal type
-        tensor_type = arg.type
-        assert isinstance(tensor_type, ir.RankedTensorType)
+    
+    assert len(kernel_func.arguments) == len(input_accesses) , '_emit_entry_point_and_kernel: Inconsistent number of arguments and input accesses.'
+    input_types = [a.tensor.mlir_tensor_type() for a in input_accesses]
+    
+    for i, tensor_type in enumerate(input_types):
+        # Get the shape, encoding, and internal type
         shape = tensor_type.shape
         arg_shapes.append(shape)
         arg_types.append(tensor_type)
@@ -156,7 +162,9 @@ def emit_mlir(
             module, dst, dst_indices, expr_to_info, input_accesses,
         )
         input_shapes = []
-        if emit_entry_point: mlir_code, input_shapes = self._emit_entry_point_and_kernel(module, add_timing, print_frostt)
+        if emit_entry_point: mlir_code, input_shapes = self._emit_entry_point_and_kernel(
+            module, input_accesses, add_timing, print_frostt
+        )
         else: mlir_code = str(module)
         return mlir_code, input_shapes
 
