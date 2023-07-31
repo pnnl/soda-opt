@@ -1,6 +1,5 @@
-[![Github Action](https://github.com/pnnl/soda-opt/actions/workflows/main.buildAndTest/badge.svg)](https://github.com/pnnl/soda-opt/actions/workflows/buildAndTest.yml)
+[![Github Action](https://github.com/pnnl/soda-opt/actions/workflows/ci-setup.buildAndTest/badge.svg)](https://github.com/pnnl/soda-opt/actions/workflows/buildAndTest.yml)
 [![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://github.com/pnnl/soda-opt/blob/main/LICENSE.txt)
-
 
 # SODA-OPT - Enabling System Level Design in MLIR
 
