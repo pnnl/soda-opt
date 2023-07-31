@@ -68,7 +68,7 @@ jobs:
           -DLLVM_ENABLE_ASSERTIONS=On \
           -DLLVM_BUILD_EXAMPLES=OFF 
 
-        cmake --build . --target check-mlir
+        cmake --build . --target check-mlir -j $(nproc)
         
     # setup soda-opt
     - name: setup soda-opt
@@ -84,7 +84,7 @@ jobs:
           -DMLIR_DIR=$PREFIX/lib/cmake/mlir \
           -DMLIR_ENABLE_BINDINGS_PYTHON=ON
 
-        cmake --build . --target check-soda
+        cmake --build . --target check-soda -j $(nproc)
 
     # # install clang-12/opt-12
     # - name: install LLVM and Clang for scripts/experiment
