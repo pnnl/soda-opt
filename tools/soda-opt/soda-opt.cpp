@@ -164,6 +164,7 @@ int main(int argc, char **argv) {
   mlir::soda::registerOptimizedForVitisHLSPass();
 
   // Conversion passes
+  mlir::soda::registerConvertAccelToAXI4MLIR();
 
   // ----- SNN -----
   mlir::snn::registerSNNPrintPass();
