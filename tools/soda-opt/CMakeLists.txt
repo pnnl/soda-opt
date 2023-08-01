@@ -88,6 +88,7 @@ set(LIBS
 
   # ACCEL
   SODAAccelOps
+  SODAAccelToRuntime
 )
 
 set(SOURCES

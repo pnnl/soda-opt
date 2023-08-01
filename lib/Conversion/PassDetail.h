@@ -29,6 +29,14 @@ namespace scf {
 class SCFDialect;
 } // end namespace scf
 
+namespace memref {
+class MemRefDialect;
+} // namespace memref
+
+namespace LLVM {
+class LLVMDialect;
+} // namespace LLVM
+
 #define GEN_PASS_CLASSES
 #include "soda/Conversion/Passes.h.inc"
 
