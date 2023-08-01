@@ -1,0 +1,120 @@
+{
+    "name": "MM_4x4_v1",
+    "version": "1.0",
+    "description": "MM Accelerator",
+
+    "memory_layout": {
+        "#A_Buffer": {
+            "size": 16,
+            "data_type": "int32"
+        },
+        "#B_Buffer": {
+            "size": 16,
+            "data_type": "int32"
+        },
+        "#C_Buffer": {
+            "size": 16,
+            "data_type": "int32"
+        }
+    },
+    
+    "dma_fifo": {
+        "din": {
+            "id": "0",
+            "data_type": "int32",
+            "read": true,
+            "write": false
+        },
+        "dout": {
+            "id": "1",
+            "data_type": "int32",
+            "read": false,
+            "write": true
+        }
+    },
+
+    "kernels": {
+        "4x4_MM": {
+            "id": 0,
+            "description": "4x4 matrix multiplication",
+            "compute": "C += A * B",
+            "tile_info": {
+                "tile_dims": {
+                    "#N": 4,
+                    "#M": 4,
+                    "#K": 4
+                },
+                "A": {
+                    "associated_buffer": "#A_Buffer",
+                    "read": true,
+                    "write": false,
+                    "default_offset": 0,
+                    "shape": [
+                        "#N",
+                        "#K"
+                    ]
+                },
+                "B": {
+                    "associated_buffer": "#B_Buffer",
+                    "read": true,
+                    "write": false,
+                    "default_offset": 0,
+                    "shape": [
+                        "#M",
+                        "#K"
+                    ]
+                },
+                "C": {
+                    "associated_buffer": "#C_Buffer",
+                    "read": true,
+                    "write": true,
+                    "default_offset": 0,
+                    "shape": [
+                        "#N",
+                        "#M"
+                    ]
+                }
+            }
+        }
+    },
+    
+    "ISA": {
+        "instruction_format": {
+            "opcode_length": 0,
+            "op_args": 0
+        },
+        "opcodes": {
+            "-": [
+                {
+                    "READ": {
+                        "dma_fifo_id": 0,
+                        "buffer": "#A_Buffer",
+                        "offset": 0,
+                        "length": 16
+                    }
+                },
+                {
+                    "READ": {
+                        "dma_fifo_id": 0,
+                        "buffer": "#B_Buffer",
+                        "offset": 0,
+                        "length": 16
+                    }
+                },
+                {
+                    "COMPUTE": {
+                        "kernel_id": 0
+                    }
+                },
+                {
+                    "SEND": {
+                        "dma_fifo_id": 1,
+                        "buffer": "#C_Buffer",
+                        "offset": 0,
+                        "length": 16
+                    }
+                }
+            ]
+        }
+    }
+}
