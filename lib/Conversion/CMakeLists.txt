@@ -1,2 +1,3 @@
 add_subdirectory(KernelsToSODA)
 add_subdirectory(CustomFuncToLLVM)
+add_subdirectory(AccelToRuntime)
