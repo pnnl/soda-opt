@@ -11,7 +11,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "soda/ExecutionEngine/AxiUtils.h"
+#include "soda/ExecutionEngine/axi/AxiUtils.h"
 
 #include "soda/ExecutionEngine/axi/api_v1.h"
 
