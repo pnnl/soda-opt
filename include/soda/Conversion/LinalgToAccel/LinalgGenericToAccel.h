@@ -6,8 +6,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef MLIR_CONVERSION_LINALGTOAXI4MLIR_LINALGGENERICTOACCEL_H_
-#define MLIR_CONVERSION_LINALGTOAXI4MLIR_LINALGGENERICTOACCEL_H_
+#ifndef SODA_CONVERSION_LINALGTOACCEL_LINALGGENERICTOACCEL_H_
+#define SODA_CONVERSION_LINALGTOACCEL_LINALGGENERICTOACCEL_H_
 
 #include "soda/Conversion/LinalgToAccel/AXI4MLIRUtils.h"
 #include "mlir/IR/PatternMatch.h"
@@ -36,4 +36,4 @@ std::unique_ptr<OperationPass<ModuleOp>> createConvertLinalgGenericToAccelPass(
 
 } // namespace mlir
 
-#endif // MLIR_CONVERSION_LINALGTOAXI4MLIR_LINALGGENERICTOACCEL_H_
+#endif // SODA_CONVERSION_LINALGTOACCEL_LINALGGENERICTOACCEL_H_
