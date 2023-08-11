@@ -1,4 +1,4 @@
-add_mlir_dialect_library(SODAAccelOps
+add_mlir_dialect_library(SODAAccelDialect
   AccelOps.cpp
   AccelDialect.cpp
 
