@@ -87,7 +87,7 @@ set(LIBS
   MLIRSNNTransforms
 
   # ACCEL
-  SODAAccelOps
+  SODAAccelDialect
   SODAAccelToRuntime
 )
 
