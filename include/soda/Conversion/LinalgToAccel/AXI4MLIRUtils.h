@@ -5,8 +5,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef MLIR_CONVERSION_LINALGTOAXI4MLIR_UTILS_H_
-#define MLIR_CONVERSION_LINALGTOAXI4MLIR_UTILS_H_
+#ifndef SODA_CONVERSION_LINALGTOAXI4MLIR_UTILS_H_
+#define SODA_CONVERSION_LINALGTOAXI4MLIR_UTILS_H_
 
 #include "mlir/IR/PatternMatch.h"
 
@@ -67,4 +67,4 @@ void populateCommonLinalgTransformationPatterns(
 
 } // namespace mlir
 
-#endif // MLIR_CONVERSION_LINALGTOAXI4MLIR_UTILS_H_
+#endif // SODA_CONVERSION_LINALGTOAXI4MLIR_UTILS_H_
