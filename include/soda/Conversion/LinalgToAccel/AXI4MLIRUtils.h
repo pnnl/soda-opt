@@ -16,6 +16,9 @@ class Pass;
 class RewritePatternSet;
 class PatternRewriter;
 class ModuleOp;
+namespace func {
+class FuncOp;
+} // namespace func
 
 struct AccelTransformationOptions {
   /// Accelerator Tile Size information
@@ -56,7 +59,7 @@ public:
 };
 
 /// Apply tiling patterns to matmul operations with the correct attribute
-void applyPatterns(FuncOp funcOp, const AccelTransformationOptions &options);
+void applyPatterns(func::FuncOp funcOp, const AccelTransformationOptions &options);
 
 /// Populates patterns that implement a FSM of modifications.
 /// Changhing the kLinalgTransformMarker
