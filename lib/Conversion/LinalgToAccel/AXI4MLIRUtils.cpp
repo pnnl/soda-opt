@@ -6,13 +6,15 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "mlir/Conversion/LinalgToAXI4MLIR/AXI4MLIRUtils.h"
+#include "soda/Conversion/LinalgToAccel/AXI4MLIRUtils.h"
 
 #include "mlir/Dialect/Linalg/Transforms/Transforms.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
+#include "mlir/Dialect/Func/IR/FuncOps.h"
 
 using namespace mlir;
 using namespace mlir::linalg;
+using namespace mlir::func;
 
 const StringLiteral kLinalgTransformMarker = "__internal_linalg_transform__";
 
