@@ -15,5 +15,6 @@ def Accel_Dialect : Dialect {
     The accel dialect is intended to hold accel operations that abstract
     AXI4MLIR DMA communciations.
   }];
+  let useFoldAPI = kEmitFoldAdaptorFolder;
 }
 #endif // ACCEL_BASE

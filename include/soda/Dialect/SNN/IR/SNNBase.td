@@ -25,6 +25,7 @@ def SNN_Dialect : Dialect {
   }];
 
   let dependentDialects = ["tensor::TensorDialect"];
+  let useFoldAPI = kEmitFoldAdaptorFolder;
 }
 
 #endif // SNN_BASE
