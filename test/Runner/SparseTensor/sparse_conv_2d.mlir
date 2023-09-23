@@ -1,5 +1,5 @@
-// RUN: soda-opt %s --sparse-compiler="enable-runtime-library=false enable-buffer-initialization=true" | \
-// RUN: mlir-cpu-runner \
+// RUN: soda-opt %s --soda-sparse-compiler="enable-runtime-library=false enable-buffer-initialization=true" | \
+// RUN: mlir-runner \
 // RUN:  -e entry -entry-point-result=void  \
 // RUN:  -shared-libs=%mlir_lib_dir/libmlir_c_runner_utils%shlibext | \
 // RUN: FileCheck %s

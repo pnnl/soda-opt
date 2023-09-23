@@ -36,6 +36,9 @@ config.substitutions.append(('%shlibext', config.llvm_shlib_ext))
 # MLIR runner libraries are installed in the llvm project lib dir.
 config.substitutions.append(("%mlir_lib_dir", config.llvm_lib_dir))
 
+# export the SODA test directory
+config.substitutions.append(("%soda_test_dir", config.test_source_root))
+
 llvm_config.with_system_environment(
     ['HOME', 'INCLUDE', 'LIB', 'TMP', 'TEMP'])
 
