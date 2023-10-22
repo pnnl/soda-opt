@@ -1,20 +1,15 @@
 // DEFINE: %{option} = enable-runtime-library=false
 // DEFINE: %{command} = soda-opt %s --soda-sparse-compiler=%{option} | \
 // DEFINE: TENSOR0="%soda_test_dir/Runner/SparseTensor/data/test_symmetric.mtx" \
-// DEFINE: mlir-cpu-runner \
+// DEFINE: mlir-runner \
 // DEFINE:  -e entry -entry-point-result=void  \
 // DEFINE:  -shared-libs=%mlir_lib_dir/libmlir_c_runner_utils%shlibext | \
 // DEFINE: FileCheck %s
 //
 // RUN: %{command}
-//
-// Do the same run, but now with direct IR generation.
-// REDEFINE: %{option} = enable-runtime-library=false
-// RUN: %{command}
-//
-// Do the same run, but now with direct IR generation and vectorization.
-// REDEFINE: %{option} = "enable-runtime-library=false vl=2 reassociate-fp-reductions=true enable-index-optimizations=true"
-// RUN: %{command}
+
+// This test was modified based on from the llvm project test:
+// llvm-project/mlir/test/Integration/Dialect/SparseTensor/CPU/sparse_sum.mlir
 
 !Filename = !llvm.ptr<i8>
 

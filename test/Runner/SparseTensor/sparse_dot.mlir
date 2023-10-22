@@ -1,6 +1,6 @@
 // DEFINE: %{option} = enable-runtime-library=false
 // DEFINE: %{command} = soda-opt %s --soda-sparse-compiler=%{option} | \
-// DEFINE: mlir-cpu-runner \
+// DEFINE: mlir-runner \
 // DEFINE:  -e entry -entry-point-result=void  \
 // DEFINE:  -shared-libs=%mlir_lib_dir/libmlir_c_runner_utils%shlibext | \
 // DEFINE: FileCheck %s
