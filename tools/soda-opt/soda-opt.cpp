@@ -115,7 +115,8 @@ int main(int argc, char **argv) {
                   mlir::arith::ArithDialect,
                   mlir::AffineDialect,
                   mlir::transform::TransformDialect,
-                  mlir::pdl::PDLDialect>();
+                  mlir::pdl::PDLDialect,
+                  mlir::omp::OpenMPDialect>();
 
   // clang-format on
   // mlir::registerAllDialects(registry);

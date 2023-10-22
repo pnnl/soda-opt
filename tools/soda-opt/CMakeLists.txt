@@ -63,10 +63,12 @@ set(LIBS
   MLIRAffineToStandard
   MLIRComplexToStandard
   MLIRComplexToLLVM
+  MLIRSCFToOpenMP
   MLIRSCFToControlFlow
   MLIRMemRefToLLVM
   MLIRMathToLLVM
   MLIRMathToLibm
+  MLIROpenMPToLLVM
   MLIRArithToLLVM
   MLIRFuncToLLVM
   MLIRLinalgToLLVM
