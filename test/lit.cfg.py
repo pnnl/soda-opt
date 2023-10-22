@@ -39,6 +39,9 @@ config.substitutions.append(("%mlir_lib_dir", config.llvm_lib_dir))
 # export the SODA test directory
 config.substitutions.append(("%soda_test_dir", config.test_source_root))
 
+# export the OpenMP library
+config.substitutions.append(("%openmp_lib", config.openmp_lib))
+
 llvm_config.with_system_environment(
     ['HOME', 'INCLUDE', 'LIB', 'TMP', 'TEMP'])
 
