@@ -1,5 +1,6 @@
 llvm_canonicalize_cmake_booleans(
         MLIR_ENABLE_BINDINGS_PYTHON
+        ENABLE_PYTACO 
 )
 
 configure_lit_site_cfg(
