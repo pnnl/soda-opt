@@ -1,4 +1,4 @@
-# RUN: PYTHONPATH=/home/sgh185/new-soda-opt/build/python_packages/soda/:/home/sgh185/taco/build/lib:/home/sgh185/new-soda-opt/python:/home/sgh185/soda-llvm/mlir/test/Integration/Dialect/SparseTensor/taco:/home/sgh185/soda-llvm/build/tools/mlir/python_packages/mlir_core:$PYTHONPATH \
+# RUN: PYTHONPATH=%pyextra:$PYTHONPATH \
 # RUN:  RUNNER_UTILS=%mlir_lib_dir/libmlir_runner_utils%shlibext \
 # RUN:  C_RUNNER_UTILS=%mlir_lib_dir/libmlir_c_runner_utils%shlibext \
 # RUN:  SODA_RUNNER_EXT=%sodashlibdir/libsoda_runner_ext%shlibext \
