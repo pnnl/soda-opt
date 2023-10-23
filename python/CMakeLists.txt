@@ -39,8 +39,9 @@ if(ENABLE_PYTACO)
     ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/mlir_soda"
     ADD_TO_PARENT SODAPythonSources
     SOURCES
-    SOURCES_GLOB
-      pytaco/*.py
+      pytaco/mlir_pytaco_ext.py
+      pytaco/soda_pytaco_check.py
+      pytaco/soda_sparse_compiler.py
   )
 else()
   message(STATUS "SODA-OPT PyTACO support is disabled.")
