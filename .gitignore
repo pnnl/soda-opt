@@ -49,9 +49,6 @@ pythonenv*
 /clang/utils/analyzer/projects/*/RefScanBuildResults
 # pycache
 **/__pycache__
-# any pytaco output directories
-**/pytaco-output
-**/pytaco-tensors
 #==============================================================================#
 # File extensions to be ignored anywhere in the tree.
 #==============================================================================#
