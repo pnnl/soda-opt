@@ -9,6 +9,7 @@ sys.path.append(_SCRIPT_PATH)
 from typing import Optional, List, Tuple, Any
 
 import sparse
+import ast
 import argparse
 from enum import Enum
 
@@ -16,8 +17,9 @@ from mlir_soda.pytaco.soda_sparse_compiler import SODASparseCompiler, MLIRGenOpt
 
 # ------------------------------------------------------------------
 
-LINE = "------------------------------------------------------------"
-DONE = f"DONE.\n{LINE}\n"
+DOUBLE = "============================================================================"
+SINGLE = "----------------------------------------------------------------------------"
+DONE = "DONE."
 DEBUG="[DEBUG]:"
 ERROR="[ERROR]:"
 COMMAND="[CMD]:"
@@ -41,6 +43,11 @@ def tensor_specs(pstr) -> List[Tuple[Tuple[int], float]]:
         specs.append((tuple([int(d) for d in dim_split]), float(density)))
     return specs
 
+def tobool(pstr) -> bool:
+    val = pstr.strip().lower().capitalize()
+    val = ast.literal_eval(pstr)
+    assert type(val) == bool or type(val) == int, f"Invalid boolean specification: {pstr}"
+    return bool(val)
 
 # ------------------------------------------------------------------
 
@@ -95,9 +102,11 @@ def generate_tensors(
 def main(args):
     # Handle tensor generation if specified
     if args.new_tensor_specs is not None:
-        if args.v: print(LINE, f"\n{DEBUG}", f"Generating tensors: {args.new_tensor_specs} ...")
+        if args.v: print(DOUBLE, f"Generating tensors: {args.new_tensor_specs} ...", SINGLE, sep="\n")
         generate_tensors(args.output_dir, args.new_tensor_specs)
-        if args.v: print(DEBUG, DONE)
+        if args.v:
+            print(DEBUG, DONE)
+            print(DOUBLE, "\n")
 
     if 'mlir' not in args.actions: return
 
@@ -105,6 +114,8 @@ def main(args):
     compiler = SODASparseCompiler(args.kernel, args.kernel_dir)
     cap = Capture()
     stem = []
+
+    if args.v: print(DOUBLE, compiler.kernel_name, DOUBLE, sep="\n")   
 
     # ------------------------------------------------------------------
 
@@ -118,12 +129,12 @@ def main(args):
         
         # Generate the MLIR
         if args.v: 
-            print(f"{LINE}\n{DEBUG}", f"Generating MLIR for {compiler.kernel_name} ...")
-            print(DEBUG, f"  Options:")
-            print(DEBUG, f"    emit-entry-point: {mlir_options.entry}")
-            print(DEBUG, f"    print-input-tensors: {mlir_options.print_input}")
-            print(DEBUG, f"    print-output-tensors: {mlir_options.print_output}")
-            print(DEBUG, f"    add-timing: {mlir_options.timing}")
+            print(DOUBLE, f"Generating MLIR for {compiler.kernel_name} ...", SINGLE, sep="\n")
+            print(DEBUG, f"Options:")
+            print(DEBUG, f"  emit-entry-point: {mlir_options.entry}")
+            print(DEBUG, f"  print-input-tensors: {mlir_options.print_input}")
+            print(DEBUG, f"  print-output-tensors: {mlir_options.print_output}")
+            print(DEBUG, f"  add-timing: {mlir_options.timing}")
         
         compiler.compile_pytaco_to_mlir(mlir_options, cap, args.inps)
 
@@ -136,6 +147,7 @@ def main(args):
         if args.v: 
             print(DEBUG, f"MLIR written to {mlir_file_name}")
             print(DEBUG, DONE)
+            print(DOUBLE, "\n")
 
     # ------------------------------------------------------------------
 
@@ -151,7 +163,7 @@ def main(args):
         llvm_file_name = create_file_path(args.output_dir, stem, '.ll')
 
         if args.v: 
-            print(DEBUG, f"Lowering {compiler.kernel_name} [{mlir_file_name}] ...")
+            print(DOUBLE, f"Lowering {compiler.kernel_name} [{mlir_file_name}] ...", SINGLE, sep="\n")
             print(COMMAND, f"{llvm_options.get_lowered_mlir_cmd()} {mlir_file_name} -o {lowered_mlir_file_name} 2>&1 {log_file_name}")
             print(COMMAND, f"{llvm_options.get_lowered_llvm_cmd()} {lowered_mlir_file_name} -o {llvm_file_name}")
 
@@ -165,6 +177,7 @@ def main(args):
             print(DEBUG, f"Lowering log written to {log_file_name}")
             print(DEBUG, f"LLVM-IR written to {llvm_file_name}")
             print(DEBUG, DONE)
+            print(DOUBLE, "\n")
 
     # ------------------------------------------------------------------
 
@@ -179,7 +192,7 @@ def main(args):
         timing_output_file_name = create_file_path(args.output_dir, stem, '.time')
 
         if args.v: 
-            print(DEBUG, f"Running {compiler.kernel_name} [{lowered_mlir_file_name}]...")
+            print(DOUBLE, f"Running {compiler.kernel_name} [{lowered_mlir_file_name}]...", SINGLE, sep="\n")
         
             # Rebuild the mlir-cpu-runner command
             env_vars = f"OMP_NUM_THREADS={run_options.num_threads} {' '.join([f'TENSOR{i}={f}' for i, f in enumerate(run_options.tensor_files)])}"
@@ -197,9 +210,12 @@ def main(args):
             with open(timing_output_file_name, 'w') as f: f.write(cap.timing.getvalue())
         
         if args.v: 
-            print(DEBUG, f"Tensors printed to {tensor_output_file_name}")
-            print(DEBUG, f"Timing recorded in {timing_output_file_name}")
-            print(DONE)
+            if args.print_output_tensors or args.print_input_tensors:
+                print(DEBUG, f"Tensors printed to {tensor_output_file_name}")
+            if args.add_timing:
+                print(DEBUG, f"Timing recorded in {timing_output_file_name}")
+            print(DEBUG, DONE)
+            print(DOUBLE, "\n")
 
     return
     
@@ -248,27 +264,27 @@ if __name__ == "__main__":
     mlir_compilation_group = argparser.add_argument_group('MLIR kernel compilation flags')
     mlir_compilation_group.add_argument(
         '--emit-entry-point',
-        action='store_true',
+        type=tobool,
         default=True,
         help='Emit entry point function (@main) with kernel MLIR (to invoke w/ mlir-cpu-runner)')
     mlir_compilation_group.add_argument(
         '--print-input-tensors',
-        action='store_true',
+        type=tobool,
         default=False,
         help='Add input tensor printing in FROSTT format via sparse_tensor.out')
     mlir_compilation_group.add_argument(
         '--print-output-tensors',
-        action='store_true',
+        type=tobool,
         default=True,
         help='Add output tensor printing in FROSTT format via sparse_tensor.out')
     mlir_compilation_group.add_argument(
         '--add-timing',
-        action='store_true',
+        type=tobool,
         default=False,
         help='Add timing instrumentation to the kernel via rtclock() calls')
     mlir_compilation_group.add_argument(
         '--print-pytaco-mlir',
-        action='store_true',
+        type=tobool,
         default=False,
         help='Print the PyTACO-generated MLIR to stdout')
 
@@ -282,17 +298,17 @@ if __name__ == "__main__":
         help='Option for "soda-opt -soda-sparse-compiler"')
     soda_opt_group.add_argument(
         '--enable-runtime',
-        action='store_true',
+        type=tobool,
         default=False,
         help='Option for "soda-opt -soda-sparse-compiler"')
     soda_opt_group.add_argument(
         '--enable-omp',
-        action='store_true',
+        type=tobool,
         default=True,
         help='Option for "soda-opt -soda-sparse-compiler"')
     soda_opt_group.add_argument(
         '--print-after-all',
-        action='store_true',
+        type=tobool,
         default=True,
         help='Option "-mlir-print-ir-after-all" for "soda-opt -soda-sparse-compiler"')
     soda_opt_group.add_argument(
