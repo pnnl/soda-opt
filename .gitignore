@@ -47,7 +47,8 @@ pythonenv*
 /clang/utils/analyzer/projects/*/PatchedSource
 /clang/utils/analyzer/projects/*/ScanBuildResults
 /clang/utils/analyzer/projects/*/RefScanBuildResults
-
+# pycache
+**/__pycache__
 #==============================================================================#
 # File extensions to be ignored anywhere in the tree.
 #==============================================================================#

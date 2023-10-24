@@ -30,6 +30,24 @@ declare_mlir_python_extension(SODAPythonSources.Extension
 )
 
 ################################################################################
+# Pure python sources and generated code
+################################################################################
+
+if(ENABLE_PYTACO)
+  message(STATUS "Enabling SODA-OPT PyTACO API")
+  declare_mlir_python_sources(SODAPythonSources.PyTACO
+    ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/mlir_soda"
+    ADD_TO_PARENT SODAPythonSources
+    SOURCES
+      pytaco/mlir_pytaco_ext.py
+      pytaco/soda_pytaco_check.py
+      pytaco/soda_sparse_compiler.py
+  )
+else()
+  message(STATUS "SODA-OPT PyTACO support is disabled.")
+endif()
+
+################################################################################
 # Common CAPI
 ################################################################################
 

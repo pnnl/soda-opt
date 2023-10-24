@@ -63,10 +63,12 @@ set(LIBS
   MLIRAffineToStandard
   MLIRComplexToStandard
   MLIRComplexToLLVM
+  MLIRSCFToOpenMP
   MLIRSCFToControlFlow
   MLIRMemRefToLLVM
   MLIRMathToLLVM
   MLIRMathToLibm
+  MLIROpenMPToLLVM
   MLIRArithToLLVM
   MLIRFuncToLLVM
   MLIRLinalgToLLVM
@@ -81,6 +83,7 @@ set(LIBS
   SODALinalgTransforms
   SODAAffineTransforms
   SODATransformTransforms
+  SODASparseTensorPipelines
   SODALinalgReports
   SODAMisc
   MLIRSODAOps
@@ -89,6 +92,9 @@ set(LIBS
   # SNN
   MLIRSNNOps
   MLIRSNNTransforms
+
+  # Runtime
+  soda_runner_ext
 )
 
 set(SOURCES

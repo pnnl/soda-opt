@@ -2,8 +2,8 @@
 
 set -e
 
-if [[ $# -ne 5 ]] ; then
-  echo "Usage: $0 <source_dir> <build_dir> <install_dir> <path/to/llvm/build/dir> <path/to/llvm/install/dir>"
+if [[ $# -lt 5 ]] ; then
+  echo "Usage: $0 <source_dir> <build_dir> <install_dir> <path/to/llvm/build/dir> <path/to/llvm/install/dir> [<extra_cmake_options>] [<extra_cmake_targets>]"
   exit 1
 fi
 
@@ -13,6 +13,8 @@ MY_BUILD_DIR="$2"
 MY_INSTALL_DIR="$3"
 LLVM_BUILD_DIR="$4"
 LLVM_INSTALL_DIR="$5"
+EXTRA_OPTIONS="$6"
+EXTRA_TARGETS="$7"
 
 
 if ! [ -f "$LLVM_BUILD_DIR/bin/llvm-lit" ]; then
@@ -42,6 +44,7 @@ cmake -GNinja \
   -DCMAKE_BUILD_TYPE=Debug \
   -DLLVM_EXTERNAL_LIT=$LLVM_BUILD_DIR/bin/llvm-lit \
   -DMLIR_DIR=$LLVM_INSTALL_DIR/lib/cmake/mlir \
-  -DMLIR_ENABLE_BINDINGS_PYTHON=ON
+  -DPython3_EXECUTABLE=$(which python3) \
+  -DMLIR_ENABLE_BINDINGS_PYTHON=ON ${EXTRA_OPTIONS}
 
-cmake --build "$MY_BUILD_DIR" --target soda-opt soda-translate mlir-runner AllocaNamer XMLWriter SODAPythonModules VhlsLLVMRewriter
+cmake --build "$MY_BUILD_DIR" --target soda-opt soda-translate mlir-runner AllocaNamer XMLWriter SODAPythonModules VhlsLLVMRewriter ${EXTRA_TARGETS}

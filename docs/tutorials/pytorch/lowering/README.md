@@ -20,8 +20,23 @@ then to LLVM IR.
 
 ```
 cd soda-opt/docs/tutorials/torch/lowering/docker-version
-make
+docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) --user $(id -u):$(id -g) agostini01/soda make
 ```
+
+### Accessing the docker container shell
+
+If you want to access the docker container shell so that you don't have to
+prefix every command with 
+`docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) --user $(id -u):$(id -g) agostini01/soda`, 
+you can run the following command:
+
+```bash 
+docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) --user $(id -u):$(id -g) agostini01/soda /bin/bash 
+```
+
+This will mount the current folder into the docker container. Once inside the
+container, you can run `make` to compile the tutorial.
+
 
 ## Artifacts
 
