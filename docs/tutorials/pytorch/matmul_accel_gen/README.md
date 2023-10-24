@@ -17,7 +17,7 @@ Navigate to the turorial folder and run the `make` commands below. This will
 trigger execution of scripts that will generate a simple PyTorch model, lower it
 TOSA dialect, and then generate accelerators and simulation results.
 
-```
+```bash
 cd soda-opt/docs/tutorials/torch/lowering/docker-version
 # Currently, commands inside make are not wrapped with a docker prefix, thus they must be executed inside docker image
 
@@ -30,6 +30,20 @@ docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) --user $(id -u):$(id -g) agostini
 # Generate optimized verilog and simulation results (may take 5min)
 docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) --user $(id -u):$(id -g) agostini01/soda make synth-optimized
 ```
+
+### Accessing the docker container shell
+
+If you want to access the docker container shell so that you don't have to
+prefix every command with 
+`docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) --user $(id -u):$(id -g) agostini01/soda`, 
+you can run the following command:
+
+```bash 
+docker run -it --rm -v $(pwd):$(pwd) -w $(pwd) --user $(id -u):$(id -g) agostini01/soda /bin/bash 
+```
+
+This will mount the current folder into the docker container. Once inside the
+container, you can run the `make` comamnds above to compile the tutorial.
 
 ## Artifacts
 
