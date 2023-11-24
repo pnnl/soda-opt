@@ -2,7 +2,7 @@
 ; RUN:     -xlntbgen -xlntbdummynames="gemm.dummy.c" -xlntbtclnames="gemm.run.tcl" \
 ; RUN:     -xlnllvm="test.ll" -xlnpath=test_path \
 ; RUN:     -clock-period-ns=10 -target=test_board \
-; RUN:     -S -enable-new-pm=0 < %s 2>&1 | FileCheck %s
+; RUN:     -S -enable-new-pm=0 -opaque-pointers=0 < %s 2>&1 | FileCheck %s
 ; RUN: FileCheck %s -input-file=gemm.run.tcl --check-prefixes=CHECK_TCL
 ; RUN: FileCheck %s -input-file=gemm.dummy.c --check-prefixes=CHECK_TB
 

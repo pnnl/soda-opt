@@ -32,6 +32,7 @@ config.test_exec_root = os.path.join(config.soda_obj_root, 'test')
 config.substitutions.append(('%PATH%', config.environment['PATH']))
 config.substitutions.append(('%sodashlibdir', config.soda_lib_root))
 config.substitutions.append(('%shlibext', config.llvm_shlib_ext))
+config.substitutions.append(('%mlir_lib_dir', config.mlir_lib_root))
 
 llvm_config.with_system_environment(
     ['HOME', 'INCLUDE', 'LIB', 'TMP', 'TEMP'])
@@ -59,9 +60,14 @@ tools = [
     'soda-translate',
     'soda-capi-test',
     'mlir-runner',
+    'mlir-cpu-runner',
     'opt',
     ToolSubst('%PYTHON', config.python_executable, unresolved='ignore'),
 ]
+
+print("==========")
+print(config.llvm_tools_dir)
+print("==========")
 
 llvm_config.add_tool_substitutions(tools, tool_dirs)
 

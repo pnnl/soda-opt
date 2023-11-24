@@ -58,7 +58,8 @@ parseTilingString(ModuleOp &module, MLIRContext *context,
       transform.sequence failures(propagate) {
       ^bb0(%arg1: !pdl.operation):
         %0 = transform.structured.match ops{["<anchor-op>"]} in %arg1
-        %1, %loops:<tileNDims> = transform.structured.tile %0 [<tileSizes>]
+        %1, %loops:<tileNDims> = transform.structured.tile %0 [<tileSizes>] : 
+          (!pdl.operation) -> (<pdlOutTypesStr>)
       }
     )MLIR";
 
@@ -80,6 +81,18 @@ parseTilingString(ModuleOp &module, MLIRContext *context,
   // replace <tileNDims> with tile.size()
   std::string tileNDimsStr = std::to_string(tileSizes.size());
   str = str.replace(str.find("<tileNDims>"), 11, tileNDimsStr);
+
+  // replace <pdlOutTypesStr> with the correct number of !pdl.operation,...
+  std::string pdlOutTypeStr = "";
+  // the number of types is given by the number of for loops + 1
+  for (size_t i = 0; i < tileSizes.size() + 1; i++) {
+    pdlOutTypeStr += "!pdl.operation";
+    if (i != tileSizes.size()) {
+      pdlOutTypeStr += ", ";
+    }
+  }
+  // perform string replacement
+  str = str.replace(str.find("<pdlOutTypesStr>"), 16, pdlOutTypeStr);
 
   // Parse the string
   return parseSourceString(str, module, context);
@@ -119,7 +132,8 @@ parseTilingString(ModuleOp &module, MLIRContext *context,
 //         // todo: create tile op
 //         // SmallVector<int64_t, 2> tileSizes = {4, 4};
 //         // auto tiletoScfForOp =
-//         //     b.create<transform::TileOp>(loc, matchOp.getResult(), tileSizes);
+//         //     b.create<transform::TileOp>(loc, matchOp.getResult(),
+//         tileSizes);
 //         // auto forLoops = tiletoScfForOp.getLoops();
 //         // auto tiledOpH = tiletoScfForOp.getTiledLinalgOp();
 

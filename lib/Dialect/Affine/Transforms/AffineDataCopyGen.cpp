@@ -39,7 +39,6 @@
 #include "llvm/Support/Debug.h"
 #include <algorithm>
 
-
 #define DEBUG_TYPE "soda-affine-data-copy-gen"
 
 using namespace mlir;
@@ -73,7 +72,7 @@ struct AffineDataCopyGen
   }
 
   void runOnOperation() override;
-  LogicalResult runOnBlock(Block *block, DenseSet<Operation *> &copyNests);
+  void runOnBlock(Block *block, DenseSet<Operation *> &copyNests);
 
   // Constant zero index to avoid too many duplicates.
   Value zeroIndex = nullptr;
@@ -98,10 +97,10 @@ mlir::soda::createAffineDataCopyGenPass(
 /// ranges: each range is either a sequence of one or more operations starting
 /// and ending with an affine load or store op, or just an affine.forop (which
 /// could have other affine for op's nested within).
-LogicalResult AffineDataCopyGen::runOnBlock(Block *block,
-                                            DenseSet<Operation *> &copyNests) {
+void AffineDataCopyGen::runOnBlock(Block *block,
+                                   DenseSet<Operation *> &copyNests) {
   if (block->empty())
-    return success();
+    return;
 
   uint64_t fastMemCapacityBytes =
       fastMemoryCapacity != std::numeric_limits<uint64_t>::max()
@@ -111,7 +110,7 @@ LogicalResult AffineDataCopyGen::runOnBlock(Block *block,
                                    fastMemorySpace, tagMemorySpace,
                                    fastMemCapacityBytes};
 
-  // Every affine.forop in the block starts and ends a block range for copying;
+  // Every affine.for op in the block starts and ends a block range for copying;
   // in addition, a contiguous sequence of operations starting with a
   // load/store op but not including any copy nests themselves is also
   // identified as a copy block range. Straightline code (a contiguous chunk of
@@ -160,7 +159,7 @@ LogicalResult AffineDataCopyGen::runOnBlock(Block *block,
       if (recurseInner) {
         // We'll recurse and do the copies at an inner level for 'forInst'.
         // Recurse onto the body of this loop.
-        (void)runOnBlock(forOp.getBody(), copyNests);
+        runOnBlock(forOp.getBody(), copyNests);
       } else {
         // We have enough capacity, i.e., copies will be computed for the
         // portion of the block until 'it', and for 'it', which is 'forOp'. Note
@@ -198,8 +197,6 @@ LogicalResult AffineDataCopyGen::runOnBlock(Block *block,
                                  /*end=*/std::prev(block->end()), copyOptions,
                                  /*filterMemRef=*/std::nullopt, copyNests);
   }
-
-  return success();
 }
 
 void AffineDataCopyGen::runOnOperation() {
@@ -215,7 +212,7 @@ void AffineDataCopyGen::runOnOperation() {
   copyNests.clear();
 
   for (auto &block : f)
-    (void)runOnBlock(&block, copyNests);
+    runOnBlock(&block, copyNests);
 
   // Promote any single iteration loops in the copy nests and collect
   // load/stores to simplify.
@@ -237,5 +234,6 @@ void AffineDataCopyGen::runOnOperation() {
   AffineLoadOp::getCanonicalizationPatterns(patterns, &getContext());
   AffineStoreOp::getCanonicalizationPatterns(patterns, &getContext());
   FrozenRewritePatternSet frozenPatterns(std::move(patterns));
-  (void)applyOpPatternsAndFold(copyOps, frozenPatterns, /*strict=*/true);
+  (void)applyOpPatternsAndFold(copyOps, frozenPatterns,
+                               GreedyRewriteStrictness::ExistingAndNewOps);
 }

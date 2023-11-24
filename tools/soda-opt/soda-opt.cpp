@@ -15,6 +15,7 @@
 #include "llvm/Support/ToolOutputFile.h"
 
 #include "soda/Conversion/Passes.h"
+#include "soda/Dialect/Accel/IR/Accel.h"
 #include "soda/Dialect/Linalg/Reports/Passes.h"
 #include "soda/Dialect/Linalg/Transforms/Passes.h"
 #include "soda/Dialect/SNN/IR/SNN.h"
@@ -123,8 +124,8 @@ int main(int argc, char **argv) {
   //===--------------------------------------------------------------------===//
 
   // Dialects
-  registry.insert<mlir::soda::SODADialect>();
-  registry.insert<mlir::snn::SNNDialect>();
+  registry.insert<mlir::soda::SODADialect, mlir::snn::SNNDialect,
+                  mlir::accel::AccelDialect>();
 
   // ----- SODA -----
   // Misc passes
@@ -163,6 +164,7 @@ int main(int argc, char **argv) {
   mlir::soda::registerOptimizedForVitisHLSPass();
 
   // Conversion passes
+  mlir::soda::registerConvertAccelToAXI4MLIR();
 
   // ----- SNN -----
   mlir::snn::registerSNNPrintPass();

@@ -1,4 +1,5 @@
 // RUN: soda-opt %s -soda-linalg-tile="tile-sizes=2,4,8 anchor-op=linalg.matmul" -cse| FileCheck %s --check-prefix=TILE
+// RUN: soda-opt %s -soda-linalg-tile="tile-sizes=2,3 anchor-op=linalg.conv_2d" -cse| FileCheck %s --check-prefix=TILE_CONV
 
 
 // transform.sequence failures(propagate) {
@@ -40,3 +41,13 @@ func.func @linalg_generic(%in0t: tensor<4x4xf32>, %out0t: tensor<4xf32>) {
 
 // TILE-LABEL:  func.func @linalg_generic
 // TILE-NOT:    scf.for
+
+func.func @conv(%arg0 : memref<?x?xf32>, %arg1 : memref<?x?xf32>, %arg2 : memref<?x?xf32>) {
+  linalg.conv_2d ins(%arg0, %arg1 : memref<?x?xf32>, memref<?x?xf32>) outs(%arg2 : memref<?x?xf32>)
+  return
+}
+
+// TILE_CONV: func @conv
+// TILE_CONV:   scf.for %{{.*}} = %{{.*}} to %{{.*}} step
+// TILE_CONV:     scf.for %{{.*}} = %{{.*}} to %{{.*}} step
+// TILE_CONV:       linalg.conv_2d

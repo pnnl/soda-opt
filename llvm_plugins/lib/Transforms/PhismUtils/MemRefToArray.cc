@@ -337,7 +337,8 @@ private:
     lhs = rhs;
   }
 
-  template <typename T> void setMemberOnce(T *&lhs, T *rhs) {
+  template <typename T>
+  void setMemberOnce(T *&lhs, T *rhs) {
     assert(lhs == nullptr);
     lhs = rhs;
   }
@@ -608,7 +609,8 @@ static Instruction *duplicateGEPWithRankedArray(Instruction *I,
   IdxList.push_back(Addr);
 
   GetElementPtrInst *NewGEP = GetElementPtrInst::CreateInBounds(
-      RankedArrayPtr->getType()->getScalarType()->getPointerElementType(), RankedArrayPtr, IdxList, "gep" + Twine(NumNewGEP++), GEP->getNextNode());
+      RankedArrayPtr->getType()->getScalarType()->getPointerElementType(),
+      RankedArrayPtr, IdxList, "gep" + Twine(NumNewGEP++), GEP->getNextNode());
 
   return NewGEP;
 }
@@ -680,7 +682,7 @@ static SmallVector<Function *> TopologicalSort(ArrayRef<Function *> funcs) {
     graph[F] = {};
 
   for (Function *F : funcs)
-    for (BasicBlock &BB : F->getBasicBlockList())
+    for (BasicBlock &BB : *F)
       for (Instruction &I : BB)
         if (isa<CallInst>(I) &&
             Avail.count(cast<CallInst>(I).getCalledFunction()))
@@ -1030,8 +1032,9 @@ static void convertMemRefToArray(Module &M, bool ranked = false) {
         indices.push_back(ConstantInt::get(indices.front()->getType(), 0));
         std::reverse(indices.begin(), indices.end());
 
-        NewGEP = GetElementPtrInst::CreateInBounds(ptr->getType()->getScalarType()->getPointerElementType(), ptr, indices, Twine(""),
-                                                   I->getNextNode());
+        NewGEP = GetElementPtrInst::CreateInBounds(
+            ptr->getType()->getScalarType()->getPointerElementType(), ptr,
+            indices, Twine(""), I->getNextNode());
         LLVM_DEBUG({
           dbgs() << "Newly generated GEP: ";
           NewGEP->dump();

@@ -15,6 +15,8 @@
 #include "soda/Conversion/KernelsToSODA/OperationToSODAPass.h"
 #include "soda/Conversion/KernelsToSODA/SCFToSODAPass.h"
 
+#include "soda/Conversion/AccelToRuntime/AccelToAXI4MLIR.h"
+
 namespace mlir {
 namespace soda {
 
