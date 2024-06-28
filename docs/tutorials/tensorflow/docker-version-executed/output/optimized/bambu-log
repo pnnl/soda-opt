@@ -17,7 +17,7 @@
                 Copyright (C) 2004-2022 Politecnico di Milano
     Version: PandA 0.9.8 - Revision 891ec3caed502474cab0813cc4a9fc678deabaa5
 
-Parameters parsed in 0.12 seconds
+Parameters parsed in 0.21 seconds
 
 Target technology = FPGA
 Library Name     : STD_FU
@@ -223,7 +223,7 @@ Warning: This function uses unknown addresses: main_kernel
   Module allocation information for function __float_adde8m23b_127nih:
     Number of complex operations: 0
     Number of complex operations: 0
-  Time to perform module allocation: 0.05 seconds
+  Time to perform module allocation: 0.08 seconds
 
 
   Module allocation information for function __float_mule8m23b_127nih:
@@ -236,7 +236,7 @@ Warning: This function uses unknown addresses: main_kernel
     Number of control steps: 5
     Minimum slack: 1.2453454070818424
     Estimated max frequency (MHz): 266.33608372023093
-  Time to perform scheduling: 0.03 seconds
+  Time to perform scheduling: 0.04 seconds
 
   Number of function call sites = 128
 
@@ -248,14 +248,14 @@ Warning: This function uses unknown addresses: main_kernel
     Maximum number of cycles 4
     Parameters are registered
     Done port is registered
-  Time to perform creation of STG: 0.02 seconds
+  Time to perform creation of STG: 0.03 seconds
 
 
   Scheduling Information of function __float_mule8m23b_127nih:
     Number of control steps: 4
     Minimum slack: 0.089668775531421829
     Estimated max frequency (MHz): 203.65224957064382
-  Time to perform scheduling: 0.02 seconds
+  Time to perform scheduling: 0.03 seconds
 
   Number of function call sites = 128
 
@@ -289,7 +289,7 @@ Warning: This function uses unknown addresses: main_kernel
     Number of storage values inserted: 4
   Time to compute storage value information: 0.00 seconds
 
-  Slack computed in 0.01 seconds
+  Slack computed in 0.00 seconds
   Weight computation completed in 0.00 seconds
   False-loop computation completed in 0.00 seconds
   Iteration 0 completed in 0.00 seconds
@@ -299,7 +299,7 @@ Warning: This function uses unknown addresses: main_kernel
   Time to perform register binding: 0.00 seconds
 
   Iteration 1 completed in 0.00 seconds
-  Clique covering computation completed in 0.00 seconds
+  Clique covering computation completed in 0.01 seconds
 
   Module binding information for function __float_adde8m23b_127nih:
     Number of modules instantiated: 248
@@ -349,14 +349,14 @@ Warning: This function uses unknown addresses: main_kernel
   Module allocation information for function main_kernel:
     Number of complex operations: 352
     Number of complex operations: 352
-  Time to perform module allocation: 0.03 seconds
+  Time to perform module allocation: 0.04 seconds
 
 
   Scheduling Information of function main_kernel:
     Number of control steps: 58
     Minimum slack: 0.089668773531400348
     Estimated max frequency (MHz): 203.65224948769446
-  Time to perform scheduling: 0.38 seconds
+  Time to perform scheduling: 0.46 seconds
 
   Number of function call sites = 0
 
@@ -367,7 +367,7 @@ Warning: This function uses unknown addresses: main_kernel
     Minimum number of cycles: 56
     Maximum number of cycles 56
     Done port is registered
-  Time to perform creation of STG: 0.42 seconds
+  Time to perform creation of STG: 0.47 seconds
 
 
   Easy binding information for function main_kernel:
@@ -380,22 +380,22 @@ Warning: This function uses unknown addresses: main_kernel
   Time to compute storage value information: 0.00 seconds
 
   Slack computed in 0.01 seconds
-  Weight computation completed in 0.08 seconds
+  Weight computation completed in 0.10 seconds
   False-loop computation completed in 0.00 seconds
   cdfc mux estimation 93 -- Number of cliques covering the graph: 2 main_kernel_BMEMORY_CTRLN_774 with 96 vertices
   cdfc mux estimation 224 -- Number of cliques covering the graph: 16 main_kernel___float_adde8m23b_127nih_806 with 128 vertices
   cdfc mux estimation 224 -- Number of cliques covering the graph: 16 main_kernel___float_mule8m23b_127nih_807 with 128 vertices
-  Iteration 0 completed in 1.10 seconds
+  Iteration 0 completed in 1.13 seconds
 
   Register binding information for function main_kernel:
     Register allocation algorithm obtains a sub-optimal result: 607 registers(LB:124)
-  Time to perform register binding: 0.27 seconds
+  Time to perform register binding: 0.33 seconds
 
   cdfc mux estimation 93 -- Number of cliques covering the graph: 2 main_kernel_BMEMORY_CTRLN_774 with 96 vertices
   cdfc mux estimation 224 -- Number of cliques covering the graph: 16 main_kernel___float_adde8m23b_127nih_806 with 128 vertices
   cdfc mux estimation 224 -- Number of cliques covering the graph: 16 main_kernel___float_mule8m23b_127nih_807 with 128 vertices
-  Iteration 1 completed in 1.10 seconds
-  Clique covering computation completed in 2.47 seconds
+  Iteration 1 completed in 1.14 seconds
+  Clique covering computation completed in 2.60 seconds
 
   Module binding information for function main_kernel:
     Number of modules instantiated: 885
@@ -404,12 +404,12 @@ Warning: This function uses unknown addresses: main_kernel
     Estimated area of MUX21: 314110.59999999998
     Total estimated area: 508089.59999999998
     Estimated number of DSPs: 0
-  Time to perform module binding: 2.58 seconds
+  Time to perform module binding: 2.73 seconds
 
 
   Register binding information for function main_kernel:
     Register allocation algorithm obtains a sub-optimal result: 607 registers(LB:124)
-  Time to perform register binding: 0.27 seconds
+  Time to perform register binding: 0.31 seconds
 
 
   Connection Binding Information for function main_kernel:

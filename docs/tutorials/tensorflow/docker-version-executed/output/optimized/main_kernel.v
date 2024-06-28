@@ -1,6 +1,6 @@
 // 
 // Politecnico di Milano
-// Code created using PandA - Version: PandA 0.9.8 - Revision 891ec3caed502474cab0813cc4a9fc678deabaa5 - Date 2022-10-07T16:38:15
+// Code created using PandA - Version: PandA 0.9.8 - Revision 891ec3caed502474cab0813cc4a9fc678deabaa5 - Date 2024-06-28T14:27:22
 // bambu executed with: bambu -v3 --print-dot -lm --soft-float --compiler=I386_CLANG12 --device=nangate45 --clock-period=5 --no-iob --experimental-setup=BAMBU-BALANCED-MP --channels-number=2 --memory-allocation-policy=ALL_BRAM --disable-function-proxy --generate-tb=main_kernel_test.xml --simulate --simulator=VERILATOR --top-fname=main_kernel input.ll 
 // 
 // Send any bug to: panda-info@polimi.it

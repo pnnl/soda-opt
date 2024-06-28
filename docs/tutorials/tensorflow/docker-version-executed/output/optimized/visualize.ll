@@ -1,7 +1,7 @@
 ; ModuleID = 'input.ll'
 source_filename = "LLVMDialectModule"
 
-; Function Attrs: argmemonly mustprogress nofree norecurse nosync nounwind willreturn
+; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: readwrite)
 define void @main_kernel(float* noalias nocapture readonly %0, float* noalias nocapture readonly %1, float* noalias nocapture %2) local_unnamed_addr #0 {
   %4 = load float, float* %0, align 4
   %5 = getelementptr float, float* %0, i64 1
@@ -435,7 +435,7 @@ define void @main_kernel(float* noalias nocapture readonly %0, float* noalias no
   ret void
 }
 
-attributes #0 = { argmemonly mustprogress nofree norecurse nosync nounwind willreturn }
+attributes #0 = { mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: readwrite) }
 
 !llvm.module.flags = !{!0}
 

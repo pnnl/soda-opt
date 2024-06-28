@@ -1,7 +1,7 @@
 ; ModuleID = 'input.ll'
 source_filename = "LLVMDialectModule"
 
-; Function Attrs: argmemonly nofree norecurse nosync nounwind
+; Function Attrs: nofree norecurse nosync nounwind memory(argmem: readwrite)
 define void @main_kernel(float* nocapture readonly %0, float* nocapture readonly %1, float* nocapture %2) local_unnamed_addr #0 {
   br label %.preheader1
 
@@ -99,7 +99,7 @@ define void @main_kernel(float* nocapture readonly %0, float* nocapture readonly
   ret void
 }
 
-attributes #0 = { argmemonly nofree norecurse nosync nounwind }
+attributes #0 = { nofree norecurse nosync nounwind memory(argmem: readwrite) }
 
 !llvm.module.flags = !{!0}
 

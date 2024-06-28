@@ -17,7 +17,7 @@
                 Copyright (C) 2004-2022 Politecnico di Milano
     Version: PandA 0.9.8 - Revision 891ec3caed502474cab0813cc4a9fc678deabaa5
 
-Parameters parsed in 0.15 seconds
+Parameters parsed in 0.31 seconds
 
 Target technology = FPGA
 Library Name     : STD_FU
@@ -231,20 +231,20 @@ Warning: This function uses unknown addresses: main_kernel
   Module allocation information for function __float_adde8m23b_127nih:
     Number of complex operations: 0
     Number of complex operations: 0
-  Time to perform module allocation: 0.07 seconds
+  Time to perform module allocation: 0.08 seconds
 
 
   Module allocation information for function __float_mule8m23b_127nih:
     Number of complex operations: 0
     Number of complex operations: 0
-  Time to perform module allocation: 0.06 seconds
+  Time to perform module allocation: 0.07 seconds
 
 
   Scheduling Information of function __float_adde8m23b_127nih:
     Number of control steps: 5
     Minimum slack: 1.2453454070818424
     Estimated max frequency (MHz): 266.33608372023093
-  Time to perform scheduling: 0.03 seconds
+  Time to perform scheduling: 0.05 seconds
 
   Number of function call sites = 8
 
@@ -263,7 +263,7 @@ Warning: This function uses unknown addresses: main_kernel
     Number of control steps: 4
     Minimum slack: 0.089668775531421829
     Estimated max frequency (MHz): 203.65224957064382
-  Time to perform scheduling: 0.03 seconds
+  Time to perform scheduling: 0.04 seconds
 
   Number of function call sites = 8
 
@@ -275,7 +275,7 @@ Warning: This function uses unknown addresses: main_kernel
     Maximum number of cycles 3
     Parameters are registered
     Done port is registered
-  Time to perform creation of STG: 0.02 seconds
+  Time to perform creation of STG: 0.01 seconds
 
 
   Easy binding information for function __float_adde8m23b_127nih:
@@ -324,7 +324,7 @@ Warning: This function uses unknown addresses: main_kernel
   Time to perform register binding: 0.00 seconds
 
   Total number of flip-flops in function __float_adde8m23b_127nih: 139
-  Slack computed in 0.00 seconds
+  Slack computed in 0.01 seconds
   Weight computation completed in 0.00 seconds
   False-loop computation completed in 0.00 seconds
   Iteration 0 completed in 0.00 seconds
@@ -343,7 +343,7 @@ Warning: This function uses unknown addresses: main_kernel
     Estimated area of MUX21: 0
     Total estimated area: 113692
     Estimated number of DSPs: 0
-  Time to perform module binding: 0.00 seconds
+  Time to perform module binding: 0.01 seconds
 
 
   Register binding information for function __float_mule8m23b_127nih:
@@ -364,7 +364,7 @@ Warning: This function uses unknown addresses: main_kernel
     Number of control steps: 86
     Minimum slack: 0.089668773531400348
     Estimated max frequency (MHz): 203.65224948769446
-  Time to perform scheduling: 0.03 seconds
+  Time to perform scheduling: 0.04 seconds
 
   Number of function call sites = 0
 
@@ -373,7 +373,7 @@ Warning: This function uses unknown addresses: main_kernel
     Number of basic blocks: 7
     Number of states: 84
     Done port is registered
-  Time to perform creation of STG: 0.07 seconds
+  Time to perform creation of STG: 0.09 seconds
 
 
   Easy binding information for function main_kernel:
@@ -383,7 +383,7 @@ Warning: This function uses unknown addresses: main_kernel
 
   Storage Value Information of function main_kernel:
     Number of storage values inserted: 66
-  Time to compute storage value information: 0.01 seconds
+  Time to compute storage value information: 0.00 seconds
 
   Slack computed in 0.00 seconds
   Weight computation completed in 0.00 seconds
@@ -391,11 +391,11 @@ Warning: This function uses unknown addresses: main_kernel
   cdfc mux estimation 22 -- Number of cliques covering the graph: 2 main_kernel_BMEMORY_CTRLN_85 with 25 vertices
   cdfc mux estimation 14 -- Number of cliques covering the graph: 1 main_kernel___float_adde8m23b_127nih_121 with 8 vertices
   cdfc mux estimation 14 -- Number of cliques covering the graph: 1 main_kernel___float_mule8m23b_127nih_122 with 8 vertices
-  Iteration 0 completed in 0.00 seconds
+  Iteration 0 completed in 0.01 seconds
 
   Register binding information for function main_kernel:
     Register allocation algorithm obtains a sub-optimal result: 64 registers(LB:27)
-  Time to perform register binding: 0.01 seconds
+  Time to perform register binding: 0.00 seconds
 
   cdfc mux estimation 22 -- Number of cliques covering the graph: 2 main_kernel_BMEMORY_CTRLN_85 with 25 vertices
   cdfc mux estimation 14 -- Number of cliques covering the graph: 1 main_kernel___float_adde8m23b_127nih_121 with 8 vertices
@@ -410,18 +410,18 @@ Warning: This function uses unknown addresses: main_kernel
     Estimated area of MUX21: 32300
     Total estimated area: 98092
     Estimated number of DSPs: 0
-  Time to perform module binding: 0.01 seconds
+  Time to perform module binding: 0.02 seconds
 
 
   Register binding information for function main_kernel:
     Register allocation algorithm obtains a sub-optimal result: 64 registers(LB:27)
-  Time to perform register binding: 0.00 seconds
+  Time to perform register binding: 0.01 seconds
 
 
   Connection Binding Information for function main_kernel:
     Number of allocated multiplexers (2-to-1 equivalent): 52
     Total number of bit-level multiplexers: 1728
-  Time to perform interconnection binding: 0.01 seconds
+  Time to perform interconnection binding: 0.00 seconds
 
   Total number of flip-flops in function main_kernel: 2046
  .:: Creating Generic Bash Backend Flow ::.
@@ -430,10 +430,6 @@ Warning: This function uses unknown addresses: main_kernel
   Parameter P2 (494939) (testvector 0) allocated at 1073742080 : reserved_mem_size = 64
   C-based testbench generation for function main_kernel: /working_dir/HLS_output//simulation/values.c
   Prepared testbench
-clang: warning: optimization flag '-ffloat-store' is not supported [-Wignored-optimization-argument]
-clang: warning: optimization flag '-ffloat-store' is not supported [-Wignored-optimization-argument]
-warning: overriding the module target triple with i386-pc-linux-gnu [-Woverride-module]
-1 warning generated.
 clang: warning: optimization flag '-ffloat-store' is not supported [-Wignored-optimization-argument]
 clang: warning: optimization flag '-ffloat-store' is not supported [-Wignored-optimization-argument]
 warning: overriding the module target triple with i386-pc-linux-gnu [-Woverride-module]
@@ -475,7 +471,11 @@ warning: overriding the module target triple with i386-pc-linux-gnu [-Woverride-
      - ui_mult_expr_FU: 1
      - ui_ne_expr_FU: 19
      - ui_plus_expr_FU: 15
-     - ui_pointer_plus_expr_FU: 17
+     - ui_pointer_plus_expr_FU: 17clang: warning: optimization flag '-ffloat-store' is not supported [-Wignored-optimization-argument]
+clang: warning: optimization flag '-ffloat-store' is not supported [-Wignored-optimization-argument]
+warning: overriding the module target triple with i386-pc-linux-gnu [-Woverride-module]
+1 warning generated.
+
      - ui_rshift_expr_FU: 58
      - ui_ternary_plus_expr_FU: 1
      - ui_ternary_pm_expr_FU: 1
