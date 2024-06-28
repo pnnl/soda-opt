@@ -39,7 +39,7 @@ conda create --name soda tensorflow-cpu pandas lxml
 conda activate soda
 ```
 
-Enter the HPCA tutorial directory with vscode or another tool capable of rendering jupyter notebooks.
+Enter the tutorial directory with vscode or another tool capable of rendering jupyter notebooks.
 
 ```bash
 # Open this folder with vscode
