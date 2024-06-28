@@ -9,7 +9,7 @@ Download this project on a machine **capable of running docker containers** and
 update the docker image to the latest version.
 
 ```
-git clone https://gitlab.pnnl.gov/sodalite/soda-opt
+git clone https://github.com/pnnl/soda-opt
 docker pull agostini01/soda
 ```
 

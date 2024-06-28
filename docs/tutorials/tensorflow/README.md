@@ -10,7 +10,7 @@ optimization of selected kernels.
 Download this project on a machine **capable of running docker containers**
 
 ```
-git clone https://gitlab.pnnl.gov/sodalite/soda-opt
+git clone https://github.com/pnnl/soda-opt
 ```
 
 Navigate to the turorial folder
