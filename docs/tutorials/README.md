@@ -3,8 +3,8 @@
 Variations of the examples in this folder have been used as tutorials for the
 *SODA Synthesizer* in many conferences.
 
-- [Generating accelerators for TensorFlow models](tensorflow/README.md)
-- [Generating accelerators for Pytorch models](pytorch/README.md)
+- [Generating accelerators for TensorFlow models](tensorflow)
+- [Generating accelerators for Pytorch models](pytorch)
 
 
 # ISCA-2024 Tutorial

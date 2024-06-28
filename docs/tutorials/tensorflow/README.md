@@ -63,4 +63,4 @@ If required, **grant permissions for vscode to install any missing dependencies*
 
 # Instructions for users without docker access
 
-Please follow the tutorial using the files and folders available [here](docs/tutorials/tensorflow/docker-version-executed).
+Please follow the tutorial using the files and folders available [here](docker-version-executed).
