@@ -72,6 +72,7 @@ set(LIBS
   # Conversion SODA
   SODAKERNELToSODA
   SODAFuncToLLVM
+  # SODALinalgToAccel
 
   # SODA
   SODALinalgTransforms
@@ -85,6 +86,10 @@ set(LIBS
   # SNN
   MLIRSNNOps
   MLIRSNNTransforms
+
+  # ACCEL
+  SODAAccelDialect
+  SODAAccelToRuntime
 )
 
 set(SOURCES

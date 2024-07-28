@@ -16,8 +16,8 @@
 #include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
-#include "mlir/IR/BlockAndValueMapping.h"
 #include "mlir/IR/Builders.h"
+#include "mlir/IR/IRMapping.h"
 #include "mlir/IR/SymbolTable.h"
 #include "mlir/Parser/Parser.h"
 #include "mlir/Support/LLVM.h"
@@ -98,7 +98,7 @@ LogicalResult mlir::sinkOperationsIntoLaunchOp(soda::LaunchOp launchOp) {
   }
 
   // Insert operations so that the defs get cloned before uses.
-  BlockAndValueMapping map;
+  IRMapping map;
   OpBuilder builder(launchOpBody);
   for (Operation *op : toBeSunk) {
     Operation *clonedOp = builder.clone(*op, map);
@@ -137,7 +137,7 @@ outlineKernelFuncImpl(soda::LaunchOp launchOp, StringRef kernelFnName,
   auto outlinedFunc = builder.create<soda::SODAFuncOp>(loc, kernelFnName, type);
   outlinedFunc->setAttr(soda::SODADialect::getKernelFuncAttrName(),
                         builder.getUnitAttr());
-  BlockAndValueMapping map;
+  IRMapping map;
 
   // Map the arguments corresponding to the launch parameter like blockIdx,
   // threadIdx, etc.

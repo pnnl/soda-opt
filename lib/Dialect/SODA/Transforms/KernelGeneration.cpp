@@ -17,9 +17,9 @@
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
-#include "mlir/IR/BlockAndValueMapping.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/FunctionInterfaces.h"
+#include "mlir/IR/IRMapping.h"
 #include "mlir/IR/SymbolTable.h"
 #include "mlir/Support/LLVM.h"
 #include "mlir/Transforms/RegionUtils.h"
@@ -72,7 +72,7 @@ void SodaKernelGenerationPass::runOnOperation() {
       return signalPassFailure();
     }
 
-    BlockAndValueMapping map;
+    IRMapping map;
     sodaOp.getRegion().cloneInto(&(mop.getRegion()), map);
     sodaOp.erase();
 
