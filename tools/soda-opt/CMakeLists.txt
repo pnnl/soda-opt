@@ -88,8 +88,9 @@ set(LIBS
   MLIRSNNTransforms
 
   # ACCEL
-  SODAAccelDialect
-  SODAAccelToRuntime
+  # WIP: AXI4MLIR integration
+  #SODAAccelDialect
+  #SODAAccelToRuntime
 )
 
 set(SOURCES

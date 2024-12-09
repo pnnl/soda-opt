@@ -33,4 +33,5 @@ void mlir::accel::AccelDialect::initialize() {
 #include "soda/Dialect/Accel/IR/AccelOps.cpp.inc"
       >();
   addInterfaces<AccelInlinerInterface>();
+  registerAttributes();
 }
