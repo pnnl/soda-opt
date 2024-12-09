@@ -16,5 +16,8 @@ def Accel_Dialect : Dialect {
     AXI4MLIR DMA communciations.
   }];
   let useFoldAPI = kEmitFoldAdaptorFolder;
+  let extraClassDeclaration = [{
+    void registerAttributes();
+  }];
 }
 #endif // ACCEL_BASE

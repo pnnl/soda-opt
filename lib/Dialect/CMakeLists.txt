@@ -2,5 +2,6 @@ add_subdirectory(SODA)
 add_subdirectory(SNN)
 add_subdirectory(Linalg)
 add_subdirectory(Affine)
-add_subdirectory(Accel)
+# WIP: AXI4MLIR integration
+#add_subdirectory(Accel)
 add_subdirectory(Transform)

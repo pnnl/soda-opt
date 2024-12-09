@@ -13,7 +13,8 @@ add_mlir_conversion_library(SODALinalgToAccel
 
   LINK_LIBS PUBLIC
   MLIRArithDialect
-  SODAAccelDialect
+  # WIP: AXI4MLIR integration
+  #SODAAccelDialect
   MLIRMemRefDialect
   MLIRTransforms
   )
