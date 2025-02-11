@@ -37,6 +37,7 @@ set(LIBS
   MLIRTilingInterfaceTestPasses
   
   # TransformOps 
+  MLIRFuncTransformOps
   MLIRLinalgTransformOps
   MLIRSCFTransformOps
   
@@ -51,6 +52,7 @@ set(LIBS
   MLIRSCFTransforms
   MLIRReconcileUnrealizedCasts
   MLIRMemRefTransforms
+  MLIRTransformDialectTransforms
 
   # Test Passes
   MLIRLinalgTestPasses
@@ -66,8 +68,8 @@ set(LIBS
   MLIRMathToLibm
   MLIRArithToLLVM
   MLIRFuncToLLVM
-  MLIRLinalgToLLVM
   MLIRLinalgToStandard
+  MLIRVectorToLLVMPass
 
   # Conversion SODA
   SODAKERNELToSODA

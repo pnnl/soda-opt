@@ -8,7 +8,7 @@
 // RUN:    -affine-loop-unroll="unroll-full" \
 // RUN:    -affine-loop-unroll="unroll-full" \
 // RUN:    -affine-scalrep -cse \
-// RUN:    -lower-affine -convert-scf-to-cf -convert-memref-to-llvm \
+// RUN:    -lower-affine -convert-scf-to-cf -finalize-memref-to-llvm \
 // RUN:    --convert-math-to-llvm --convert-math-to-libm \
 // RUN:    -arith-expand   \
 // RUN:    -memref-expand  \
