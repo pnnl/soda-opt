@@ -15,7 +15,7 @@ def LinalgTiling : Pass<"soda-linalg-tile", "ModuleOp"> {
   let summary = "Tile operations in the linalg dialect. Default to tile all "
                 "linalg.generic operations.";
   let dependentDialects = [
-    "AffineDialect",
+    "affine::AffineDialect",
     "linalg::LinalgDialect",
     "memref::MemRefDialect",
     "scf::SCFDialect",
