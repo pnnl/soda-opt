@@ -212,7 +212,7 @@ void registerPassManagerMiscPass() {
 
         // When given a cache size, tile affine loops
         if (options.cacheSizeInKiB > 0)
-          pm.addPass(mlir::createLoopTilingPass(options.cacheSizeInKiB * 1024));
+          pm.addPass(mlir::affine::createLoopTilingPass(options.cacheSizeInKiB * 1024));
 
         pm.addPass(createLowerAffinePass());
         pm.addPass(createCanonicalizerPass());
@@ -221,7 +221,7 @@ void registerPassManagerMiscPass() {
         pm.addPass(createConvertComplexToStandardPass());
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass()); // Only has impact outside linalg ops
-        pm.addPass(createMemRefToLLVMConversionPass());
+        pm.addPass(createFinalizeMemRefToLLVMConversionPass());
         pm.addPass(createConvertMathToLLVMPass());
         pm.addPass(createConvertMathToLibmPass());
         pm.addPass(arith::createArithExpandOpsPass());
@@ -263,7 +263,7 @@ void registerSimpleLoweringPass() {
         pm.addPass(createArithToLLVMConversionPass());
         pm.addPass(memref::createExpandOpsPass());
         pm.addPass(createConvertVectorToLLVMPass());
-        pm.addPass(createMemRefToLLVMConversionPass());
+        pm.addPass(createFinalizeMemRefToLLVMConversionPass());
         pm.addPass(createConvertComplexToLLVMPass());
         if (options.useBarePtrCallConv) {
           pm.addPass(createCustomFuncToLLVMPass(options.useBarePtrCallConv));
@@ -272,7 +272,7 @@ void registerSimpleLoweringPass() {
             pm.addPass(LLVM::createRequestCWrappersPass());
           pm.addPass(createConvertFuncToLLVMPass());
         }
-        pm.addPass(cf::createConvertControlFlowToLLVMPass());
+        pm.addPass(createConvertControlFlowToLLVMPass());
         pm.addPass(createReconcileUnrealizedCastsPass());
         pm.addPass(createSymbolDCEPass());
       });
@@ -317,7 +317,7 @@ void registerOptimizedForBambuPass() {
 
         for (size_t i = 0; i < options.numberOfFullUnrolls; i++) {
           // --affine-loop-unroll="unroll-full"
-          pm.addPass(mlir::createLoopUnrollPass(4, false, true, 0));
+          pm.addPass(mlir::affine::createLoopUnrollPass(4, false, true, 0));
         }
 
         pm.addPass(createCSEPass());
@@ -326,7 +326,7 @@ void registerOptimizedForBambuPass() {
 
         if (!options.noScalarReplacement) {
           // --affine-scalrep
-          pm.addPass(mlir::createAffineScalarReplacementPass());
+          pm.addPass(mlir::affine::createAffineScalarReplacementPass());
         }
 
         pm.addPass(createLowerAffinePass());
@@ -336,7 +336,7 @@ void registerOptimizedForBambuPass() {
         pm.addPass(createConvertComplexToStandardPass());
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass());
-        pm.addPass(createMemRefToLLVMConversionPass());
+        pm.addPass(createFinalizeMemRefToLLVMConversionPass());
         pm.addPass(createConvertMathToLLVMPass());
         pm.addPass(createConvertMathToLibmPass());
         pm.addPass(arith::createArithExpandOpsPass());
@@ -351,7 +351,7 @@ void registerOptimizedForBambuPass() {
             pm.addPass(LLVM::createRequestCWrappersPass());
           pm.addPass(createConvertFuncToLLVMPass());
         }
-        pm.addPass(cf::createConvertControlFlowToLLVMPass());
+        pm.addPass(createConvertControlFlowToLLVMPass());
         pm.addPass(createReconcileUnrealizedCastsPass());
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createSymbolDCEPass());
@@ -397,7 +397,7 @@ void registerOptimizedForVitisHLSPass() {
 
         for (size_t i = 0; i < options.numberOfFullUnrolls; i++) {
           // --affine-loop-unroll="unroll-full"
-          pm.addPass(mlir::createLoopUnrollPass(4, false, true, 0));
+          pm.addPass(mlir::affine::createLoopUnrollPass(4, false, true, 0));
         }
 
         pm.addPass(createCSEPass());
@@ -406,7 +406,7 @@ void registerOptimizedForVitisHLSPass() {
 
         if (!options.noScalarReplacement) {
           // --affine-scalrep
-          pm.addPass(mlir::createAffineScalarReplacementPass());
+          pm.addPass(mlir::affine::createAffineScalarReplacementPass());
         }
 
         pm.addPass(createLowerAffinePass());
@@ -416,7 +416,7 @@ void registerOptimizedForVitisHLSPass() {
         pm.addPass(createConvertComplexToStandardPass());
         pm.addPass(createCanonicalizerPass());
         pm.addPass(createCSEPass());
-        pm.addPass(createMemRefToLLVMConversionPass());
+        pm.addPass(createFinalizeMemRefToLLVMConversionPass());
         pm.addPass(createConvertMathToLLVMPass());
         pm.addPass(createConvertMathToLibmPass());
         pm.addPass(arith::createArithExpandOpsPass());
@@ -429,7 +429,7 @@ void registerOptimizedForVitisHLSPass() {
         } else {
           pm.addPass(createConvertFuncToLLVMPass());
         }
-        pm.addPass(cf::createConvertControlFlowToLLVMPass());
+        pm.addPass(createConvertControlFlowToLLVMPass());
         pm.addPass(createReconcileUnrealizedCastsPass());
         pm.addPass(createSymbolDCEPass());
       });

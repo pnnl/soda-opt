@@ -9,6 +9,6 @@ func.func @matmul_kernel(%A:memref<4x4xf32>, %B:memref<4x4xf32>, %C : memref<4x4
 
 }
 
-// CHECK-DEFAULT:   llvm.func @matmul_kernel(%arg0: !llvm.ptr<f32>, %arg1: !llvm.ptr<f32>, %arg2: i64, %arg3
-// CHECK-WRAPPERS:  llvm.func @_mlir_ciface_matmul_kernel(%arg0: !llvm.ptr<struct<(ptr<f32>, ptr<f32>, i64, array<2 x i64>, array<2 x i64>)>>,
-// CHECK-BARE:      llvm.func @matmul_kernel(%arg0: !llvm.ptr<f32>, %arg1: !llvm.ptr<f32>, %arg2: !llvm.ptr<f32>) {
+// CHECK-DEFAULT:   llvm.func @matmul_kernel(%arg0: !llvm.ptr, %arg1: !llvm.ptr, %arg2: i64, %arg3: i64, %arg4: i64, %arg5: i64, %arg6: i64
+// CHECK-WRAPPERS:  llvm.func @_mlir_ciface_matmul_kernel(%arg0: !llvm.ptr, %arg1: !llvm.ptr, %arg2: !llvm.ptr) 
+// CHECK-BARE:      llvm.func @matmul_kernel(%arg0: !llvm.ptr, %arg1: !llvm.ptr, %arg2: !llvm.ptr) {
