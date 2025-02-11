@@ -47,7 +47,9 @@ void LinalgToSodaConverter::createLaunch(T rootLinalgOp) {
   auto *newOp = Operation::create(
       rootLinalgOp->getLoc(), rootLinalgOp->getName(),
       rootLinalgOp->getResultTypes(), rootLinalgOp->getOperands(),
-      rootLinalgOp->getAttrDictionary(), rootLinalgOp->getSuccessors(),
+      rootLinalgOp->getAttrDictionary(), 
+      rootLinalgOp->getPropertiesStorage(),
+      rootLinalgOp->getSuccessors(),
       rootLinalgOp->getRegions());
 
   // Insert the clone into the soda launch.

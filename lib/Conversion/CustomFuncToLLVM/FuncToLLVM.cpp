@@ -30,9 +30,13 @@
 #include "mlir/Pass/Pass.h"
 #include "mlir/Transforms/Passes.h"
 
+
 namespace mlir {
-#define GEN_PASS_DEF_CONVERTFUNCTOLLVM
+namespace soda { // Namespace is necessary here, because we also include the
+                // upstream implementation of the conversion pass.
+#define GEN_PASS_DEF_CONVERTFUNCTOLLVMPASS
 #include "mlir/Conversion/Passes.h.inc"
+} // namespace soda
 } // namespace mlir
 
 using namespace mlir;
@@ -41,7 +45,9 @@ using namespace mlir;
 
 namespace {
 /// A pass converting MLIR operations into the LLVM IR dialect.
-struct LLVMLoweringPass : public impl::ConvertFuncToLLVMBase<LLVMLoweringPass> {
+struct LLVMLoweringPass : public soda::impl::ConvertFuncToLLVMPassBase<LLVMLoweringPass> {
+  using Base::Base;
+  
   LLVMLoweringPass() = default;
 
   LLVMLoweringPass(bool useBarePtrCallConv) {
@@ -59,15 +65,22 @@ struct LLVMLoweringPass : public impl::ConvertFuncToLLVMBase<LLVMLoweringPass> {
       signalPassFailure();
       return;
     }
+    
+    ModuleOp m = getOperation();
+    StringRef dataLayout;
+    auto dataLayoutAttr = dyn_cast_or_null<StringAttr>(
+        m->getAttr(LLVM::LLVMDialect::getDataLayoutAttrName()));
+    if (dataLayoutAttr)
+      dataLayout = dataLayoutAttr.getValue();
+
     if (failed(LLVM::LLVMDialect::verifyDataLayoutString(
-            this->dataLayout, [this](const Twine &message) {
+            dataLayout, [this](const Twine &message) {
               getOperation().emitError() << message.str();
             }))) {
       signalPassFailure();
       return;
     }
 
-    ModuleOp m = getOperation();
     const auto &dataLayoutAnalysis = getAnalysis<DataLayoutAnalysis>();
 
     LowerToLLVMOptions options(&getContext(),
@@ -75,22 +88,29 @@ struct LLVMLoweringPass : public impl::ConvertFuncToLLVMBase<LLVMLoweringPass> {
     options.useBarePtrCallConv = useBarePtrCallConv;
     if (indexBitwidth != kDeriveIndexBitwidthFromDataLayout)
       options.overrideIndexBitwidth(indexBitwidth);
-    options.dataLayout = llvm::DataLayout(this->dataLayout);
+    options.dataLayout = llvm::DataLayout(dataLayout);
 
     LLVMTypeConverter typeConverter(&getContext(), options,
                                     &dataLayoutAnalysis);
 
+    std::optional<SymbolTable> optSymbolTable = std::nullopt;
+    const SymbolTable *symbolTable = nullptr;
+    if (!options.useBarePtrCallConv) {
+      optSymbolTable.emplace(m);
+      symbolTable = &optSymbolTable.value();
+    }
+
     RewritePatternSet patterns(&getContext());
-    populateFuncToLLVMConversionPatterns(typeConverter, patterns);
+    populateFuncToLLVMConversionPatterns(typeConverter, patterns, symbolTable);
+
+    // TODO(https://github.com/llvm/llvm-project/issues/70982): Remove these in
+    // favor of their dedicated conversion passes.
     arith::populateArithToLLVMConversionPatterns(typeConverter, patterns);
     cf::populateControlFlowToLLVMConversionPatterns(typeConverter, patterns);
 
     LLVMConversionTarget target(getContext());
     if (failed(applyPartialConversion(m, target, std::move(patterns))))
       signalPassFailure();
-
-    m->setAttr(LLVM::LLVMDialect::getDataLayoutAttrName(),
-               StringAttr::get(m.getContext(), this->dataLayout));
   }
 };
 } // end namespace

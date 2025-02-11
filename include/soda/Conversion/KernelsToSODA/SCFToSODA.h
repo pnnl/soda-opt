@@ -6,8 +6,9 @@
 #include "mlir/Support/LLVM.h"
 
 namespace mlir {
+namespace affine {
 class AffineForOp;
-struct LogicalResult;
+}
 
 namespace scf {
 class ForOp;
@@ -15,7 +16,7 @@ class ForOp;
 
 /// Convert a perfect affine loop nest with the outermost loop identified by
 /// `forOp` into a soda::Launch operation.
-LogicalResult convertAffineLoopNestToSODALaunch(AffineForOp forOp);
+LogicalResult convertAffineLoopNestToSODALaunch(affine::AffineForOp forOp);
 
 /// Convert a scf loop nest with the outermost loop identified by
 /// `forOp` into a soda::Launch operation.
