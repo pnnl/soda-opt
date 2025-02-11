@@ -16,12 +16,16 @@
 #ifndef SODA_DIALECT_SODA_SODADIALECT_H
 #define SODA_DIALECT_SODA_SODADIALECT_H
 
+#include "mlir/Bytecode/BytecodeOpInterface.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/Dialect.h"
-#include "mlir/IR/FunctionInterfaces.h"
 #include "mlir/IR/OpDefinition.h"
 #include "mlir/IR/OpImplementation.h"
 #include "mlir/IR/SymbolTable.h"
+#include "mlir/Interfaces/ControlFlowInterfaces.h"
+#include "mlir/Interfaces/FunctionInterfaces.h"
+#include "mlir/Interfaces/InferIntRangeInterface.h"
+#include "mlir/Interfaces/InferTypeOpInterface.h"
 #include "mlir/Interfaces/SideEffectInterfaces.h"
 
 namespace mlir {
@@ -41,6 +45,8 @@ class AsyncTokenType
 public:
   // Used for generic hooks in TypeBase.
   using Base::Base;
+
+  static constexpr StringLiteral name = "soda.async_token";
 };
 
 // Adds a `soda.async.token` to the front of the argument list.
