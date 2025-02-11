@@ -1,13 +1,15 @@
 // RUN: soda-opt %s -soda-transform-erase-schedule | FileCheck %s --check-prefixes=CHECK-ERASE-SCHEDULE
-// RUN: soda-opt %s -soda-transform-interpreter -soda-transform-erase-schedule | FileCheck %s --check-prefixes=CHECK-TILE
+// RUN: soda-opt %s -transform-interpreter -soda-transform-erase-schedule | FileCheck %s --check-prefixes=CHECK-TILE
 
 // CHECK-ERASE-SCHEDULE-NOT: transform.sequence
 // // CHECK-TILE-NOT: transform.sequence
 
-transform.sequence failures(propagate) {
-^bb0(%arg1: !pdl.operation):
-  %0 = transform.structured.match ops{["linalg.matmul"]} in %arg1
-  %1, %loops:3 = transform.structured.tile %0 [4, 4, 4] : (!pdl.operation) -> (!pdl.operation, !pdl.operation, !pdl.operation, !pdl.operation)
+module attributes {transform.with_named_sequence} {
+  transform.named_sequence @__transform_main(%arg1: !transform.any_op {transform.readonly}) {
+    %0 = transform.structured.match ops{["linalg.matmul"]} in %arg1 : (!transform.any_op) -> !transform.any_op
+    %1, %loops:3 = transform.structured.tile_using_for %0 tile_sizes [4, 4, 4] : (!transform.any_op) -> (!transform.any_op, !transform.any_op, !transform.any_op, !transform.any_op)
+    transform.yield
+  }
 }
 
 // CHECK-TILE-LABEL: func @tile_linalg_matmul_on_tensors(

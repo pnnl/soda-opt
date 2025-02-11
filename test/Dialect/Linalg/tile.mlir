@@ -1,11 +1,14 @@
-// RUN: soda-opt %s -soda-linalg-tile="tile-sizes=2,4,8 anchor-op=linalg.matmul" -cse| FileCheck %s --check-prefix=TILE
-// RUN: soda-opt %s -soda-linalg-tile="tile-sizes=2,3 anchor-op=linalg.conv_2d" -cse| FileCheck %s --check-prefix=TILE_CONV
+// RUN: soda-opt %s -soda-linalg-tile="tile-sizes=2,4,8 anchor-op=linalg.matmul" --canonicalize| FileCheck %s --check-prefix=TILE
+// RUN: soda-opt %s -soda-linalg-tile="tile-sizes=2,3 anchor-op=linalg.conv_2d" --canonicalize| FileCheck %s --check-prefix=TILE_CONV
 
 
-// transform.sequence failures(propagate) {
-//   ^bb0(%arg1: !pdl.operation):
-//     %0 = transform.structured.match ops{["linalg.conv_3d_ndhwc_dhwcf"]} in %arg1
-//     %1, %loops:3 = transform.structured.tile %0 [0, 5, 5, 5]
+// Example Transform Schedule
+// module attributes {transform.with_named_sequence} {
+//   transform.named_sequence @__transform_main(%arg1: !transform.any_op {transform.readonly}) {
+//     %0 = transform.structured.match ops{["linalg.matmul"]} in %arg1 : (!transform.any_op) -> !transform.any_op
+//     %1, %loops:3 = transform.structured.tile_using_for %0 tile_sizes [2, 4, 8] : (!transform.any_op) -> (!transform.any_op, !transform.any_op, !transform.any_op, !transform.any_op)
+//     transform.yield
+//   }
 // }
 
 func.func @matmul(%A: memref<1024x1024xf32>, %B: memref<1024x1024xf32>, %C: memref<1024x1024xf32>) {

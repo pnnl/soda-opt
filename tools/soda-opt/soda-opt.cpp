@@ -34,6 +34,11 @@
 #include "mlir/Dialect/Linalg/Passes.h"
 #include "mlir/Dialect/MemRef/Transforms/Passes.h"
 
+#include "mlir/Dialect/Linalg/Transforms/AllInterfaces.h"
+
+#include "mlir/Dialect/Func/TransformOps/FuncTransformOps.h"
+#include "mlir/Dialect/Linalg/TransformOps/DialectExtension.h"
+
 // Defined in the test directory, no public header.
 namespace mlir {
 void registerTestLoopPermutationPass();
@@ -70,6 +75,9 @@ int main(int argc, char **argv) {
   //===--------------------------------------------------------------------===//
   // Register mlir dialects and passes
   //===--------------------------------------------------------------------===//
+
+
+  transform::registerTransformPasses();
 
   mlir::registerInlinerPass();
   mlir::registerCanonicalizerPass();
@@ -115,11 +123,18 @@ int main(int argc, char **argv) {
   // clang-format on
   // mlir::registerAllDialects(registry);
 
+
+  // Interfaces  
+  linalg::registerAllDialectInterfaceImplementations(registry);
+
   // Register dialect extensions
+  // linalg::registerTransformDialectExtension(registry);
+  func::registerTransformDialectExtension(registry);
   linalg::registerTransformDialectExtension(registry);
 
   // Register external models
-  linalg::registerTilingInterfaceExternalModels(registry);
+  // linalg::registerTilingInterfaceExternalModels(registry);
+  memref::registerAllocationOpInterfaceExternalModels(registry);
 
   //===--------------------------------------------------------------------===//
   // Register SODA dialects and passes
@@ -143,7 +158,6 @@ int main(int argc, char **argv) {
 
   // Temporary passes to trigger transformations using the transform dialect
   mlir::soda::trans::registerTransformDialectEraseSchedule();
-  mlir::soda::trans::registerTransformDialectInterpreter();
 
   // SODA Passes
   mlir::soda::registerSodaKernelOutliningPass();
