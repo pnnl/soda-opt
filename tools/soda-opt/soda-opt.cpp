@@ -56,12 +56,12 @@ inline void registerLinalgPassesForSoda() {
 
 // Register important affine passes
 inline void registerAffinePassesForSoda() {
-  mlir::registerAffineDataCopyGenerationPass();
-  mlir::registerAffineLoopInvariantCodeMotionPass();
-  mlir::registerAffineLoopTilingPass();
-  mlir::registerAffineLoopFusionPass();
-  mlir::registerAffineLoopUnrollPass();
-  mlir::registerAffineScalarReplacementPass();
+  mlir::affine::registerAffineDataCopyGenerationPass();
+  mlir::affine::registerAffineLoopInvariantCodeMotionPass();
+  mlir::affine::registerAffineLoopTilingPass();
+  mlir::affine::registerAffineLoopFusionPass();
+  mlir::affine::registerAffineLoopUnrollPass();
+  mlir::affine::registerAffineScalarReplacementPass();
 
   // Test passes
   mlir::registerTestLoopPermutationPass();
@@ -89,9 +89,9 @@ int main(int argc, char **argv) {
 
   mlir::registerConvertLinalgToStandardPass();
   // mlir::registerConvertLinalgToLLVMPass(); // This pass maps linalg to blas
-  mlir::registerLinalgLowerToAffineLoopsPass();
+  mlir::registerConvertLinalgToAffineLoopsPass();
   mlir::registerConvertFuncToLLVMPass();
-  mlir::registerMemRefToLLVMConversionPass();
+  mlir::registerFinalizeMemRefToLLVMConversionPass();
   mlir::registerSCFToControlFlowPass();
   mlir::registerConvertAffineToStandardPass();
   mlir::registerConvertMathToLLVMPass();
@@ -105,20 +105,21 @@ int main(int argc, char **argv) {
   // need to register dialects that will be *parsed* by the tool, not the one
   // generated
   // clang-format off
-  registry.insert<mlir::func::FuncDialect,
-                  mlir::memref::MemRefDialect,
-                  mlir::LLVM::LLVMDialect,
-                  mlir::ml_program::MLProgramDialect,
-                  mlir::linalg::LinalgDialect,
-                  mlir::math::MathDialect,
-                  // mlir::tensor::TensorDialect,
-                  mlir::scf::SCFDialect,
-                  mlir::cf::ControlFlowDialect,
-                  mlir::vector::VectorDialect,
+  registry.insert<
+                  mlir::affine::AffineDialect,
                   mlir::arith::ArithDialect,
-                  mlir::AffineDialect,
+                  mlir::bufferization::BufferizationDialect,
+                  mlir::cf::ControlFlowDialect,
+                  mlir::func::FuncDialect,
+                  mlir::linalg::LinalgDialect,
+                  mlir::LLVM::LLVMDialect,
+                  mlir::math::MathDialect,
+                  mlir::memref::MemRefDialect,
+                  mlir::ml_program::MLProgramDialect,
+                  mlir::pdl::PDLDialect,
+                  mlir::scf::SCFDialect,
                   mlir::transform::TransformDialect,
-                  mlir::pdl::PDLDialect>();
+                  mlir::vector::VectorDialect>();
 
   // clang-format on
   // mlir::registerAllDialects(registry);

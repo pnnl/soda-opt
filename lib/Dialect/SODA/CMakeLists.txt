@@ -12,6 +12,7 @@ add_mlir_dialect_library(MLIRSODAOps
 
   LINK_LIBS PUBLIC
   MLIRDLTIDialect
+  MLIRControlFlowInterfaces
   MLIRIR
   MLIRMemRefDialect
   MLIRSideEffectInterfaces
