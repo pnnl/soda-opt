@@ -4,6 +4,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+// TODO: This pass is not working as intended. The commandline is not being
+// parsed correctly.  The code implementing this pass may be have bugs. It has to
+// handle non-opaque pointer emition that is not supported in later LLVM verions
+
 #include "Utils.h"
 
 #include "llvm/ADT/SmallPtrSet.h"
@@ -21,6 +25,9 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Transforms/Utils/Cloning.h"
+
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Passes/PassPlugin.h"
 
 #include <queue>
 #include <regex>
@@ -75,7 +82,7 @@ public:
 
   Type *getRankedArrayType(ArrayRef<int64_t> dims) const {
     Type *newType =
-        ArrayType::get(ptr->getType()->getPointerElementType(), dims.back());
+        ArrayType::get(ptr->getType()->getArrayElementType(), dims.back());
     for (size_t i = 1; i < dims.size(); i++)
       newType = ArrayType::get(newType, dims[dims.size() - i - 1]);
     return newType;
@@ -230,7 +237,7 @@ public:
     BitCastInst *bitCastInst = new BitCastInst(
         ptr, restoredType, Twine(""), cast<Instruction>(offset)->getNextNode());
     LoadInst *load = new LoadInst(
-        cast<Type>(restoredType)->getPointerElementType(), bitCastInst,
+        cast<Type>(restoredType)->getArrayElementType(), bitCastInst,
         Twine(""), cast<Instruction>(bitCastInst->getNextNode()));
 
     SmallVector<Value *> gepInds;
@@ -565,7 +572,7 @@ static Instruction *duplicateGEPWithRankedArray(Instruction *I,
   // New pointer operand for the new GEP.
   Value *RankedArrayPtr = RankedArrMap[GEP->getPointerOperand()];
   SmallVector<Value *, 4> ArrSizes;
-  getArraySizes(RankedArrayPtr->getType()->getPointerElementType(), ArrSizes);
+  getArraySizes(RankedArrayPtr->getType()->getArrayElementType(), ArrSizes);
 
   // The address to be accessed. We will recover the addresses to each dimension
   // from it.
@@ -609,7 +616,7 @@ static Instruction *duplicateGEPWithRankedArray(Instruction *I,
   IdxList.push_back(Addr);
 
   GetElementPtrInst *NewGEP = GetElementPtrInst::CreateInBounds(
-      RankedArrayPtr->getType()->getScalarType()->getPointerElementType(),
+      RankedArrayPtr->getType()->getScalarType()->getArrayElementType(),
       RankedArrayPtr, IdxList, "gep" + Twine(NumNewGEP++), GEP->getNextNode());
 
   return NewGEP;
@@ -783,7 +790,7 @@ static SmallVector<Value *> getGepIndices(GetElementPtrInst *inst, Type *type) {
     LLVM_DEBUG(dbgs() << "Given GEP has 0 or more than 1 indices.");
     return {};
   }
-  ArrayType *arrayType = cast<ArrayType>(type->getPointerElementType());
+  ArrayType *arrayType = cast<ArrayType>(type->getArrayElementType());
   SmallVector<int64_t> dims = getDimsFromArrayType(arrayType);
 
   SmallVector<Value *> operands;
@@ -1033,7 +1040,7 @@ static void convertMemRefToArray(Module &M, bool ranked = false) {
         std::reverse(indices.begin(), indices.end());
 
         NewGEP = GetElementPtrInst::CreateInBounds(
-            ptr->getType()->getScalarType()->getPointerElementType(), ptr,
+            ptr->getType()->getScalarType()->getArrayElementType(), ptr,
             indices, Twine(""), I->getNextNode());
         LLVM_DEBUG({
           dbgs() << "Newly generated GEP: ";
@@ -1127,7 +1134,7 @@ static void convertMemRefToArray(Module &M, bool ranked = false) {
               indices.push_back(val);
             // Construct the new GEP.
             GetElementPtrInst *newGEP = GetElementPtrInst::Create(
-                cast<Type>(newArg->getType())->getPointerElementType(), newArg,
+                cast<Type>(newArg->getType())->getArrayElementType(), newArg,
                 indices, Twine(""),
                 cast<Instruction>(bitCastInst->getNextNode()));
 
@@ -1187,11 +1194,9 @@ namespace {
 
 /// Fix the case that a caller that should take the pointer extracted from the
 /// subview takes from the original memref instead.
-struct MemRefSubview : public ModulePass {
-  static char ID;
-  MemRefSubview() : ModulePass(ID) {}
+struct MemRefSubview : public PassInfoMixin<MemRefSubview> {
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
 
-  bool runOnModule(Module &M) override {
     for (Function &F : M) {
       for (BasicBlock &BB : F) {
         for (Instruction &I : BB) {
@@ -1249,36 +1254,30 @@ struct MemRefSubview : public ModulePass {
       }
     }
 
-    return false;
+    return PreservedAnalyses::none();
   }
 };
 } // namespace
 
 namespace {
-struct ConvertMemRefToArray : public ModulePass {
-  static char ID; // Pass identification, replacement for typeid
-  ConvertMemRefToArray() : ModulePass(ID) {}
-
-  bool runOnModule(Module &M) override {
+struct ConvertMemRefToArray : public PassInfoMixin<ConvertMemRefToArray> {
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
     convertMemRefToArray(M);
 
-    return false;
+    return PreservedAnalyses::none();
   }
 };
 } // namespace
 
 namespace {
 
-struct ConvertMemRefToRankedArray : public ModulePass {
-  static char ID; // Pass identification, replacement for typeid
-  ConvertMemRefToRankedArray() : ModulePass(ID) {}
-
-  bool runOnModule(Module &M) override {
+struct ConvertMemRefToRankedArray : public PassInfoMixin<ConvertMemRefToRankedArray> {
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
     convertMemRefToArray(M, /*ranked=*/true);
 
-    return false;
+    return PreservedAnalyses::none();
   }
-};
+};;
 
 } // namespace
 
@@ -1328,11 +1327,8 @@ static void replaceUses(Instruction *inst, Value *source, Value *trueValue,
 }
 
 namespace {
-struct SelectPointer : public ModulePass {
-  static char ID;
-  SelectPointer() : ModulePass(ID) {}
-
-  bool runOnModule(Module &M) override {
+struct SelectPointer : public PassInfoMixin<SelectPointer> {
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
     // Find select instructions on insertvalue.
     SmallVector<SelectInst *> selectInsts;
     for (Function &F : M) {
@@ -1373,24 +1369,60 @@ struct SelectPointer : public ModulePass {
     for (SelectInst *selectInst : selectInsts)
       selectInst->eraseFromParent();
 
-    return false;
+    return PreservedAnalyses::none();
   }
 };
 } // namespace
 
-char ConvertMemRefToArray::ID = 0;
-static RegisterPass<ConvertMemRefToArray>
-    X1("mem2ptr",
-       "Convert MemRef structure to unranked array, i.e., raw pointer.");
+/* New PM Registration */
+llvm::PassPluginLibraryInfo getMemRefToArrayPluginInfo() {
+  return {LLVM_PLUGIN_API_VERSION, "MemRefToArray", LLVM_VERSION_STRING,
+          [](PassBuilder &PB) {
+            PB.registerPipelineParsingCallback(
+                [](StringRef Name, llvm::ModulePassManager &MPM,
+                   ArrayRef<llvm::PassBuilder::PipelineElement>) {
+                  if (Name == "mem2ptr") {
+                    MPM.addPass(ConvertMemRefToArray());
+                    return true;
+                  }
+                  return false;
+                });
 
-char ConvertMemRefToRankedArray::ID = 1;
-static RegisterPass<ConvertMemRefToRankedArray>
-    X2("mem2arr", "Convert MemRef structure to ranked array.");
+            PB.registerPipelineParsingCallback(
+                [](StringRef Name, llvm::ModulePassManager &MPM,
+                   ArrayRef<llvm::PassBuilder::PipelineElement>) {
+                  if (Name == "mem2arr") {
+                    MPM.addPass(ConvertMemRefToRankedArray());
+                    return true;
+                  }
+                  return false;
+                });
 
-char MemRefSubview::ID = 12;
-static RegisterPass<MemRefSubview> X3("subview",
-                                      "Fix various subview related issues.");
+            PB.registerPipelineParsingCallback(
+                [](StringRef Name, llvm::ModulePassManager &MPM,
+                   ArrayRef<llvm::PassBuilder::PipelineElement>) {
+                  if (Name == "subview") {
+                    MPM.addPass(MemRefSubview());
+                    return true;
+                  }
+                  return false;
+                });
 
-char SelectPointer::ID = 13;
-static RegisterPass<SelectPointer> X4("select-pointer",
-                                      "Select pointer instead of struct.");
+            PB.registerPipelineParsingCallback(
+                [](StringRef Name, llvm::ModulePassManager &MPM,
+                   ArrayRef<llvm::PassBuilder::PipelineElement>) {
+                  if (Name == "select-pointer") {
+                    MPM.addPass(SelectPointer());
+                    return true;
+                  }
+                  return false;
+                });
+          }};
+}
+
+#ifndef LLVM_MEMREFTOARRAY_LINK_INTO_TOOLS
+extern "C" LLVM_ATTRIBUTE_WEAK ::llvm::PassPluginLibraryInfo
+llvmGetPassPluginInfo() {
+  return getMemRefToArrayPluginInfo();
+}
+#endif
