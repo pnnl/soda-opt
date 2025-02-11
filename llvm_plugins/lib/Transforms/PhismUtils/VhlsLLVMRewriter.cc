@@ -4,10 +4,14 @@
 //
 //===----------------------------------------------------------------------===//
 
+// TODO: This pass is not working as intended. The commandline is not being
+// parsed correctly.  The code implementing this pass may be have bugs. It has to
+// handle non-opaque pointer emition that is not supported in later LLVM verions
+
 #include "Utils.h"
 
-#include "llvm/ADT/Optional.h"
 #include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/StringExtras.h"
 #include "llvm/Analysis/LoopInfo.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Dominators.h"
@@ -22,6 +26,9 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Transforms/Utils/Cloning.h"
+
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Passes/PassPlugin.h"
 
 #include <queue>
 #include <regex>
@@ -73,25 +80,18 @@ renameBasicBlocksAndValues(Module &M,
 }
 
 namespace {
-
-struct RenameBasicBlocksAndValues : public ModulePass {
-  static char ID; // Pass identification, replacement for typeid
-  RenameBasicBlocksAndValues() : ModulePass(ID) {}
-
-  bool runOnModule(Module &M) override {
+struct RenameBasicBlocksAndValues : public PassInfoMixin<RenameBasicBlocksAndValues> {
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
     llvm::SmallVector<llvm::StringRef, 4> ParamNames;
     std::string names = getXlnNames();
     llvm::SplitString(names, ParamNames, ",");
-
     LLVM_DEBUG(dbgs() << "Input xlnnames: " << names << '\n');
     LLVM_DEBUG(dbgs() << "Parsed name list:\n");
     LLVM_DEBUG(interleaveComma(ParamNames, dbgs()));
-
     renameBasicBlocksAndValues(M, ParamNames);
-    return false;
+    return PreservedAnalyses::none();
   }
 };
-
 } // namespace
 
 static void annotateXilinxAttributes(Module &M) {
@@ -107,25 +107,18 @@ static void annotateXilinxAttributes(Module &M) {
 
 namespace {
 
-struct AnnotateXilinxAttributes : public ModulePass {
-  static char ID; // Pass identification, replacement for typeid
-  AnnotateXilinxAttributes() : ModulePass(ID) {}
-
-  bool runOnModule(Module &M) override {
+struct AnnotateXilinxAttributes : public PassInfoMixin<AnnotateXilinxAttributes> {
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
     annotateXilinxAttributes(M);
-    return false;
+    return PreservedAnalyses::none();
   }
 };
-
 } // namespace
 
 namespace {
 
-struct StripInvalidAttributes : public ModulePass {
-  static char ID; // Pass identification, replacement for typeid
-  StripInvalidAttributes() : ModulePass(ID) {}
-
-  bool runOnModule(Module &M) override {
+struct StripInvalidAttributes : public PassInfoMixin<StripInvalidAttributes> {
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
     // Here is the list of all supported attributes. Note that not all the
     // differences are covered.
     // https://github.com/llvm/llvm-project/blob/release%2F3.9.x/llvm/include/llvm/IR/Attributes.td
@@ -140,11 +133,9 @@ struct StripInvalidAttributes : public ModulePass {
         P.removeAttr(Attribute::AttrKind::NoUndef);
       }
     }
-
-    return false;
+    return PreservedAnalyses::none();
   }
 };
-
 } // namespace
 
 /// Rewrite fneg to fsub, e.g., %1 = fneg double %0 will be rewritten to
@@ -172,14 +163,11 @@ static Instruction *rewriteFNegToFSub(Instruction &I) {
 
 namespace {
 
+
 /// Rewrite some math instructions to work together with Vitis.
-struct XilinxRewriteMathInstPass : public ModulePass {
-  static char ID;
-  XilinxRewriteMathInstPass() : ModulePass(ID) {}
-
-  bool runOnModule(Module &M) override {
+struct XilinxRewriteMathInstPass : public PassInfoMixin<XilinxRewriteMathInstPass> {
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
     SmallVector<Instruction *, 4> ToErase;
-
     for (auto &F : M)
       for (auto &BB : F)
         for (auto &I : BB) {
@@ -188,17 +176,16 @@ struct XilinxRewriteMathInstPass : public ModulePass {
             ToErase.push_back(&I);
           }
         }
-
     for (Instruction *I : ToErase) {
       assert(I->use_empty() && "Inst to be erased should have empty use.");
       I->eraseFromParent();
     }
-
-    return false;
+    return PreservedAnalyses::none();
   }
 };
 
 } // namespace
+
 
 /// getTripCountTemporary - Return an integer indicating the number of times the
 /// loop will be executed. This function assumes the affine loop always have a
@@ -297,15 +284,11 @@ static void unrollLoop(Loop *loop, int alreadyUnrolled, int maxUnrolled,
 
 namespace {
 
-/// Unroll all the loops in a specified function for Xilinx Vitis.
-struct XilinxUnrollPass : public ModulePass {
-  static char ID;
-  XilinxUnrollPass() : ModulePass(ID) {}
-
-  bool runOnModule(Module &M) override {
+struct XilinxUnrollPass : public PassInfoMixin<XilinxUnrollPass> {
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
+    // ...existing code from runOnModule...
     assert((!getXlnTop().empty() || getXlnHasNonAffine()) &&
            "Top function name should be set.");
-
     for (auto &F : M)
       if ((!getXlnHasNonAffine() && F.getName() == getXlnTop()) ||
           (getXlnHasNonAffine() &&
@@ -319,8 +302,7 @@ struct XilinxUnrollPass : public ModulePass {
           }
         }
       }
-
-    return false;
+    return PreservedAnalyses::none();
   }
 };
 
@@ -344,27 +326,16 @@ getArrayDimensionInfo(ArrayType *arrayTy) {
 
 namespace {
 
-/// Partition arrays in the top-level function arguments for Xilinx Vitis.
-/// This pass partitions the array in first half dimensions completely to
-/// parallelise the transformed arrays from Polymer. For instance, an array of
-/// size 2x3x32x32 will be partitioned into 6 blocks of size 32x32
-struct XilinxArrayPartitionPass : public ModulePass {
-  static char ID;
-  XilinxArrayPartitionPass() : ModulePass(ID) {}
-
-  bool runOnModule(Module &M) override {
+struct XilinxArrayPartitionPass : public PassInfoMixin<XilinxArrayPartitionPass> {
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
     if (!getXlnArrayPartitionEnabled())
-      return true;
-
-    // Declare array partition APIs in Vitis HLS LLVM frontend
+      return PreservedAnalyses::none();
     auto mod = &M;
     auto voidTy = Type::getVoidTy(mod->getContext());
-    mod->getOrInsertFunction("llvm.sideeffect",
-                             FunctionType::get(voidTy, {}, false));
+    mod->getOrInsertFunction("llvm.sideeffect", FunctionType::get(voidTy, {}, false));
     auto arrayPartitionFunc = mod->getFunction("llvm.sideeffect");
     arrayPartitionFunc->addFnAttr(llvm::Attribute::Memory);
     arrayPartitionFunc->addFnAttr(llvm::Attribute::NoUnwind);
-
     for (auto &F : M)
       if (F.getName() == getXlnTop()) {
         auto &BB = F.getEntryBlock();
@@ -372,9 +343,9 @@ struct XilinxArrayPartitionPass : public ModulePass {
         for (unsigned i = 0; i < F.arg_size(); i++) {
           auto arg = F.getArg(i);
           if (arg->getType()->isPointerTy() &&
-              arg->getType()->getPointerElementType()->isArrayTy()) {
+              arg->getType()->getArrayElementType()->isArrayTy()) {
             auto arrayTy =
-                dyn_cast<ArrayType>(arg->getType()->getPointerElementType());
+                dyn_cast<ArrayType>(arg->getType()->getArrayElementType());
             auto partitions = getArrayDimensionInfo(arrayTy);
             if (partitions.size() == 1)
               continue;
@@ -384,23 +355,23 @@ struct XilinxArrayPartitionPass : public ModulePass {
               partitions.pop_back_n(partitions.size() / 2);
             for (auto partition : partitions) {
               auto int32ty = Type::getInt32Ty(mod->getContext());
-              OperandBundleDef bd = OperandBundleDef(
-                  "xlx_array_partition",
+              OperandBundleDef bd = OperandBundleDef("xlx_array_partition",
                   (std::vector<Value *>){
                       arg, ConstantInt::get(int32ty, partition.first),
                       ConstantInt::get(int32ty, partition.second),
-                      ConstantInt::get(int32ty, 1) /* block scheme*/});
+                      ConstantInt::get(int32ty, 1) });
               builder.CreateCall(arrayPartitionFunc, {}, {bd});
             }
           }
         }
       }
-
-    return false;
+    return PreservedAnalyses::none();
   }
 };
 
 } // namespace
+
+
 
 static std::string interpretArgumentType(Type *type) {
   if (type->isVoidTy())
@@ -415,7 +386,7 @@ static std::string interpretArgumentType(Type *type) {
     return "float";
   if (type->isPointerTy()) {
     auto pointerTy = dyn_cast<Type>(type);
-    auto elementTy = pointerTy->getPointerElementType();
+    auto elementTy = pointerTy->getArrayElementType();
     // A plain pointer
     if (!elementTy->isArrayTy())
       return interpretArgumentType(elementTy) + "*";
@@ -480,7 +451,7 @@ static void generateXlnTBDummy(Function &F, StringRef fileName) {
     // e.g. (in LLVM), [32 x f64]* %0
     if (isPointerToArray(argType)) {
       auto dims = getArrayDimensionInfo(
-          dyn_cast<ArrayType>(argType->getPointerElementType()));
+          dyn_cast<ArrayType>(argType->getArrayElementType()));
       for (auto dim : dims)
         argDecl += "[" + std::to_string(dim.second) + "]";
 
@@ -565,7 +536,7 @@ static void generateXlnTBTcl(Function &F, StringRef fileName,
   //   auto arg = F.getArg(i);
   //   if (isPointerToArray(arg->getType())) {
   //     auto arrayTy =
-  //         dyn_cast<ArrayType>(arg->getType()->getPointerElementType());
+  //         dyn_cast<ArrayType>(arg->getType()->getArrayElementType());
   //     if (arrayPartitionEnabled) {
   //       auto partitions = getArrayDimensionInfo(arrayTy);
   //       // dbgs() << "Partition size: " << partitions.size() << '\n';
@@ -607,31 +578,19 @@ static void generateXlnTBTcl(Function &F, StringRef fileName,
 
 namespace {
 
-/// Generate test bench tcl script and C dummy for Xilinx Vitis. This pass
-/// parses the LLVM IR and generates compatible test bench for the design in
-/// LLVM IR.
-struct XilinxTBTclGenPass : public ModulePass {
-  static char ID;
-  XilinxTBTclGenPass() : ModulePass(ID) {}
-
-  bool runOnModule(Module &M) override {
+struct XilinxTBTclGenPass : public PassInfoMixin<XilinxTBTclGenPass> {
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
     assert(!getXlnTop().empty() && "Top function name should be set.");
-
     Function *F = findFunc(&M, getXlnTop());
     assert(F && "Top function should be found.");
-
-    // Generate the dummy C file.
     generateXlnTBDummy(*F, getXlnTBDummyNames());
-    // Generate the Tcl file.
     generateXlnTBTcl(*F, getXlnTBTclNames(), getXlnTBDummyNames(),
-                     getXlnArrayPartitionEnabled(),
-                     getXlnArrayPartitionFlattened());
-
-    return false;
+                     getXlnArrayPartitionEnabled(), getXlnArrayPartitionFlattened());
+    return PreservedAnalyses::none();
   }
 };
 
-} // namespace
+} // end of anonymous namespace
 
 static void nameLoop(Loop *loop, int &loopCounter) {
   SmallVector<Metadata *, 4> Args;
@@ -660,37 +619,27 @@ static void nameLoop(Loop *loop, int &loopCounter) {
 
 namespace {
 
-/// Assign a name to each loop and enable flattening for Xilinx Vitis.
-struct XilinxNameLoopPass : public ModulePass {
-  static char ID;
-  XilinxNameLoopPass() : ModulePass(ID) {}
-
-  bool runOnModule(Module &M) override {
-
+struct XilinxNameLoopPass : public PassInfoMixin<XilinxNameLoopPass> {
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
     int loopCounter = 0;
     for (auto &F : M)
       if (F.getName() != getXlnTop() && !F.empty()) {
         auto DT = llvm::DominatorTree(F);
         LoopInfo LI(DT);
-
         if (!LI.empty())
           for (auto &loop : LI)
             nameLoop(loop, loopCounter);
       }
-
-    return false;
+    return PreservedAnalyses::none();
   }
 };
 
-} // namespace
+} // end of anonymous namespace
 
-// -----------------------------------------------------------------------------------
-// Mark no inline for kernels'
-
-/// Check if the input function is a scop.stmt based on the pattern S[0-1]+
+// Check if the input function is a scop.stmt based on the pattern S[0-1]+
 static bool isScopStmt(Function &F) {
   StringRef name = F.getName();
-  if (!name.startswith("S"))
+  if (!name.starts_with("S"))
     return false;
 
   StringRef suffix = name.drop_front();
@@ -702,11 +651,8 @@ static bool isScopStmt(Function &F) {
 
 namespace {
 
-struct AnnotateNoInlinePass : public ModulePass {
-  static char ID; // Pass identification, replacement for typeid
-  AnnotateNoInlinePass() : ModulePass(ID) {}
-
-  bool runOnModule(Module &M) override {
+struct AnnotateNoInlinePass : public PassInfoMixin<AnnotateNoInlinePass> {
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
     bool modified = false;
     for (auto &F : M) {
       if (!isScopStmt(F)) {
@@ -716,108 +662,160 @@ struct AnnotateNoInlinePass : public ModulePass {
         }
       } else {
         modified = true;
-        // Should always inline scop.stmt.
         F.addFnAttr(Attribute::AlwaysInline);
       }
     }
 
-    return modified;
+    if (modified)
+      return PreservedAnalyses::none();
+    return PreservedAnalyses::all();
   }
 };
 
-} // namespace
+} // end of anonymous namespace
 
 namespace {
 
-/// Add attributes related to memory interfaces to each of the array arguments
-/// of a function.
-struct ConfigMemoryInterfacePass : public ModulePass {
-  static char ID; // Pass identification, replacement for typeid
-  ConfigMemoryInterfacePass() : ModulePass(ID) {}
-
-  bool runOnModule(Module &M) override {
+struct ConfigMemoryInterfacePass : public PassInfoMixin<ConfigMemoryInterfacePass> {
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
     assert(!getXlnTop().empty() && "Top function name should be set.");
-
     Function *F = findFunc(&M, getXlnTop());
     assert(F && "Top function should be found.");
-
     auto attributeList = F->getAttributes();
     for (unsigned i = 0; i < F->arg_size(); i++) {
       Value *arg = F->getArg(i);
       if (isPointerToArray(arg->getType())) {
-        // Set ap_memory interface to array arguments.
         auto arrayName = arg->getName().str();
         attributeList = attributeList.addAttributeAtIndex(
             F->getContext(), i + 1, "fpga.address.interface",
             "ap_memory." + arrayName);
-
-        // Set bram configuration to function metadata.
         auto &C = F->getContext();
-        // A list of aggregated metadata
         SmallVector<Metadata *, 32> ops;
         ops.push_back(MDString::get(C, arrayName));
         ops.push_back(MDString::get(C, "ap_memory"));
-        ops.push_back(ConstantAsMetadata::get(
-            ConstantInt::get(IntegerType::get(C, 32), 666)));
-        ops.push_back(ConstantAsMetadata::get(
-            ConstantInt::get(IntegerType::get(C, 32), 208 /*ram2p*/)));
-        ops.push_back(ConstantAsMetadata::get(
-            ConstantInt::get(IntegerType::get(C, 32), -1)));
-        // One additional metadata annotating the adaptor type.
+        ops.push_back(ConstantAsMetadata::get(ConstantInt::get(IntegerType::get(C, 32), 666)));
+        ops.push_back(ConstantAsMetadata::get(ConstantInt::get(IntegerType::get(C, 32), 208)));
+        ops.push_back(ConstantAsMetadata::get(ConstantInt::get(IntegerType::get(C, 32), -1)));
         auto *N = MDTuple::get(C, ops);
         F->setMetadata("fpga.adaptor.bram." + arrayName, N);
       }
     }
     F->setAttributes(attributeList);
-
-    return false;
+    return PreservedAnalyses::none();
   }
 };
 
-} // namespace
+} // end of anonymous namespace
 
-char RenameBasicBlocksAndValues::ID = 2;
-static RegisterPass<RenameBasicBlocksAndValues>
-    X3("xlnname", "Rename entities in the model with string prefixes to follow "
-                  "Xilinx tool guidance.");
 
-char AnnotateXilinxAttributes::ID = 3;
-static RegisterPass<AnnotateXilinxAttributes>
-    X4("xlnanno", "Annotate attributes for Xilinx HLS.");
+llvm::PassPluginLibraryInfo getVhlsLLVMRewriterPluginInfo() {
+  return {LLVM_PLUGIN_API_VERSION, "VhlsLLVMRewriter", LLVM_VERSION_STRING,
+    [](PassBuilder &PB) {
+      PB.registerPipelineParsingCallback(
+        [](StringRef Name, llvm::ModulePassManager &MPM,
+           ArrayRef<llvm::PassBuilder::PipelineElement>) {
+          if (Name == "xlnname") {
+            MPM.addPass(RenameBasicBlocksAndValues());
+            return true;
+          }
+          return false;
+        });
 
-char StripInvalidAttributes::ID = 4;
-static RegisterPass<StripInvalidAttributes>
-    X5("strip-attr",
-       "Strip invalid function attributes not compatible with Clang 3.9.");
+      PB.registerPipelineParsingCallback(
+        [](StringRef Name, llvm::ModulePassManager &MPM,
+           ArrayRef<llvm::PassBuilder::PipelineElement>) {
+          if (Name == "xlnanno") {
+            MPM.addPass(AnnotateXilinxAttributes());
+            return true;
+          }
+          return false;
+        });
 
-char XilinxRewriteMathInstPass::ID = 5;
-static RegisterPass<XilinxRewriteMathInstPass>
-    X6("xlnmath", "Rewrite math instructions for Xilinx Vitis.");
+      PB.registerPipelineParsingCallback(
+        [](StringRef Name, llvm::ModulePassManager &MPM,
+           ArrayRef<llvm::PassBuilder::PipelineElement>) {
+          if (Name == "strip-attr") {
+            MPM.addPass(StripInvalidAttributes());
+            return true;
+          }
+          return false;
+        });
 
-char XilinxUnrollPass::ID = 6;
-static RegisterPass<XilinxUnrollPass>
-    X7("xlnunroll",
-       "Unroll all the loops in a specified function for Xilinx Vitis.");
+      PB.registerPipelineParsingCallback(
+        [](StringRef Name, llvm::ModulePassManager &MPM,
+           ArrayRef<llvm::PassBuilder::PipelineElement>) {
+          if (Name == "xlnmath") {
+            MPM.addPass(XilinxRewriteMathInstPass());
+            return true;
+          }
+          return false;
+        });
 
-char XilinxArrayPartitionPass::ID = 7;
-static RegisterPass<XilinxArrayPartitionPass> X8(
-    "xlnarraypartition",
-    "Partition arrays in the top-level function arguments for Xilinx Vitis.");
+      PB.registerPipelineParsingCallback(
+        [](StringRef Name, llvm::ModulePassManager &MPM,
+           ArrayRef<llvm::PassBuilder::PipelineElement>) {
+          if (Name == "xlnunroll") {
+            MPM.addPass(XilinxUnrollPass());
+            return true;
+          }
+          return false;
+        });
 
-char XilinxTBTclGenPass::ID = 8;
-static RegisterPass<XilinxTBTclGenPass>
-    X9("xlntbgen",
-       "Generate test bench tcl script and dummy C code for Xilinx Vitis.");
+      PB.registerPipelineParsingCallback(
+        [](StringRef Name, llvm::ModulePassManager &MPM,
+           ArrayRef<llvm::PassBuilder::PipelineElement>) {
+          if (Name == "xlnarraypartition") {
+            MPM.addPass(XilinxArrayPartitionPass());
+            return true;
+          }
+          return false;
+        });
 
-char XilinxNameLoopPass::ID = 9;
-static RegisterPass<XilinxNameLoopPass> X10("xlnloopname",
-                                            "Name loops for Xilinx Vitis.");
+      PB.registerPipelineParsingCallback(
+        [](StringRef Name, llvm::ModulePassManager &MPM,
+           ArrayRef<llvm::PassBuilder::PipelineElement>) {
+          if (Name == "xlntbgen") {
+            MPM.addPass(XilinxTBTclGenPass());
+            return true;
+          }
+          return false;
+        });
 
-char AnnotateNoInlinePass::ID = 10;
-static RegisterPass<AnnotateNoInlinePass>
-    X11("anno-noinline", "Annotate noinline to the functions.");
+      PB.registerPipelineParsingCallback(
+        [](StringRef Name, llvm::ModulePassManager &MPM,
+           ArrayRef<llvm::PassBuilder::PipelineElement>) {
+          if (Name == "xlnloopname") {
+            MPM.addPass(XilinxNameLoopPass());
+            return true;
+          }
+          return false;
+        });
 
-char ConfigMemoryInterfacePass::ID = 11;
-static RegisterPass<ConfigMemoryInterfacePass>
-    X12("xlnram2p",
-        "Config all the arrays to have ram2p interface for Xilinx Vitis.");
+      PB.registerPipelineParsingCallback(
+        [](StringRef Name, llvm::ModulePassManager &MPM,
+           ArrayRef<llvm::PassBuilder::PipelineElement>) {
+          if (Name == "anno-noinline") {
+            MPM.addPass(AnnotateNoInlinePass());
+            return true;
+          }
+          return false;
+        });
+
+      PB.registerPipelineParsingCallback(
+        [](StringRef Name, llvm::ModulePassManager &MPM,
+           ArrayRef<llvm::PassBuilder::PipelineElement>) {
+          if (Name == "xlnram2p") {
+            MPM.addPass(ConfigMemoryInterfacePass());
+            return true;
+          }
+          return false;
+        });
+    }};
+}
+
+#ifndef LLVM_VHLSLLVMREWRITER_LINK_INTO_TOOLS
+extern "C" LLVM_ATTRIBUTE_WEAK ::llvm::PassPluginLibraryInfo
+llvmGetPassPluginInfo() {
+  return getVhlsLLVMRewriterPluginInfo();
+}
+#endif

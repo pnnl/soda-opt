@@ -1,10 +1,13 @@
-; RUN: opt -load %sodashlibdir/VhlsLLVMRewriter%shlibext -mem2arr -xlnname -xlnanno -xlntop gemm_2_kernel \
-; RUN:     -xlntbgen -xlntbdummynames="gemm.dummy.c" -xlntbtclnames="gemm.run.tcl" \
-; RUN:     -xlnllvm="test.ll" -xlnpath=test_path \
-; RUN:     -clock-period-ns=10 -target=test_board \
-; RUN:     -S -enable-new-pm=0 -opaque-pointers=0 < %s 2>&1 | FileCheck %s
+; RUN: opt \
+; RUN   -load-pass-plugin=%sodashlibdir/VhlsLLVMRewriter%shlibext \
+; RUN   -load-pass-plugin=%sodashlibdir/MemRefToArray%shlibext \
+; RUN   -passes='mem2arr,function(xlnname,xlnanno),xlntop(gemm_2_kernel),xlntbgen,xlntbdummynames="gemm.dummy.c",xlntbtclnames="gemm.run.tcl",xlnllvm="test.ll",xlnpath=test_path,clock-period-ns=10,target=test_board' -S < %s 2>&1 | FileCheck %s
 ; RUN: FileCheck %s -input-file=gemm.run.tcl --check-prefixes=CHECK_TCL
 ; RUN: FileCheck %s -input-file=gemm.dummy.c --check-prefixes=CHECK_TB
+
+; TODO: This pass is not working as intended. The commandline is not being
+; parsed correctly.  The code implementing this pass may be have bugs. It has to
+; handle non-opaque pointer emition that is not supported in later LLVM verions
 
 declare i8* @malloc(i64)
 

@@ -76,7 +76,7 @@ namespace phism {
 namespace llvm {
 
 bool isPointerToArray(Type *type) {
-  return type->isPointerTy() && type->getPointerElementType()->isArrayTy();
+  return type->isPointerTy() && type->getArrayElementType()->isArrayTy();
 }
 
 std::string getXlnTop() { return XlnTop; }
