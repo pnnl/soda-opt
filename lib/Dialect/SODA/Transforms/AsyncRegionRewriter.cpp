@@ -13,15 +13,17 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "PassDetail.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
-#include "mlir/IR/BlockAndValueMapping.h"
+#include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.h"
+// #include "mlir/IR/BlockAndValueMapping.h"
+#include "mlir/IR/IRMapping.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/IR/SymbolTable.h"
 #include "mlir/Support/LLVM.h"
 #include "mlir/Transforms/RegionUtils.h"
 
+#include "PassDetail.h"
 #include "soda/Dialect/SODA/Passes.h"
 #include "soda/Dialect/SODA/SODADialect.h"
 #include "soda/Dialect/SODA/Utils.h"
@@ -67,11 +69,7 @@ struct SodaAsyncRegionPass::Callback {
   // Replaces asyncOp with a clone that returns a token.
   LogicalResult rewriteAsyncOp(soda::AsyncOpInterface asyncOp) {
     auto *op = asyncOp.getOperation();
-    if (asyncOp.getAsyncToken())
-      // TODO: Support ops that are already async.
-      return op->emitOpError("is already async");
-    if (op->getNumRegions() > 0)
-      return op->emitOpError("regions are not supported");
+    auto tokenType = builder.getType<soda::AsyncTokenType>();
 
     // If there is no current token, insert a `soda.wait async` without
     // dependencies to create one.
@@ -79,19 +77,31 @@ struct SodaAsyncRegionPass::Callback {
       currentToken = createWaitOp(op->getLoc(), tokenType, {});
     asyncOp.addAsyncDependency(currentToken);
 
+    // Return early if op returns a token already.
+    currentToken = asyncOp.getAsyncToken();
+    if (currentToken)
+      return success();
+
     // Clone the op to return a token in addition to the other results.
-    SmallVector<Type, 1> resultTypes = {tokenType};
+    SmallVector<Type, 1> resultTypes;
     resultTypes.reserve(1 + op->getNumResults());
     copy(op->getResultTypes(), std::back_inserter(resultTypes));
-    auto *newOp = Operation::create(op->getLoc(), op->getName(), resultTypes,
-                                    op->getOperands(), op->getAttrDictionary(),
-                                    op->getSuccessors());
+    resultTypes.push_back(tokenType);
+    auto *newOp = Operation::create(
+        op->getLoc(), op->getName(), resultTypes, op->getOperands(),
+        op->getDiscardableAttrDictionary(), op->getPropertiesStorage(),
+        op->getSuccessors(), op->getNumRegions());
+
+    // Clone regions into new op.
+    IRMapping mapping;
+    for (auto pair : llvm::zip_first(op->getRegions(), newOp->getRegions()))
+      std::get<0>(pair).cloneInto(&std::get<1>(pair), mapping);
 
     // Replace the op with the async clone.
     auto results = newOp->getResults();
-    currentToken = results.front();
+    currentToken = results.back();
     builder.insert(newOp);
-    op->replaceAllUsesWith(results.drop_front());
+    op->replaceAllUsesWith(results.drop_back());
     op->erase();
 
     return success();

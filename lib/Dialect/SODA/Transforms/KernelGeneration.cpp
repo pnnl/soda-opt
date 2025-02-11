@@ -15,10 +15,12 @@
 //===----------------------------------------------------------------------===//
 
 #include "mlir/Dialect/Func/IR/FuncOps.h"
+#include "mlir/Dialect/ControlFlow/IR/ControlFlowOps.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
+#include "mlir/Bytecode/BytecodeOpInterface.h"
 #include "mlir/IR/Builders.h"
-#include "mlir/IR/FunctionInterfaces.h"
+#include "mlir/Interfaces/FunctionInterfaces.h"
 #include "mlir/IR/IRMapping.h"
 #include "mlir/IR/SymbolTable.h"
 #include "mlir/Support/LLVM.h"
@@ -107,7 +109,7 @@ void SodaKernelGenerationPass::runOnOperation() {
     if (!(this->noAliasAnalysis)) {
       int index = 0;
       for (BlockArgument argument : dstFunc.getArguments()) {
-        if (argument.getType().isa<MemRefType>()) {
+        if (isa<MemRefType>(argument.getType())) {
           dstFunc.setArgAttr(index, LLVMDialect::getNoAliasAttrName(),
                              UnitAttr::get(dstFunc.getContext()));
         }
