@@ -44,4 +44,7 @@ cmake -GNinja \
   -DMLIR_DIR=$LLVM_INSTALL_DIR/lib/cmake/mlir \
   -DMLIR_ENABLE_BINDINGS_PYTHON=ON
 
-cmake --build "$MY_BUILD_DIR" --target soda-opt soda-translate mlir-runner AllocaNamer XMLWriter SODAPythonModules VhlsLLVMRewriter
+
+# TODO(Vitis-Support): Fix emitting legacy LLVM code with non-opaque pointers
+# Add VhlsLLVMRewriter to targets
+cmake --build "$MY_BUILD_DIR" --target soda-opt soda-translate mlir-runner AllocaNamer XMLWriter SODAPythonModules
