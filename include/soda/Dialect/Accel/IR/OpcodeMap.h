@@ -31,7 +31,6 @@ struct OpcodeMapStorage;
 } // namespace detail
 
 class Attribute;
-struct LogicalResult;
 class MLIRContext;
 
 /// A dictionary of opcodes
