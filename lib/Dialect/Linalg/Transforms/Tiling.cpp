@@ -16,6 +16,7 @@
 #include "mlir/Dialect/Transform/IR/TransformOps.h"
 
 #include "mlir/Dialect/Linalg/Passes.h"
+#include "mlir/Dialect/Transform/Transforms/Passes.h"
 #include "mlir/IR/Block.h"
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/Pass/PassManager.h"
@@ -55,18 +56,19 @@ parseTilingString(ModuleOp &module, MLIRContext *context,
                   mlir::Pass::Option<std::string> &anchorOp) {
   // Parse the string
   std::string str = R"MLIR(
-      transform.sequence failures(propagate) {
-      ^bb0(%arg1: !pdl.operation):
-        %0 = transform.structured.match ops{["<anchor-op>"]} in %arg1
-        %1, %loops:<tileNDims> = transform.structured.tile %0 [<tileSizes>] : 
-          (!pdl.operation) -> (<pdlOutTypesStr>)
+      module attributes {transform.with_named_sequence} {
+        transform.named_sequence @__transform_main(%arg1: !transform.any_op {transform.readonly}) {
+          %0 = transform.structured.match ops{["<anchor-op>"]} in %arg1 : (!transform.any_op) -> !transform.any_op
+          %1, %loops:<tileNDims> = transform.structured.tile_using_for %0 tile_sizes [<tileSizes>] : (!transform.any_op) -> (<outTypesStr>)
+          transform.yield
+        }
       }
     )MLIR";
 
   // replace <anchor-op> with anchorOp
   str = str.replace(str.find("<anchor-op>"), 11, anchorOp);
 
-  // reaplce <tileSizes> with tileSizes
+  // replace <tileSizes> with tileSizes
   std::string tileSizesStr = "";
   for (size_t i = 0; i < tileSizes.size(); i++) {
     tileSizesStr += std::to_string(tileSizes[i]);
@@ -76,23 +78,22 @@ parseTilingString(ModuleOp &module, MLIRContext *context,
   }
   // perform string replacement
   str = str.replace(str.find("<tileSizes>"), 11, tileSizesStr);
-  // src = src.replace(src.find("<tileSizes>"), 11, tileSizesStr);
 
   // replace <tileNDims> with tile.size()
   std::string tileNDimsStr = std::to_string(tileSizes.size());
   str = str.replace(str.find("<tileNDims>"), 11, tileNDimsStr);
 
-  // replace <pdlOutTypesStr> with the correct number of !pdl.operation,...
-  std::string pdlOutTypeStr = "";
+  // replace <outTypesStr> with the correct number of !transform.any_op,...
+  std::string outTypeStr = "";
   // the number of types is given by the number of for loops + 1
   for (size_t i = 0; i < tileSizes.size() + 1; i++) {
-    pdlOutTypeStr += "!pdl.operation";
+    outTypeStr += "!transform.any_op";
     if (i != tileSizes.size()) {
-      pdlOutTypeStr += ", ";
+      outTypeStr += ", ";
     }
   }
   // perform string replacement
-  str = str.replace(str.find("<pdlOutTypesStr>"), 16, pdlOutTypeStr);
+  str = str.replace(str.find("<outTypesStr>"), 13, outTypeStr);
 
   // Parse the string
   return parseSourceString(str, module, context);
@@ -179,7 +180,7 @@ struct LinalgTilingPass
     {
       // Using the pass manager
       OpPassManager pm("builtin.module");
-      pm.addPass(mlir::soda::trans::createTransformDialectInterpreter());
+      pm.addPass(mlir::transform::createInterpreterPass());
       pm.addPass(mlir::soda::trans::createTransformDialectEraseSchedule());
       if (failed(runPipeline(pm, getOperation())))
         return signalPassFailure();
