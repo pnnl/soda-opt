@@ -183,12 +183,12 @@ class TestArgumentsToXMLPass
           // TODO
           // soda.launch_func should not have anything else but memrefs as args
           // if (a.isa<MemRefType, UnrankedMemRefType>()) {
-          if (MemRefType mr = a.dyn_cast<MemRefType>()) {
+          if (MemRefType mr = mlir::dyn_cast<MemRefType>(a)) {
 
             assert(mr.hasRank() && "expected only ranked shapes");
 
             StringRef v;
-            if (mr.getElementType().isa<FloatType>()) {
+            if (mlir::dyn_cast<FloatType>(mr.getElementType())) {
               v = "1.0";
             } else {
               v = "1";
@@ -237,19 +237,19 @@ class TestArgumentsToXMLPass
             }
           }
 
-          if (FloatType value = a.dyn_cast<FloatType>()) {
+          if (FloatType value = mlir::dyn_cast<FloatType>(a)) {
             StringRef v;
             v = "1.0";
             printIndentT() << "P" << incPointerId() << "=\"" << v << "\"\n";
           }
 
-          if (IntegerType value = a.dyn_cast<IntegerType>()) {
+          if (IntegerType value = mlir::dyn_cast<IntegerType>(a)) {
             StringRef v;
             v = "1";
             printIndentT() << "P" << incPointerId() << "=\"" << v << "\"\n";
           }
           
-          if (IndexType value = a.dyn_cast<IndexType>()) {
+          if (IndexType value = mlir::dyn_cast<IndexType>(a)) {
             StringRef v;
             v = "1";
             printIndentT() << "P" << incPointerId() << "=\"" << v << "\"\n";
@@ -275,12 +275,12 @@ class TestArgumentsToXMLPass
           long numElements = 0;
           std::string typeString = "int";
 
-          if (MemRefType mr = a.dyn_cast<MemRefType>()) {
+          if (MemRefType mr = mlir::dyn_cast<MemRefType>(a)) {
 
             assert(mr.hasRank() && "expected only ranked shapes");
             numElements = mr.getNumElements();
 
-            if (mr.getElementType().isa<FloatType>())
+            if (mlir::dyn_cast<FloatType>(mr.getElementType()))
               typeString = "float";
             if (mr.getElementType().isInteger(1))
               typeString = "_Bool";
@@ -325,9 +325,9 @@ class TestArgumentsToXMLPass
               }
             }
           } else {
-            if (FloatType value = a.dyn_cast<FloatType>())
+            if (FloatType value = mlir::dyn_cast<FloatType>(a))
               typeString = "float";
-            if (IntegerType value = a.dyn_cast<IntegerType>()) {
+            if (IntegerType value = mlir::dyn_cast<IntegerType>(a)) {
               if (a.isInteger(1))
                 typeString = "_Bool";
               if (a.isInteger(8))
@@ -339,7 +339,7 @@ class TestArgumentsToXMLPass
               if (a.isInteger(64))
                 typeString = "unsigned long long";
             }
-            if (IndexType value = a.dyn_cast<IndexType>())
+            if (IndexType value = mlir::dyn_cast<IndexType>(a))
               typeString = "unsigned long long";
             printInterfaceLine(incPointerId(), false, typeString, numElements);
           }
@@ -374,12 +374,12 @@ class TestArgumentsToXMLPass
           // of elements to generate the array and we can ignore the other
           // members
 
-          if (MemRefType mr = a.dyn_cast<MemRefType>()) {
+          if (MemRefType mr = mlir::dyn_cast<MemRefType>(a)) {
 
             assert(mr.hasRank() && "expected only ranked shapes");
 
             StringRef v;
-            if (mr.getElementType().isa<FloatType>()) {
+            if (mlir::dyn_cast<FloatType>(mr.getElementType())) {
               v = "1.0";
             } else {
               v = "1";
@@ -395,19 +395,19 @@ class TestArgumentsToXMLPass
             printT() << v << "}\"\n";
           }
 
-          if (FloatType value = a.dyn_cast<FloatType>()) {
+          if (FloatType value = mlir::dyn_cast<FloatType>(a)) {
             StringRef v;
             v = "1.0";
             printIndentT() << "P" << incPointerId() << "=\"" << v << "\"\n";
           }
 
-          if (IntegerType value = a.dyn_cast<IntegerType>()) {
+          if (IntegerType value = mlir::dyn_cast<IntegerType>(a)) {
             StringRef v;
             v = "1";
             printIndentT() << "P" << incPointerId() << "=\"" << v << "\"\n";
           }
           
-          if (IndexType value = a.dyn_cast<IndexType>()) {
+          if (IndexType value = mlir::dyn_cast<IndexType>(a)) {
             StringRef v;
             v = "1";
             printIndentT() << "P" << incPointerId() << "=\"" << v << "\"\n";
@@ -433,11 +433,11 @@ class TestArgumentsToXMLPass
           long numElements = 0;
           std::string typeString = "int";
 
-          if (MemRefType mr = a.dyn_cast<MemRefType>()) {
+          if (MemRefType mr = mlir::dyn_cast<MemRefType>(a)) {
             assert(mr.hasRank() && "expected only ranked shapes");
             numElements = mr.getNumElements();
 
-            if (mr.getElementType().isa<FloatType>())
+            if (mlir::dyn_cast<FloatType>(mr.getElementType()))
               typeString = "float";
             if (mr.getElementType().isInteger(1))
               typeString = "_Bool";
@@ -452,9 +452,9 @@ class TestArgumentsToXMLPass
 
             printInterfaceLine(incPointerId(), true, typeString, numElements);
           } else {
-            if (FloatType value = a.dyn_cast<FloatType>())
+            if (FloatType value = mlir::dyn_cast<FloatType>(a))
               typeString = "float";
-            if (IntegerType value = a.dyn_cast<IntegerType>()) {
+            if (IntegerType value = mlir::dyn_cast<IntegerType>(a)) {
               if (a.isInteger(1))
                 typeString = "_Bool";
               if (a.isInteger(8))
@@ -466,7 +466,7 @@ class TestArgumentsToXMLPass
               if (a.isInteger(64))
                 typeString = "unsigned long long";
             }
-            if (IndexType value = a.dyn_cast<IndexType>())
+            if (IndexType value = mlir::dyn_cast<IndexType>(a))
               typeString = "unsigned long long";
             printInterfaceLine(incPointerId(), false, typeString, numElements);
           }

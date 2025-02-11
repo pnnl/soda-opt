@@ -19,10 +19,11 @@
 #include "mlir/IR/Attributes.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/DialectImplementation.h"
-#include "mlir/IR/FunctionImplementation.h"
 #include "mlir/IR/OpImplementation.h"
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/IR/TypeUtilities.h"
+#include "mlir/Interfaces/FunctionImplementation.h"
+#include "mlir/Interfaces/SideEffectInterfaces.h"
 #include "llvm/ADT/TypeSwitch.h"
 
 using namespace mlir;
@@ -69,7 +70,7 @@ void SODADialect::printType(Type type, DialectAsmPrinter &os) const {
 
 LogicalResult SODADialect::verifyOperationAttribute(Operation *op,
                                                     NamedAttribute attr) {
-  if (!attr.getValue().isa<UnitAttr>() ||
+  if (!isa<UnitAttr>(attr.getValue()) ||
       attr.getName() != getContainerModuleAttrName())
     return success();
 
@@ -544,7 +545,7 @@ static LogicalResult verifyAttributions(Operation *op,
                                         ArrayRef<BlockArgument> attributions,
                                         unsigned memorySpace) {
   for (Value v : attributions) {
-    auto type = v.getType().dyn_cast<MemRefType>();
+    auto type = dyn_cast<MemRefType>(v.getType());
     if (!type)
       return op->emitOpError() << "expected memref type in attribution";
 
