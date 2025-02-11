@@ -15,6 +15,7 @@ include "mlir/Pass/PassBase.td"
 def SodaKernelOutlining : Pass<"soda-outline-bambu-code", "mlir::ModuleOp"> {
   let summary = "Outline soda.launch bodies into bambu kernel functions";
   let constructor = "mlir::soda::createSodaKernelOutliningPass()";
+  let dependentDialects = ["mlir::cf::ControlFlowDialect"];
 }
 
 def SodaKernelGeneration : Pass<"soda-generate-bambu-accelcode", "mlir::ModuleOp"> {

@@ -18,8 +18,11 @@
 include "soda/Dialect/SODA/SODABase.td"
 include "mlir/IR/EnumAttr.td"
 include "mlir/Dialect/LLVMIR/LLVMOpBase.td"
-include "mlir/IR/FunctionInterfaces.td"
 include "mlir/IR/SymbolInterfaces.td"
+include "mlir/Interfaces/FunctionInterfaces.td"
+include "mlir/Interfaces/InferIntRangeInterface.td"
+include "mlir/Interfaces/InferTypeOpInterface.td"
+include "mlir/Interfaces/ControlFlowInterfaces.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
 
 //===----------------------------------------------------------------------===//
@@ -185,6 +188,8 @@ def SODA_SODAFuncOp : SODA_Op<"func", [HasParent<"SODAModuleOp">,
     // /// Hooks for the input/output type enumeration in FunctionLike .
     // unsigned getNumFuncArguments() { return getFunctionType().getNumInputs(); }
     // unsigned getNumFuncResults() { return getFunctionType().getNumResults(); }
+
+    Region *getCallableRegion() { return &getBody(); }
 
     /// Returns the keywords used in the custom syntax for this Op.
     static StringRef getWorkgroupKeyword() { return "workgroup"; }
