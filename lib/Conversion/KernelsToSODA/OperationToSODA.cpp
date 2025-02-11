@@ -45,6 +45,7 @@ void OperationToSodaConverter::createLaunch(Operation *rootOp) {
   auto *newOp = Operation::create(
       rootOp->getLoc(), rootOp->getName(), rootOp->getResultTypes(),
       rootOp->getOperands(), rootOp->getAttrDictionary(),
+      rootOp->getPropertiesStorage(),
       rootOp->getSuccessors(), rootOp->getRegions());
 
   // Insert the clone into the soda launch.

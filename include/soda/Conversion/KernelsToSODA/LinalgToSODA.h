@@ -6,7 +6,6 @@
 #include "mlir/Support/LLVM.h"
 
 namespace mlir {
-struct LogicalResult;
 
 namespace linalg {
 class DotOp;

@@ -1,4 +1,4 @@
-//===- AllToSODAPass.cpp - Convert ops in a function to SODA operatios ---- =//
+//===- AllToSODAPass.cpp - Convert ops in a function to SODA operations ---- =//
 //
 // This pass converts all operations in a function into soda.launch + the same
 // operation. Marking the region to be outlined.
@@ -61,9 +61,15 @@ struct ConvertAllToSODAPass
     builder.setInsertionPointToStart(&launchOp.getBody().front());
 
     for (Operation *op : opsToClone) {
+      // auto *newOp = Operation::create(
+      //   op->getLoc(), op->getName(), op->getResultTypes(), op->getOperands(),
+      //   op->getDiscardableAttrDictionary(), op->getPropertiesStorage(),
+      //   op->getSuccessors(), op->getNumRegions());
+
       Operation *newOp = Operation::create(
           op->getLoc(), op->getName(), op->getResultTypes(), op->getOperands(),
-          op->getAttrDictionary(), op->getSuccessors(), op->getRegions());
+          op->getAttrDictionary(), op->getPropertiesStorage(),
+          op->getSuccessors(), op->getRegions());
 
       // Insert the clone into the soda launch.
       auto results = newOp->getResults();

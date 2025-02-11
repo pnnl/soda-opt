@@ -17,6 +17,7 @@
 #define DEBUG_TYPE "loops-to-soda"
 
 using namespace mlir;
+using namespace mlir::affine;
 
 namespace {
 // Helper structure that holds common state of the loop to SODA kernel
