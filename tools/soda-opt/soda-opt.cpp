@@ -142,7 +142,7 @@ int main(int argc, char **argv) {
   //===--------------------------------------------------------------------===//
 
   // Dialects
-  registry.insert<mlir::soda::SODADialect, mlir::snn::SNNDialect>();
+  registry.insert<mlir::soda::SODADialect>();
   // WIP: AXI4MLIR integration
   // registry.insert<mlir::soda::SODADialect, mlir::snn::SNNDialect,
   //                 mlir::accel::AccelDialect>();
