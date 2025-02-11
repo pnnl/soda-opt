@@ -19,8 +19,9 @@
 // #include "soda/Dialect/Accel/IR/Accel.h"
 #include "soda/Dialect/Linalg/Reports/Passes.h"
 #include "soda/Dialect/Linalg/Transforms/Passes.h"
-#include "soda/Dialect/SNN/IR/SNN.h"
-#include "soda/Dialect/SNN/Transforms/Passes.h"
+// WIP: Removing SNN dialect support
+// #include "soda/Dialect/SNN/IR/SNN.h"
+// #include "soda/Dialect/SNN/Transforms/Passes.h"
 #include "soda/Dialect/SODA/Passes.h"
 #include "soda/Dialect/SODA/SODADialect.h"
 #include "soda/Dialect/Transform/Transforms/Passes.h"
@@ -171,7 +172,8 @@ int main(int argc, char **argv) {
   // mlir::soda::registerConvertAccelToAXI4MLIR();
 
   // ----- SNN -----
-  mlir::snn::registerSNNPrintPass();
+  // WIP: Remove SNN dialect
+  // mlir::snn::registerSNNPrintPass();
 
   return failed(
       mlir::MlirOptMain(argc, argv, "SODA optimizer driver\n", registry));
