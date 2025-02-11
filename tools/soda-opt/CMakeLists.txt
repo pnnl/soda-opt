@@ -84,8 +84,9 @@ set(LIBS
   MLIRSODATransforms
 
   # SNN
-  MLIRSNNOps
-  MLIRSNNTransforms
+  # WIP Remove SNN
+  # MLIRSNNOps
+  # MLIRSNNTransforms
 
   # ACCEL
   # WIP: AXI4MLIR integration

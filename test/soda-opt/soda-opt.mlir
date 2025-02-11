@@ -12,7 +12,6 @@
 // CHECK: ml_program
 // CHECK: pdl
 // CHECK: scf
-// CHECK: snn
 // CHECK: soda
 // CHECK: transform
 // CHECK: vector
