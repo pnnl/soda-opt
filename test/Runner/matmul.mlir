@@ -1,11 +1,12 @@
-// RUN: soda-opt %s --convert-linalg-to-affine-loops --convert-linalg-to-std \
-// RUN: --lower-affine --canonicalize --cse \ 
-// RUN: --convert-scf-to-cf --canonicalize --cse  \
-// RUN: --convert-memref-to-llvm \
+// RUN: soda-opt %s \
+// RUN: --convert-linalg-to-affine-loops --convert-linalg-to-std \
+// RUN: --lower-affine \ 
+// RUN: --convert-scf-to-cf \
 // RUN: --convert-math-to-llvm --convert-math-to-libm \
-// RUN: -arith-expand   \
-// RUN: -memref-expand  \
+// RUN: --arith-expand \
+// RUN: --memref-expand \
 // RUN: --convert-arith-to-llvm \
+// RUN: --finalize-memref-to-llvm \
 // RUN: --convert-func-to-llvm --reconcile-unrealized-casts \
 // RUN: | mlir-runner -e matmul_driver -entry-point-result=f32 \
 // RUN: | FileCheck %s
