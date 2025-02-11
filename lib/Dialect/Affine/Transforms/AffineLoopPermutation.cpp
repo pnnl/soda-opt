@@ -24,6 +24,7 @@
 #define PASS_NAME "soda-affine-test-loop-permutation"
 
 using namespace mlir;
+using namespace mlir::affine;
 using namespace soda;
 
 static llvm::cl::OptionCategory clOptionsCategory(PASS_NAME " options");

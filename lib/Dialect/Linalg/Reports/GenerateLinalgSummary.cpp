@@ -83,10 +83,10 @@ static int getSizeOfMemRefShape(TensorType type) {
 static void getInputSizes(mlir::linalg::GenericOp op, std::vector<int> &sizes) {
   for (auto x : op.getInputs()) {
     Type type = x.getType();
-    if (MemRefType mr = type.dyn_cast<MemRefType>())
+    if (MemRefType mr = dyn_cast<MemRefType>(type))
       sizes.push_back(getSizeOfMemRefShape(
           mr)); // can likely use MemRefType.getNumElements()
-    else if (TensorType t = type.dyn_cast<TensorType>())
+    else if (TensorType t = dyn_cast<TensorType>(type))
       sizes.push_back(getSizeOfMemRefShape(t));
     else
       sizes.push_back(0);
@@ -97,9 +97,9 @@ static void getOutputSizes(mlir::linalg::GenericOp op,
                            std::vector<int> &sizes) {
   for (auto x : op.getOutputs()) {
     Type type = x.getType();
-    if (MemRefType mr = type.dyn_cast<MemRefType>())
+    if (MemRefType mr = dyn_cast<MemRefType>(type))
       sizes.push_back(getSizeOfMemRefShape(mr));
-    else if (TensorType t = type.dyn_cast<TensorType>())
+    else if (TensorType t = dyn_cast<TensorType>(type))
       sizes.push_back(getSizeOfMemRefShape(t));
     else
       sizes.push_back(0);
@@ -134,9 +134,9 @@ static void getInputElementTypeBitwidth(mlir::linalg::GenericOp op,
                                         std::vector<int> &bitwidths) {
   for (auto x : op.getInputs()) {
     Type type = x.getType();
-    if (MemRefType mr = type.dyn_cast<MemRefType>())
+    if (MemRefType mr = dyn_cast<MemRefType>(type))
       bitwidths.push_back(mr.getElementTypeBitWidth());
-    else if (TensorType t = type.dyn_cast<TensorType>())
+    else if (TensorType t = dyn_cast<TensorType>(type))
       bitwidths.push_back(t.getElementTypeBitWidth());
     else
       bitwidths.push_back(0);
@@ -147,9 +147,9 @@ static void getOuputElementTypeBitwidth(mlir::linalg::GenericOp op,
                                         std::vector<int> &bitwidths) {
   for (auto x : op.getOutputs()) {
     Type type = x.getType();
-    if (MemRefType mr = type.dyn_cast<MemRefType>())
+    if (MemRefType mr = dyn_cast<MemRefType>(type))
       bitwidths.push_back(mr.getElementTypeBitWidth());
-    else if (TensorType t = type.dyn_cast<TensorType>())
+    else if (TensorType t = dyn_cast<TensorType>(type))
       bitwidths.push_back(t.getElementTypeBitWidth());
     else
       bitwidths.push_back(0);
@@ -210,7 +210,7 @@ static int getNumberOfIterations(mlir::linalg::GenericOp op) {
   // All maps have the same number of dimensions, so we can use the first one to
   // get the number of dimensions
   auto mapAttr = op.getIndexingMaps()[0];
-  auto map = mapAttr.cast<AffineMapAttr>().getValue();
+  auto map = cast<AffineMapAttr>(mapAttr).getValue();
   int numDims = map.getNumDims();
 
   // Now we create a dictionary to store if we have already processed a
@@ -239,12 +239,12 @@ static int getNumberOfIterations(mlir::linalg::GenericOp op) {
     }
     count++;
 
-    auto map = mapAttr.cast<AffineMapAttr>().getValue();
+    auto map = cast<AffineMapAttr>(mapAttr).getValue();
 
     for (unsigned i = 0; i < map.getNumResults(); i++) {
       if (processedDims[map.getDimPosition(i)] == false) {
         processedDims[map.getDimPosition(i)] = true;
-        loopBounds.push_back(v.getType().cast<ShapedType>().getDimSize(i));
+        loopBounds.push_back(cast<ShapedType>(v.getType()).getDimSize(i));
       } else {
         // If we have already processed this dimension, we can skip it
         continue;

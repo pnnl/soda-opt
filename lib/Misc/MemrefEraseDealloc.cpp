@@ -33,7 +33,7 @@ struct EraseMemrefDeallocPass
   void runOnOperation() override {
     RewritePatternSet patterns(&getContext());
     populateEraseMemrefDeallocPattern(patterns);
-    if (failed(applyPatternsAndFoldGreedily(getOperation()->getRegions(),
+    if (failed(applyPatternsAndFoldGreedily(getOperation(),
                                             std::move(patterns))))
       return signalPassFailure();
   }

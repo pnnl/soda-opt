@@ -25,10 +25,6 @@ namespace vector {
 class VectorDialect;
 } // end namespace vector
 
-// Needed by the mlir::soda::AffineDataCopyGen - Buffer Trick
-#define GEN_PASS_CLASSES
-#include "mlir/Dialect/Affine/Passes.h.inc"
-
 } // end namespace mlir
 
 #endif // DIALECT_SODA_AFFINE_PASSDETAIL_H_
