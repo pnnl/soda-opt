@@ -17,7 +17,9 @@ set(SODA_TEST_DEPENDS
         mlir-runner
         AllocaNamer
         XMLWriter
-        VhlsLLVMRewriter
+        # TODO(VitisHLS): Currently the passes dont trigger from commandline
+        # VhlsLLVMRewriter
+        # MemRefToArray
         mlir_mockaxi_runner_utils
         )
 
