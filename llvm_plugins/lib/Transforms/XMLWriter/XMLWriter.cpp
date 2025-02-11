@@ -61,11 +61,7 @@ void printClosure() {
   printIndent() << "</memory>\n";
 }
 
-struct XMLWriterPass : public ModulePass {
-  static char ID;
-  XMLWriterPass() : ModulePass(ID) {}
-
-  bool runOnModule(Module &M) override {
+bool runXMLWriterPass(Module &M) {
     std::error_code errorMessage;
     StringRef fileName = "memory_allocation.xml";
     raw_fd_ostream outFile(fileName, errorMessage);
@@ -119,14 +115,36 @@ struct XMLWriterPass : public ModulePass {
     }
 
     printClosure();
-    return false;
+    return true;
   }
-}; // end of struct Namer
+
+struct XMLWriterPass : public PassInfoMixin<XMLWriterPass> {
+  PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
+    runXMLWriterPass(M);
+    return PreservedAnalyses::all();
+  }
+};
 } // end of anonymous namespace
 
-char XMLWriterPass::ID = 0;
-static RegisterPass<XMLWriterPass>
-    X("xml-mem-writer",
-      "Generates an XML file for bambu that allocates memory instructions to "
-      "internal and external storage.",
-      true /* Only looks at CFG */, true /* Analysis Pass */);
+/* New PM Registration */
+llvm::PassPluginLibraryInfo getXMLWriterPluginInfo() {
+  return {LLVM_PLUGIN_API_VERSION, "XMLWriter", LLVM_VERSION_STRING,
+      [](PassBuilder &PB) {
+      PB.registerPipelineParsingCallback(
+        [](StringRef Name, llvm::ModulePassManager &MPM,
+           ArrayRef<llvm::PassBuilder::PipelineElement>) {
+          if (Name == "xml-mem-writer") {
+          MPM.addPass(XMLWriterPass());
+          return true;
+          }
+          return false;
+        });
+      }};
+}
+
+#ifndef LLVM_XMLWRITER_LINK_INTO_TOOLS
+extern "C" LLVM_ATTRIBUTE_WEAK ::llvm::PassPluginLibraryInfo
+llvmGetPassPluginInfo() {
+  return getXMLWriterPluginInfo();
+}
+#endif

@@ -1,5 +1,6 @@
-; RUN: opt -load %sodashlibdir/AllocaNamer%shlibext -name-allocas-for-xml-gen \
-; RUN:     -S -enable-new-pm=0 < %s 2>&1 | FileCheck %s
+; RUN: opt --load-pass-plugin=%sodashlibdir/AllocaNamer%shlibext \
+; RUN:     --passes=name-allocas-for-xml-gen \
+; RUN:     -S < %s 2>&1 | FileCheck %s
 
 declare i8* @malloc(i64)
 
