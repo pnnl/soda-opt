@@ -11,7 +11,7 @@ on:
 
 env:
   BUILD_TYPE: Release
-  LLVM_COMMIT: 339a7687e1c036a5f91c9d5391523b93e2e76cd3
+  LLVM_COMMIT: ab4b5a2db582958af1ee308a790cfdb42bd24720
   LLVM_SRC_DIR: /tmp/src/llvm-project
   LLVM_BUILD_DIR: /tmp/builds/llvm-project/build
   LLVM_INSTALL_DIR: /tmp/installs/llvm-project/install
@@ -21,37 +21,41 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
-        python-version: ["3.9.16"]
+        python-version: ["3.12.9"]
 
     steps:
     # Clone the SODA-OPT repo. Do shallow clone to save clone time.
     - uses: actions/checkout@v3
       with:
         fetch-depth: 2
-    
+
     # Install python and build dependencies.
-    - name: Install dependencies
-      working-directory: ${{github.workspace}}
+    - name: Install system dependencies
       run: |
-        sudo apt-get install python3.9 python3.9-dev
-        curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-        python3.9 get-pip.py
-        sudo apt-get install ninja-build
+        sudo apt-get update
+        sudo apt-get install -y python3.12 python3.12-venv python3.12-dev python3-pip ninja-build
+
+    # Set up Python Virtual Environment
+    - name: Set up Python virtual environment
+      run: |
+        python3.12 -m venv venv
+        echo "VIRTUAL_ENV=${GITHUB_WORKSPACE}/venv" >> $GITHUB_ENV
+        echo "${GITHUB_WORKSPACE}/venv/bin" >> $GITHUB_PATH
+        source venv/bin/activate
+        python -m pip install --upgrade pip
     
-    # Clone a specific verion of llvm-project and install python dependencies.
+    # Clone a specific version of llvm-project and install Python dependencies
     - name: Setup LLVM
       id: clone-llvm
       run: |
         mkdir -p /tmp/src/ && cd /tmp/src
-        git init llvm-project
-        cd /tmp/src/llvm-project
-        git remote add origin https://github.com/llvm/llvm-project.git
-        git fetch --depth=1 origin $LLVM_COMMIT
-        git reset --hard $LLVM_COMMIT
-        pip3.9 install -r ./mlir/python/requirements.txt
+        git clone --depth=1 --branch $LLVM_COMMIT https://github.com/llvm/llvm-project.git
+        cd llvm-project
+        source $GITHUB_WORKSPACE/venv/bin/activate
+        pip install -r ./mlir/python/requirements.txt
 
     # ----------------------------------
     # Try to fetch LLVM from the cache.
