@@ -30,7 +30,7 @@ And follow one of our tutorials [here](docs/tutorials).
 This setup assumes that you have built LLVM and MLIR in `$BUILD_DIR` and
 installed it to `$PREFIX`. 
 The current version of this project was tested with `llvm-project` commit:
-`08d094a0e457360ad8b94b017d2dc277e697ca76`.
+`ab4b5a2db582958af1ee308a790cfdb42bd24720`.
 Make sure you have the correct commit checked-out.
 
 **Note**: Make sure to pass `-DLLVM_INSTALL_UTILS=ON` when building LLVM/MLIR 
