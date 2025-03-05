@@ -11,7 +11,7 @@ on:
 
 env:
   BUILD_TYPE: Release
-  LLVM_COMMIT: ab4b5a2db582958af1ee308a790cfdb42bd24720
+  LLVM_COMMIT: llvmorg-19.1.5
   LLVM_SRC_DIR: /tmp/src/llvm-project
   LLVM_BUILD_DIR: /tmp/builds/llvm-project/build
   LLVM_INSTALL_DIR: /tmp/installs/llvm-project/install
