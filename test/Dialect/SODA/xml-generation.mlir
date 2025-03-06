@@ -3,8 +3,8 @@
 
 // TODO: Sometimes, filecheck will try to verify the file before the file is written. 
 // This causes the test to fail. Commenting this test for now
-// DONTRUN: soda-opt -allow-unregistered-dialect --soda-extract-arguments-to-xml %s
-// DONTRUN:   FileCheck %s -input-file=driver_kernel_test.xml --check-prefixes=CHECK_FILE
+// TODO: soda-opt -allow-unregistered-dialect --soda-extract-arguments-to-xml %s
+// TODO:   FileCheck %s -input-file=driver_kernel_test.xml --check-prefixes=CHECK_FILE
 
 module attributes {soda.container_module}  {
   func.func @driver() {
@@ -24,6 +24,7 @@ module attributes {soda.container_module}  {
   }
 }
 
+// TODO: This test is not executing due to the issue mentioned above on RUN line.
 // CHECK_FILE: <?xml version="1.0"?>
 // CHECK_FILE: <function>
 // CHECK_FILE:  <testbench
