@@ -24,13 +24,15 @@ set(LIBS
   # MLIRTensorDialect
   MLIRLinalgDialect
   MLIRMemRefDialect
-  # MLIRShapeDialect
-  # MLIRIndexDialect
+  MLIRShapeDialect
+  MLIRIndexDialect
   MLIRAffineDialect
   MLIRArithDialect
+  MLIRArithValueBoundsOpInterfaceImpl
   MLIRMathDialect
   MLIRFuncDialect
   MLIRSCFDialect
+  MLIRControlFlowDialect
   MLIRTransformDialect
   MLIRPDLDialect
   MLIRPDLInterpDialect
@@ -49,9 +51,16 @@ set(LIBS
   MLIRFuncTransforms
   MLIRLinalgTransforms
   MLIRAffineTransforms
+  MLIRArithTransforms
+  MLIRShapeOpsTransforms
   MLIRSCFTransforms
   MLIRReconcileUnrealizedCasts
   MLIRMemRefTransforms
+  MLIRBufferizationTransformOps
+  MLIRControlFlowTransforms
+  MLIRMLProgramTransforms
+  MLIRTransformDebugExtension
+  MLIRTransformLoopExtension
   MLIRTransformDialectTransforms
 
   # Test Passes
