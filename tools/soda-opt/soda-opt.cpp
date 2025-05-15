@@ -14,6 +14,8 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/ToolOutputFile.h"
 
+#include "soda/InitUpstreamDialects.h"
+
 #include "soda/Conversion/Passes.h"
 // WIP: AXI4MLIR integration
 // #include "soda/Dialect/Accel/IR/Accel.h"
@@ -38,6 +40,11 @@
 
 #include "mlir/Dialect/Func/TransformOps/FuncTransformOps.h"
 #include "mlir/Dialect/Linalg/TransformOps/DialectExtension.h"
+#include "mlir/Dialect/Transform/LoopExtension/LoopExtension.h"
+#include "mlir/Dialect/Transform/DebugExtension/DebugExtension.h"
+#include "mlir/Dialect/SCF/TransformOps/SCFTransformOps.h"
+#include "mlir/Dialect/Affine/TransformOps/AffineTransformOps.h"
+#include "mlir/Dialect/Bufferization/TransformOps/BufferizationTransformOps.h"
 
 // Defined in the test directory, no public header.
 namespace mlir {
@@ -104,25 +111,8 @@ int main(int argc, char **argv) {
   // Add the following to selectively include the necessary dialects. You only
   // need to register dialects that will be *parsed* by the tool, not the one
   // generated
-  // clang-format off
-  registry.insert<
-                  mlir::affine::AffineDialect,
-                  mlir::arith::ArithDialect,
-                  mlir::bufferization::BufferizationDialect,
-                  mlir::cf::ControlFlowDialect,
-                  mlir::func::FuncDialect,
-                  mlir::linalg::LinalgDialect,
-                  mlir::LLVM::LLVMDialect,
-                  mlir::math::MathDialect,
-                  mlir::memref::MemRefDialect,
-                  mlir::ml_program::MLProgramDialect,
-                  mlir::pdl::PDLDialect,
-                  mlir::scf::SCFDialect,
-                  mlir::transform::TransformDialect,
-                  mlir::vector::VectorDialect>();
 
-  // clang-format on
-  // mlir::registerAllDialects(registry);
+  mlir::registerUpstreamDialects(registry);
 
 
   // Interfaces  
@@ -132,6 +122,11 @@ int main(int argc, char **argv) {
   // linalg::registerTransformDialectExtension(registry);
   func::registerTransformDialectExtension(registry);
   linalg::registerTransformDialectExtension(registry);
+  bufferization::registerTransformDialectExtension(registry);
+  scf::registerTransformDialectExtension(registry);
+  transform::registerDebugExtension(registry);
+  transform::registerLoopExtension(registry);
+  cf::registerConvertControlFlowToLLVMInterface(registry);
 
   // Register external models
   // linalg::registerTilingInterfaceExternalModels(registry);
