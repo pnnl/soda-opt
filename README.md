@@ -48,13 +48,23 @@ cmake -G Ninja .. \
 cmake --build . --target check-soda
 ```
 
+**Note**: This repository contains a a vscode devcontainer configuration. In vscode, use `cmd+shift+p` and select `Remote-Containers: Rebuild and Reopen in Container` to build the container that will enable you to build and run the project. 
+
 ### Building LLVM/MLIR with Helper Script
 
 LLVM can be built with the helper `build_tools/build_llvm.sh`.
 
 ```sh
 # To configure, build, and install
+./build_llvm.sh <path/to/llvm/src> <llvm_branch_name>
 ./build_llvm.sh <path/to/llvm/src> <llvm_build_dir> <llvm_install_dir>
+```
+
+Or, inside the development container, you can run:
+
+```sh
+./download_llvm.sh ${LLVM_SRC_DIR} ${LLVM_BRANCH}
+./build_llvm.sh ${LLVM_SRC_DIR} ${LLVM_BUILD_DIR} ${LLVM_INSTALL_DIR}
 ```
 
 ### Building soda-opt with Helper Script
@@ -65,6 +75,10 @@ Alternatively it is possible to use the helper script
 ```sh
 # To configure, build, and install
 ./build_tools/build_soda.sh <source_dir> <install_dir> <build_dir> <path/to/llvm/build/dir> <path/to/llvm/install/dir>
+```
+
+```sh
+./build_tools/build_soda.sh ${SODA_OPT_SRC_DIR} ${SODA_OPT_INSTALL_DIR} ${SODA_OPT_BUILD_DIR} ${LLVM_BUILD_DIR} ${LLVM_INSTALL_DIR}
 ```
 
 ## How to generate the docs?

@@ -1,0 +1,66 @@
+{
+    "name": "soda-dev",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "target": "devcontainer",
+        "context": "."
+        // ,"args": {
+        //     "VARIANT": "buster"
+        // }
+    },
+    "runArgs": [
+        "--rm"
+    ],
+    "remoteEnv": {
+        "PYTHONPATH": "${containerEnv:PYTHONPATH}:${containerWorkspaceFolder}/builds/llvm-project/install/python_packages/mlir_core",
+        "LLVM_SYMBOLIZER_PATH": "${containerWorkspaceFolder}/builds/llvm-project/install/bin/llvm-symbolizer",
+        "LLVM_BRANCH": "llvmorg-19.1.5",
+        "LLVM_SRC_DIR": "${containerWorkspaceFolder}/builds/llvm-project/src",
+        "LLVM_BUILD_DIR": "${containerWorkspaceFolder}/builds/llvm-project/build",
+        "LLVM_INSTALL_DIR": "${containerWorkspaceFolder}/installs/llvm-project/install",
+        "SODA_OPT_SRC_DIR": "${containerWorkspaceFolder}",
+        "SODA_OPT_BUILD_DIR": "${containerWorkspaceFolder}/builds/soda-opt/build",
+        "SODA_OPT_INSTALL_DIR": "${containerWorkspaceFolder}/installs/soda-opt/install"
+    },
+    // Allow container to stop. See: https://github.com/microsoft/vscode-remote-release/issues/3512#issuecomment-1267053890
+    // "overrideCommand": false,
+    // "postCreateCommand": "pip install -r requirements.txt",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-azuretools.vscode-docker",
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.pylint",
+                "ms-python.isort",
+                "ms-toolsai.jupyter",
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-extension-pack",
+                "ms-vscode.cmake-tools",
+                "llvm-vs-code-extensions.vscode-mlir",
+                "vadimcn.vscode-lldb",
+                "tintinweb.graphviz-interactive-preview"
+            ]
+        },
+        "settings": {
+            "editor.formatOnSave": true,
+            "files.trimTrailingWhitespace": true,
+            "files.insertFinalNewline": true,
+            "files.trimFinalNewlines": true,
+            "python.formatting.provider": "black",
+            "python.linting.pylintEnabled": true,
+            "python.linting.enabled": true,
+            "C_Cpp.default.cppStandard": "c++17",
+            "C_Cpp.default.includePath": [
+                "${containerWorkspaceFolder}/**",
+                "${containerWorkspaceFolder}/builds/llvm-project/build/include",
+                "${containerWorkspaceFolder}/builds/llvm-project/build/tools/mlir/include",
+                // "${containerWorkspaceFolder}/standalone/include",
+                // "${containerWorkspaceFolder}/builds/standalone/build/include"
+            ],
+            "mlir.server_path": "${containerWorkspaceFolder}/builds/llvm-project/install/bin//mlir-lsp-server",
+            "mlir.tablegen_server_path": "${containerWorkspaceFolder}/builds/llvm-project/install/bin/tblgen-lsp-server",
+            "mlir.pdll_server_path": "${containerWorkspaceFolder}/builds/llvm-project/install/bin/pdll-lsp-server"
+        }
+    }
+}
