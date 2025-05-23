@@ -20,6 +20,7 @@ namespace soda {
 //===----------------------------------------------------------------------===//
 std::unique_ptr<mlir::Pass> createTestPrintOpNestingPass();
 std::unique_ptr<mlir::Pass> createTestArgumentsToXMLPass();
+std::unique_ptr<mlir::Pass> createTestArgumentsToCTestbenchPass();
 
 std::unique_ptr<mlir::Pass> createEraseMemrefDeallocPass();
 std::unique_ptr<mlir::Pass> createForwardMemrefAllocPass();

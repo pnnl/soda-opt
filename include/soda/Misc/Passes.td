@@ -53,6 +53,33 @@ def TestArgumentsToXML : Pass<"soda-extract-arguments-to-xml", "ModuleOp"> {
   ];
 }
 
+def TestArgumentsToCTestbench : Pass<"soda-extract-arguments-to-c-testbench", 
+  "ModuleOp"> {
+  let summary = "Generate C files for soda.launch_func and its arguments";
+  let description = [{
+      Traverses the arguments of a function and generates a c file
+      that can be read by bambu. The generated file contains random inputs with
+      the correct sizes supporting the llvm function arguments.
+
+      If option `="using-bare-ptr"` is used, output c file ignores the memref
+      struct members and only generates simple C arrays with the correct size.
+      This option is meant to be used with a lowering pipeline that finishes
+      with:
+        `--convert-func-to-llvm=use-bare-ptr-memref-call-conv`
+
+      Note that the generated file is created at the binary execution
+      location and will replace any c files that have the same name based
+      on the kernel name of the soda.launch_func.
+  }];
+  let constructor = "mlir::soda::createTestArgumentsToCTestbenchPass()";
+  let options = [
+    Option<"writeToTerminal", "write-to-terminal", "bool", /*default=*/"false",
+           "If set, write to terminal instead of a file (default: false)">,
+    Option<"usingBarePtr", "using-bare-ptr", "bool", /*default=*/"false",
+           "If set, generate test vectors assuming bare ptrs (default: false)">,
+  ];
+}
+
 //===----------------------------------------------------------------------===//
 // Basic Pattern-Match and Rewrite
 //===----------------------------------------------------------------------===//

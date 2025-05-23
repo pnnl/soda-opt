@@ -3,7 +3,7 @@
 //
 // This file implements a series of misc passes that dont modify the MLIR code.
 // These passes include printing operation nesting or generating test vectors
-// in XML targeting bambu simulation.
+// in XML or C targeting bambu simulation.
 //
 // Test vector generation works for algorithms with no dynamic behaviour based
 // on the input data. It supports regular memref call convetion and bareptr call
@@ -248,7 +248,7 @@ class TestArgumentsToXMLPass
             v = "1";
             printIndentT() << "P" << incPointerId() << "=\"" << v << "\"\n";
           }
-          
+
           if (IndexType value = mlir::dyn_cast<IndexType>(a)) {
             StringRef v;
             v = "1";
@@ -406,7 +406,7 @@ class TestArgumentsToXMLPass
             v = "1";
             printIndentT() << "P" << incPointerId() << "=\"" << v << "\"\n";
           }
-          
+
           if (IndexType value = mlir::dyn_cast<IndexType>(a)) {
             StringRef v;
             v = "1";
@@ -554,6 +554,14 @@ class TestArgumentsToXMLPass
   llvm::raw_ostream &printI() { return xmlOutI(); }
 };
 
+class TestArgumentsToCTestbenchPass
+    : public mlir::soda::TestArgumentsToCTestbenchBase<
+          TestArgumentsToCTestbenchPass> {
+
+  void runOnOperation() override { // TODO
+  }
+};
+
 } // end anonymous namespace
 
 std::unique_ptr<mlir::Pass> mlir::soda::createTestPrintOpNestingPass() {
@@ -562,4 +570,8 @@ std::unique_ptr<mlir::Pass> mlir::soda::createTestPrintOpNestingPass() {
 
 std::unique_ptr<mlir::Pass> mlir::soda::createTestArgumentsToXMLPass() {
   return std::make_unique<TestArgumentsToXMLPass>();
+}
+
+std::unique_ptr<mlir::Pass> mlir::soda::createTestArgumentsToCTestbenchPass() {
+  return std::make_unique<TestArgumentsToCTestbenchPass>();
 }
