@@ -146,6 +146,7 @@ int main(int argc, char **argv) {
   // Misc passes
   mlir::soda::registerTestPrintOpNestingPass();
   mlir::soda::registerTestArgumentsToXMLPass();
+  mlir::soda::registerTestArgumentsToCTestbenchPass();
   mlir::soda::registerEraseMemrefDeallocPass();
   mlir::soda::registerForwardMemrefAllocPass();
   mlir::soda::registerForwardLinalgFillPass();
