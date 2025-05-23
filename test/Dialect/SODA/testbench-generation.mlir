@@ -14,7 +14,7 @@ module attributes {soda.container_module}  {
     %0 = "loadA"() : () -> memref<4x7xf32>
     %1 = "loadB"() : () -> memref<7x3xf32>
     %2 = "allocateC"() : () -> memref<4x3xf32>
-    soda.launch_func  @driver_kernel::@driver_kernel args(%0 : memref<4x7xf32>, %1 : memref<7x3xf32>, %2 : memref<4x3xf32>)
+    soda.launch_func @driver_kernel::@driver_kernel args(%0 : memref<4x7xf32>, %1 : memref<7x3xf32>, %2 : memref<4x3xf32>)
     return
   }
   soda.module @driver_kernel {
@@ -22,6 +22,24 @@ module attributes {soda.container_module}  {
       cf.br ^bb1
     ^bb1:  // pred: ^bb0
       linalg.matmul ins(%arg0, %arg1 : memref<4x7xf32>, memref<7x3xf32>) outs(%arg2 : memref<4x3xf32>)
+      soda.return
+    }
+  }
+}
+
+module attributes {soda.container_module}  {
+  func.func @driver_int() {
+    %0 = "loadA"() : () -> memref<4x7xi8>
+    %1 = "loadB"() : () -> memref<7x3xi8>
+    %2 = "allocateC"() : () -> memref<4x3xi8>
+    soda.launch_func @driver_kernel_int::@driver_kernel_int args(%0 : memref<4x7xi8>, %1 : memref<7x3xi8>, %2 : memref<4x3xi8>)
+    return
+  }
+  soda.module @driver_kernel_int {
+    soda.func @driver_kernel_int(%arg0: memref<4x7xi8>, %arg1: memref<7x3xi8>, %arg2: memref<4x3xi8>) kernel {
+      cf.br ^bb1
+    ^bb1:  // pred: ^bb0
+      linalg.matmul ins(%arg0, %arg1 : memref<4x7xi8>, memref<7x3xi8>) outs(%arg2 : memref<4x3xi8>)
       soda.return
     }
   }
@@ -112,24 +130,31 @@ module attributes {soda.container_module}  {
 
 // CHECK_TERMINAL_C: #include <mdpi/mdpi_user.h>
 
-// CHECK_TERMINAL_C: CDECL void driver_kernel(void*, void*, void*);
+// CHECK_TERMINAL_C-LABEL: CDECL void driver_kernel(void*, void*, void*);
 
-// CHECK_TERMINAL_C: int main()
-// CHECK_TERMINAL_C: {
-// CHECK_TERMINAL_C:    void* P0;
-// CHECK_TERMINAL_C:    void* P1;
-// CHECK_TERMINAL_C:    void* P2;
-// CHECK_TERMINAL_C:    {
-// CHECK_TERMINAL_C:       float P0_temp[] = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
-// CHECK_TERMINAL_C:       P0 = (void*)P0_temp;
-// CHECK_TERMINAL_C:       m_param_alloc(0, sizeof(P0_temp));
-// CHECK_TERMINAL_C:       float P1_temp[] = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
-// CHECK_TERMINAL_C:       P1 = (void*)P1_temp;
-// CHECK_TERMINAL_C:       m_param_alloc(1, sizeof(P1_temp));
-// CHECK_TERMINAL_C:       float P2_temp[] = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
-// CHECK_TERMINAL_C:       P2 = (void*)P2_temp;
-// CHECK_TERMINAL_C:       m_param_alloc(2, sizeof(P2_temp));
-// CHECK_TERMINAL_C:       driver_kernel((void*) P0, (void*) P1, (void*) P2);
-// CHECK_TERMINAL_C:    }
-// CHECK_TERMINAL_C:    return 0;
-// CHECK_TERMINAL_C: }
+// CHECK_TERMINAL_C:      int main()
+// CHECK_TERMINAL_C-NEXT: {
+// CHECK_TERMINAL_C-NEXT:    void* P0;
+// CHECK_TERMINAL_C-NEXT:    void* P1;
+// CHECK_TERMINAL_C-NEXT:    void* P2;
+// CHECK_TERMINAL_C-NEXT:    {
+// CHECK_TERMINAL_C-NEXT:       float P0_temp[] = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
+// CHECK_TERMINAL_C-NEXT:       P0 = (void*)P0_temp;
+// CHECK_TERMINAL_C-NEXT:       m_param_alloc(0, sizeof(P0_temp));
+// CHECK_TERMINAL_C-NEXT:       float P1_temp[] = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
+// CHECK_TERMINAL_C-NEXT:       P1 = (void*)P1_temp;
+// CHECK_TERMINAL_C-NEXT:       m_param_alloc(1, sizeof(P1_temp));
+// CHECK_TERMINAL_C-NEXT:       float P2_temp[] = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
+// CHECK_TERMINAL_C-NEXT:       P2 = (void*)P2_temp;
+// CHECK_TERMINAL_C-NEXT:       m_param_alloc(2, sizeof(P2_temp));
+// CHECK_TERMINAL_C-NEXT:       driver_kernel((void*) P0, (void*) P1, (void*) P2);
+// CHECK_TERMINAL_C-NEXT:    }
+// CHECK_TERMINAL_C-NEXT:    return 0;
+// CHECK_TERMINAL_C-NEXT: }
+
+
+// ----- INT8 Version -----
+// CHECK_TERMINAL_C-LABEL: CDECL void driver_kernel_int(void*, void*, void*);
+// CHECK_TERMINAL_C:       uint8_t P0_temp[] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+// CHECK_TERMINAL_C:       uint8_t P1_temp[] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+// CHECK_TERMINAL_C:       uint8_t P2_temp[] = {1,1,1,1,1,1,1,1,1,1,1,1};
