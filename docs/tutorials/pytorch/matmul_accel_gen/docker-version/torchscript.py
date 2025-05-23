@@ -1,5 +1,5 @@
 import torch
-import torch_mlir
+from torch_mlir import torchscript
 import os
 import argparse
 
@@ -43,7 +43,7 @@ def main():
     input_data = torch.randn(in_shape['bs'], in_shape['c'], in_shape['h'], in_shape['w'])
 
     # Generate the MLIR module
-    module = torch_mlir.compile(model, input_data, output_type=args.dialect, use_tracing=True)
+    module = torchscript.compile(model, input_data, output_type=args.dialect, use_tracing=True)
     with open(args.out_mlir_path, "w", encoding="utf-8") as outf:
         outf.write(str(module))
     
