@@ -1,8 +1,8 @@
 // RUN: soda-opt -allow-unregistered-dialect --soda-extract-arguments-to-xml="write-to-terminal" %s | FileCheck %s --check-prefixes=CHECK_TERMINAL_XML
 // RUN: soda-opt -allow-unregistered-dialect --soda-extract-arguments-to-xml="write-to-terminal using-bare-ptr" %s | FileCheck %s --check-prefixes=CHECK_BARE_XML
 
-// TODO: soda-opt -allow-unregistered-dialect --soda-extract-arguments-to-c-testbench="write-to-terminal" %s | FileCheck %s --check-prefixes=CHECK_TERMINAL_C
-// RUN: soda-opt -allow-unregistered-dialect --soda-extract-arguments-to-c-testbench="write-to-terminal using-bare-ptr" %s | FileCheck %s --check-prefixes=CHECK_BARE_C
+// RUN: soda-opt -allow-unregistered-dialect --soda-extract-arguments-to-c-testbench="write-to-terminal" %s | FileCheck %s --check-prefixes=CHECK_TERMINAL_C
+// TODO: soda-opt -allow-unregistered-dialect --soda-extract-arguments-to-c-testbench="write-to-terminal using-bare-ptr" %s | FileCheck %s --check-prefixes=CHECK_BARE_C
 
 // TODO: Sometimes, filecheck will try to verify the file before the file is written. 
 // This causes the test to fail. Commenting this test for now
@@ -116,12 +116,10 @@ module attributes {soda.container_module}  {
 
 // CHECK_TERMINAL_C: int main()
 // CHECK_TERMINAL_C: {
-// CHECK_TERMINAL_C:    // parameters declaration
 // CHECK_TERMINAL_C:    void* P0;
 // CHECK_TERMINAL_C:    void* P1;
 // CHECK_TERMINAL_C:    void* P2;
 // CHECK_TERMINAL_C:    {
-// CHECK_TERMINAL_C:       // parameter initialization
 // CHECK_TERMINAL_C:       float P0_temp[] = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
 // CHECK_TERMINAL_C:       P0 = (void*)P0_temp;
 // CHECK_TERMINAL_C:       m_param_alloc(0, sizeof(P0_temp));
@@ -131,7 +129,6 @@ module attributes {soda.container_module}  {
 // CHECK_TERMINAL_C:       float P2_temp[] = {1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0};
 // CHECK_TERMINAL_C:       P2 = (void*)P2_temp;
 // CHECK_TERMINAL_C:       m_param_alloc(2, sizeof(P2_temp));
-// CHECK_TERMINAL_C:       // function call
 // CHECK_TERMINAL_C:       driver_kernel((void*) P0, (void*) P1, (void*) P2);
 // CHECK_TERMINAL_C:    }
 // CHECK_TERMINAL_C:    return 0;

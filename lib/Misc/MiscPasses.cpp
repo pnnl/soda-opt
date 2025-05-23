@@ -558,7 +558,108 @@ class TestArgumentsToCTestbenchPass
     : public mlir::soda::TestArgumentsToCTestbenchBase<
           TestArgumentsToCTestbenchPass> {
 
-  void runOnOperation() override { // TODO
+  void runOnOperation() override {
+    getOperation().walk([this](mlir::soda::LaunchFuncOp op) {
+      // Prepare the output stream
+      std::string errorMessage;
+      std::string filename =
+          op.getKernelName().getValue().str() + "_testbench.c";
+      std::unique_ptr<llvm::ToolOutputFile> output;
+      llvm::raw_ostream *os = nullptr;
+      if (writeToTerminal) {
+        os = &llvm::outs();
+      } else {
+        output = openOutputFile(filename, &errorMessage);
+        if (!output) {
+          llvm::errs() << "Failed to open output file: " << errorMessage
+                       << "\n";
+          return;
+        }
+        os = &output->os();
+      }
+
+      // Print C testbench preamble
+      *os << "#define _FILE_OFFSET_BITS 64\n";
+      *os << "#define __Inf (1.0 / 0.0)\n";
+      *os << "#define __Nan (0.0 / 0.0)\n";
+      *os << "#ifdef __cplusplus\n";
+      *os << "#undef printf\n";
+      *os << "#include <cstdio>\n";
+      *os << "#include <cstdlib>\n";
+      *os << "typedef bool _Bool;\n";
+      *os << "#else\n";
+      *os << "#include <stdio.h>\n";
+      *os << "#include <stdlib.h>\n";
+      *os << "extern void exit(int status);\n";
+      *os << "#endif\n";
+      *os << "#include <sys/types.h>\n";
+      *os << "#ifdef __AC_NAMESPACE\nusing namespace __AC_NAMESPACE;\n#endif\n";
+      *os << "#ifndef CDECL\n#ifdef __cplusplus\n#define CDECL extern "
+             "\"C\"\n#else\n#define CDECL\n#endif\n#endif\n";
+      *os << "#ifndef EXTERN_CDECL\n#ifdef __cplusplus\n#define EXTERN_CDECL "
+             "extern \"C\"\n#else\n#define EXTERN_CDECL "
+             "extern\n#endif\n#endif\n";
+      *os << "#include <mdpi/mdpi_user.h>\n\n";
+      *os << "CDECL void " << op.getKernelName().getValue().str() << "(";
+      // Print argument list (all as void*)
+      size_t numArgs = op.getNumOperands();
+      for (size_t i = 0; i < numArgs; ++i) {
+        *os << "void*";
+        if (i + 1 < numArgs)
+          *os << ", ";
+      }
+      *os << ");\n\n";
+      *os << "int main()\n{\n";
+      // Parameter declarations
+      for (size_t i = 0; i < numArgs; ++i) {
+        *os << "   void* P" << i << ";\n";
+      }
+      *os << "   {\n";
+      // Parameter initialization
+      auto operandTypes = op.getOperandTypes();
+      int pIdx = 0;
+      for (auto a : operandTypes) {
+        if (auto mr = mlir::dyn_cast<mlir::MemRefType>(a)) {
+          long numElements = mr.getNumElements();
+          std::string v = "1";
+          if (mlir::dyn_cast<mlir::FloatType>(mr.getElementType()))
+            v = "1.0";
+          *os << "      float P" << pIdx << "_temp[] = {";
+          for (long i = 0; i < numElements; ++i) {
+            *os << v;
+            if (i + 1 < numElements)
+              *os << ",";
+          }
+          *os << "};\n";
+          *os << "      P" << pIdx << " = (void*)P" << pIdx << "_temp;\n";
+          *os << "      m_param_alloc(" << pIdx << ", sizeof(P" << pIdx
+              << "_temp));\n";
+        } else if (mlir::dyn_cast<mlir::FloatType>(a)) {
+          *os << "      float P" << pIdx << "_temp = 1.0;\n";
+          *os << "      P" << pIdx << " = (void*)&P" << pIdx << "_temp;\n";
+        } else if (mlir::dyn_cast<mlir::IntegerType>(a)) {
+          *os << "      int P" << pIdx << "_temp = 1;\n";
+          *os << "      P" << pIdx << " = (void*)&P" << pIdx << "_temp;\n";
+        } else if (mlir::dyn_cast<mlir::IndexType>(a)) {
+          *os << "      unsigned long long P" << pIdx << "_temp = 1;\n";
+          *os << "      P" << pIdx << " = (void*)&P" << pIdx << "_temp;\n";
+        }
+        ++pIdx;
+      }
+      // Function call
+      *os << "      " << op.getKernelName().getValue().str() << "(";
+      for (size_t i = 0; i < numArgs; ++i) {
+        *os << "(void*) P" << i;
+        if (i + 1 < numArgs)
+          *os << ", ";
+      }
+      *os << ");\n";
+      *os << "   }\n";
+      *os << "   return 0;\n";
+      *os << "}\n";
+      if (output)
+        output->keep();
+    });
   }
 };
 
