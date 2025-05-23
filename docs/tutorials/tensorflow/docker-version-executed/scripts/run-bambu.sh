@@ -28,9 +28,9 @@ opt -O2 -strip-debug input.ll \
 docker run -u $(id -u):$(id -g) -v $(pwd):/working_dir --rm agostini01/soda \
 bambu -v3 --print-dot \
   -lm --soft-float \
---compiler=I386_CLANG12  \
+--compiler=I386_CLANG16  \
 --device=${DEVICE} \
---clock-period=5 --no-iob \
+--clock-period=5 \
 --experimental-setup=BAMBU-BALANCED-MP \
 --channels-number=2 \
 --memory-allocation-policy=ALL_BRAM \

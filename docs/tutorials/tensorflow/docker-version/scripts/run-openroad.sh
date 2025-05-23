@@ -3,6 +3,10 @@
 set -e
 set -o pipefail
 
+# Check if docker is available or if the needed binaries are available
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+source $SCRIPT_DIR/check_docker.sh
+
 BAMBUDIR=output/$1
 pushd $BAMBUDIR
 
@@ -12,7 +16,8 @@ pushd $BAMBUDIR
 
 # docker run -u $(id -u):$(id -g) -v $PWD:/Panda-flow -v $PWD:/working_dir --rm agostini01/panda_openroad:latest \
 
-docker run -u $(id -u):$(id -g) -v $PWD:/working_dir --rm agostini01/soda:latest \
-/bin/bash /working_dir/synthesize_Synthesis_main_kernel.sh
+
+$DOCKER_RUN \
+/bin/bash ./synthesize_Synthesis_main_kernel.sh
 
 popd
