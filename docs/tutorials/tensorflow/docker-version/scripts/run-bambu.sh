@@ -19,27 +19,31 @@ fi
 PLATFORM=nangate45
 DEVICE=nangate45
 
+# Check if docker is available or if the needed binaries are available
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+source $SCRIPT_DIR/check_docker.sh
+
 cp output/05$1.ll output/$1/input.ll
 cp main_kernel_test.xml output/$1/main_kernel_test.xml
 
 pushd output/$1;
 
-docker run -u $(id -u):$(id -g) -v $(pwd):/working_dir --rm agostini01/soda \
+$DOCKER_RUN \
 opt -O2 -strip-debug input.ll \
   -S -o visualize.ll
 
-docker run -u $(id -u):$(id -g) -v $(pwd):/working_dir --rm agostini01/soda \
+$DOCKER_RUN \
 bambu -v3 --print-dot \
   -lm --soft-float \
---compiler=I386_CLANG12  \
+--compiler=I386_CLANG16  \
 --device=${DEVICE} \
---clock-period=5 --no-iob \
+--clock-period=5 \
 --experimental-setup=BAMBU-BALANCED-MP \
 --channels-number=2 \
 --memory-allocation-policy=ALL_BRAM \
 --disable-function-proxy \
 --generate-tb=main_kernel_test.xml \
---simulate --simulator=VERILATOR \
+--simulator=VERILATOR \
 --top-fname=main_kernel \
 input.ll 2>&1 | tee bambu-log
 

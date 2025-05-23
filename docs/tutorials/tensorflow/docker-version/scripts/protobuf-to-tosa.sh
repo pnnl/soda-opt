@@ -3,7 +3,11 @@
 set -e
 set -o pipefail
 
-docker run -u $(id -u):$(id -g) -v $(pwd):/working_dir --rm agostini01/soda \
+# Check if docker is available or if the needed binaries are available
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+source $SCRIPT_DIR/check_docker.sh
+
+$DOCKER_RUN \
 tf-mlir-translate \
   --graphdef-to-mlir \
   --tf-input-arrays=x1 \
@@ -13,7 +17,7 @@ tf-mlir-translate \
   $1 \
   -o output/tf.mlir
 
-docker run -u $(id -u):$(id -g) -v $(pwd):/working_dir --rm agostini01/soda \
+$DOCKER_RUN \
 tf-opt \
   --tf-executor-to-functional-conversion \
   --tf-region-control-flow-to-functional \

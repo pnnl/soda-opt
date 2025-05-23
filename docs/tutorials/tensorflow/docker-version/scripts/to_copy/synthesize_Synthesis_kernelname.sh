@@ -6,7 +6,7 @@
 
 # Openroad variables
 
-# FLOW_HOME set to match docker image agostini01/soda (v15.01)
+# FLOW_HOME set to match docker image agostini01/soda (v19.01)
 export FLOW_HOME=/opt/openroad/openroad_flow_scripts/flow
 
 # FLOW_HOME set to match docker image agostini01/panda_openroad
