@@ -37,7 +37,7 @@ $(ODIR)/04_llvm_baseline.mlir: $(ODIR)/03-03_linalg_isolated.mlir
 	soda-opt $< -o $@ -lower-all-to-llvm=use-bare-ptr-memref-call-conv
 
 $(ODIR)/05_llvm_baseline.ll: $(ODIR)/04_llvm_baseline.mlir
-	mlir-translate $< -o $@ --mlir-to-llvmir -opaque-pointers=0
+	mlir-translate $< -o $@ --mlir-to-llvmir
 
 $(ODIR)/bambu/baseline/forward_kernel.v $(ODIR)/bambu/baseline/simulate_forward_kernel.sh : $(ODIR)/05_llvm_baseline.ll
 	test -d $(ODIR)/bambu/baseline || mkdir -p $(ODIR)/bambu/baseline; \
@@ -45,15 +45,15 @@ $(ODIR)/bambu/baseline/forward_kernel.v $(ODIR)/bambu/baseline/simulate_forward_
 	bambu \
 		-v3 --print-dot \
 		-lm --soft-float \
-		--compiler=I386_CLANG12 \
+		--compiler=I386_CLANG16 \
 		--device=xc7z020-1clg484-VVD \
-		--clock-period=5 --no-iob \
+		--clock-period=5 \
 		--experimental-setup=BAMBU-BALANCED-MP \
 		--channels-number=2 \
 		--memory-allocation-policy=ALL_BRAM \
 		--disable-function-proxy \
-		--generate-tb=../../forward_kernel_test.xml \
-  	--simulate --simulator=VERILATOR \
+		--generate-tb=../../generated_tb.c \
+	 	--simulate --simulator=VERILATOR \
 		--top-fname=forward_kernel \
 		../../../$< 2>&1 | tee ../../bambu-baseline-synth-log
 
@@ -66,7 +66,7 @@ $(ODIR)/04_llvm_optimized.mlir: $(ODIR)/03-03_linalg_isolated.mlir
 	soda-opt $< -o $@ -soda-opt-pipeline-for-bambu=use-bare-ptr-memref-call-conv
 
 $(ODIR)/05_llvm_optimized.ll: $(ODIR)/04_llvm_optimized.mlir
-	mlir-translate $< -o $@ --mlir-to-llvmir -opaque-pointers=0
+	mlir-translate $< -o $@ --mlir-to-llvmir
 
 $(ODIR)/bambu/optimized/forward_kernel.v $(ODIR)/bambu/optimized/simulate_forward_kernel.sh : $(ODIR)/05_llvm_optimized.ll
 	test -d $(ODIR)/bambu/optimized || mkdir -p $(ODIR)/bambu/optimized; \
@@ -74,15 +74,15 @@ $(ODIR)/bambu/optimized/forward_kernel.v $(ODIR)/bambu/optimized/simulate_forwar
 	bambu \
 		-v3 --print-dot \
 		-lm --soft-float \
-		--compiler=I386_CLANG12 \
+		--compiler=I386_CLANG16 \
 		--device=xc7z020-1clg484-VVD \
-		--clock-period=5 --no-iob \
+		--clock-period=5 \
 		--experimental-setup=BAMBU-BALANCED-MP \
 		--channels-number=2 \
 		--memory-allocation-policy=ALL_BRAM \
 		--disable-function-proxy \
-		--generate-tb=../../forward_kernel_test.xml \
-		--simulate --simulator=VERILATOR \
+		--generate-tb=../../generated_tb.c \
+	 	--simulate --simulator=VERILATOR \
 		--top-fname=forward_kernel \
 		../../../$< 2>&1 | tee ../../bambu-optimized-synth-log
 
