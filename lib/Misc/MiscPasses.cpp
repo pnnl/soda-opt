@@ -558,6 +558,59 @@ class TestArgumentsToCTestbenchPass
     : public mlir::soda::TestArgumentsToCTestbenchBase<
           TestArgumentsToCTestbenchPass> {
 
+  static void getCTypeAndInitValue(mlir::Type elemType, std::string &cType,
+                                   std::string &v) {
+    cType = "int";
+    v = "1";
+    if (auto floatTy = mlir::dyn_cast<mlir::FloatType>(elemType)) {
+      switch (floatTy.getWidth()) {
+      case 16:
+        cType = "_Float16"; // or use uint16_t if not supported
+        v = "1.0";
+        break;
+      case 32:
+        cType = "float";
+        v = "1.0";
+        break;
+      case 64:
+        cType = "double";
+        v = "1.0";
+        break;
+      default:
+        cType = "float"; // fallback
+        v = "1.0";
+        break;
+      }
+    } else if (auto intTy = mlir::dyn_cast<mlir::IntegerType>(elemType)) {
+      switch (intTy.getWidth()) {
+      case 1:
+        cType = "_Bool";
+        v = "1";
+        break;
+      case 8:
+        cType = "uint8_t";
+        v = "1";
+        break;
+      case 16:
+        cType = "uint16_t";
+        v = "1";
+        break;
+      case 32:
+        cType = "uint32_t";
+        v = "1";
+        break;
+      case 64:
+        cType = "uint64_t";
+        v = "1";
+        break;
+      default:
+        cType = "int";
+        v = "1";
+        break;
+      }
+    }
+  }
+
   void runOnOperation() override {
     getOperation().walk([this](mlir::soda::LaunchFuncOp op) {
       // Prepare the output stream
@@ -621,10 +674,9 @@ class TestArgumentsToCTestbenchPass
       for (auto a : operandTypes) {
         if (auto mr = mlir::dyn_cast<mlir::MemRefType>(a)) {
           long numElements = mr.getNumElements();
-          std::string v = "1";
-          if (mlir::dyn_cast<mlir::FloatType>(mr.getElementType()))
-            v = "1.0";
-          *os << "      float P" << pIdx << "_temp[] = {";
+          std::string v, cType;
+          getCTypeAndInitValue(mr.getElementType(), cType, v);
+          *os << "      " << cType << " P" << pIdx << "_temp[] = {";
           for (long i = 0; i < numElements; ++i) {
             *os << v;
             if (i + 1 < numElements)
@@ -634,14 +686,10 @@ class TestArgumentsToCTestbenchPass
           *os << "      P" << pIdx << " = (void*)P" << pIdx << "_temp;\n";
           *os << "      m_param_alloc(" << pIdx << ", sizeof(P" << pIdx
               << "_temp));\n";
-        } else if (mlir::dyn_cast<mlir::FloatType>(a)) {
-          *os << "      float P" << pIdx << "_temp = 1.0;\n";
-          *os << "      P" << pIdx << " = (void*)&P" << pIdx << "_temp;\n";
-        } else if (mlir::dyn_cast<mlir::IntegerType>(a)) {
-          *os << "      int P" << pIdx << "_temp = 1;\n";
-          *os << "      P" << pIdx << " = (void*)&P" << pIdx << "_temp;\n";
-        } else if (mlir::dyn_cast<mlir::IndexType>(a)) {
-          *os << "      unsigned long long P" << pIdx << "_temp = 1;\n";
+        } else {
+          std::string v, cType;
+          getCTypeAndInitValue(a, cType, v);
+          *os << "      " << cType << " P" << pIdx << "_temp = " << v << ";\n";
           *os << "      P" << pIdx << " = (void*)&P" << pIdx << "_temp;\n";
         }
         ++pIdx;
