@@ -29,7 +29,7 @@ export SDC_FILE      = ./HLS_output/Synthesis/nangate45_constraints.sdc
 export CORE_UTILIZATION       = 10
 export CORE_ASPECT_RATIO      = 1
 export CORE_MARGIN            = 2
-export PLACE_DENSITY          = 0.10
+export PLACE_DENSITY          = 0.11
 
 # DID NOT RUN
 # export CORE_UTILIZATION       = 15
