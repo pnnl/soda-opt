@@ -4,8 +4,8 @@ export DESIGN_NICKNAME = kernelname
 export DESIGN_NAME = kernelname
 export PLATFORM    = nangate45
 
-export VERILOG_FILES = ./kernelname.v 
-export SDC_FILE      = ./HLS_output/Synthesis/nangate45_constraints.sdc 
+export VERILOG_FILES = ./kernelname.v
+export SDC_FILE      = ./HLS_output/Synthesis/nangate45_constraints.sdc
 
 # These values must be multiples of placement site
 # x=0.19 y=1.4

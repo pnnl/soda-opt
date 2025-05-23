@@ -4,8 +4,8 @@ export DESIGN_NICKNAME = kernelname
 export DESIGN_NAME = kernelname
 export PLATFORM    = asap7
 
-export VERILOG_FILES = ./kernelname.v 
-export SDC_FILE      = ./HLS_output/Synthesis/asap7_constraints.sdc 
+export VERILOG_FILES = ./kernelname.v
+export SDC_FILE      = ./HLS_output/Synthesis/asap7_constraints.sdc
 
 # export DIE_AREA="0 0 360 360"
 # export CORE_AREA="10.16 10.16 340 340"
