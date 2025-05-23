@@ -24,9 +24,8 @@ $(ODIR)/03-01_linalg_searched.mlir: $(ODIR)/02_linalg.mlir
 	soda-opt $< -o $@ -convert-operation-to-soda="anchor-op=linalg.batch_matmul" 
 
 $(ODIR)/03-02_linalg_outlined.mlir: $(ODIR)/03-01_linalg_searched.mlir
-	soda-opt $< -o $@ -soda-outline-bambu-code -soda-extract-arguments-to-xml=using-bare-ptr
-	mv forward_kernel_interface.xml  $(ODIR)/forward_kernel_interface.xml
-	mv forward_kernel_test.xml $(ODIR)/forward_kernel_test.xml
+	soda-opt $< -o $@ -soda-outline-bambu-code -soda-extract-arguments-to-c-testbench=using-bare-ptr
+	mv forward_kernel_testbench.c $(ODIR)/forward_kernel_testbench.c
 
 $(ODIR)/03-03_linalg_isolated.mlir: $(ODIR)/03-02_linalg_outlined.mlir
 	soda-opt $< -o $@ -soda-generate-bambu-accelcode=no-aa 
@@ -52,7 +51,7 @@ $(ODIR)/bambu/baseline/forward_kernel.v $(ODIR)/bambu/baseline/simulate_forward_
 		--channels-number=2 \
 		--memory-allocation-policy=ALL_BRAM \
 		--disable-function-proxy \
-		--generate-tb=../../generated_tb.c \
+		--generate-tb=../../forward_kernel_testbench.c \
 	 	--simulate --simulator=VERILATOR \
 		--top-fname=forward_kernel \
 		../../../$< 2>&1 | tee ../../bambu-baseline-synth-log
@@ -81,7 +80,7 @@ $(ODIR)/bambu/optimized/forward_kernel.v $(ODIR)/bambu/optimized/simulate_forwar
 		--channels-number=2 \
 		--memory-allocation-policy=ALL_BRAM \
 		--disable-function-proxy \
-		--generate-tb=../../generated_tb.c \
+		--generate-tb=../../forward_kernel_testbench.c \
 	 	--simulate --simulator=VERILATOR \
 		--top-fname=forward_kernel \
 		../../../$< 2>&1 | tee ../../bambu-optimized-synth-log
