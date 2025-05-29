@@ -6,8 +6,14 @@ name: Build and Test
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - 'docs/tutorials/**'
+      - 'experiments/**'
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - 'docs/tutorials/**'
+      - 'experiments/**'
 
 env:
   BUILD_TYPE: Release
