@@ -1,5 +1,5 @@
 {
-    "name": "soda-dev",
+    "name": "soda-opt-dev",
     "build": {
         "dockerfile": "Dockerfile",
         "target": "devcontainer",
