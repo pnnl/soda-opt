@@ -24,7 +24,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 source $SCRIPT_DIR/check_docker.sh
 
 cp output/05$1.ll output/$1/input.ll
-cp main_kernel_test.xml output/$1/main_kernel_test.xml
+cp main_kernel_testbench.c output/$1/main_kernel_testbench.c
 
 pushd output/$1;
 
@@ -42,8 +42,8 @@ bambu -v3 --print-dot \
 --channels-number=2 \
 --memory-allocation-policy=ALL_BRAM \
 --disable-function-proxy \
---generate-tb=main_kernel_test.xml \
---simulator=VERILATOR \
+--generate-tb=main_kernel_testbench.c \
+--simulate --simulator=VERILATOR --verilator-parallel \
 --top-fname=main_kernel \
 input.ll 2>&1 | tee bambu-log
 

@@ -52,7 +52,7 @@ $(ODIR)/bambu/baseline/forward_kernel.v $(ODIR)/bambu/baseline/simulate_forward_
 		--memory-allocation-policy=ALL_BRAM \
 		--disable-function-proxy \
 		--generate-tb=../../forward_kernel_testbench.c \
-	 	--simulate --simulator=VERILATOR \
+	 	--simulate --simulator=VERILATOR --verilator-parallel \
 		--top-fname=forward_kernel \
 		../../../$< 2>&1 | tee ../../bambu-baseline-synth-log
 
@@ -81,7 +81,7 @@ $(ODIR)/bambu/optimized/forward_kernel.v $(ODIR)/bambu/optimized/simulate_forwar
 		--memory-allocation-policy=ALL_BRAM \
 		--disable-function-proxy \
 		--generate-tb=../../forward_kernel_testbench.c \
-	 	--simulate --simulator=VERILATOR \
+	 	--simulate --simulator=VERILATOR --verilator-parallel \
 		--top-fname=forward_kernel \
 		../../../$< 2>&1 | tee ../../bambu-optimized-synth-log
 
