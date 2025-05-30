@@ -9,11 +9,13 @@ on:
     paths-ignore:
       - 'docs/tutorials/**'
       - 'experiments/**'
+      - '.devcontainer/**'
   pull_request:
     branches: [ "main" ]
     paths-ignore:
       - 'docs/tutorials/**'
       - 'experiments/**'
+      - '.devcontainer/**'
 
 env:
   BUILD_TYPE: Release
