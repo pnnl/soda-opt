@@ -50,13 +50,12 @@
             "python.formatting.provider": "black",
             "python.linting.pylintEnabled": true,
             "python.linting.enabled": true,
+            "python.defaultInterpreterPath": "/usr/local/bin/python",
             "C_Cpp.default.cppStandard": "c++17",
             "C_Cpp.default.includePath": [
                 "${containerWorkspaceFolder}/**",
                 "${containerWorkspaceFolder}/builds/llvm-project/build/include",
-                "${containerWorkspaceFolder}/builds/llvm-project/build/tools/mlir/include",
-                // "${containerWorkspaceFolder}/standalone/include",
-                // "${containerWorkspaceFolder}/builds/standalone/build/include"
+                "${containerWorkspaceFolder}/builds/llvm-project/build/tools/mlir/include"
             ],
             "mlir.server_path": "${containerWorkspaceFolder}/builds/llvm-project/install/bin//mlir-lsp-server",
             "mlir.tablegen_server_path": "${containerWorkspaceFolder}/builds/llvm-project/install/bin/tblgen-lsp-server",
