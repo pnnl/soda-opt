@@ -1,0 +1,9 @@
+setuptools>=75.1.0
+cmake>=3.20
+clang-format>=19.0.0
+numpy>=1.19.5, <=1.26
+pybind11>=2.9.0, <=2.10.3
+PyYAML>=5.3.1, <=6.0.1
+dataclasses>=0.6, <=0.8
+ipykernel>=6.0.3
+mkdocs
