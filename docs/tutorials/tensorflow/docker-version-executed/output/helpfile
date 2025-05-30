@@ -1,6 +1,6 @@
 OVERVIEW: SODA optimizer driver
 
-Available Dialects: affine, arith, builtin, cf, func, linalg, llvm, math, memref, ml_program, pdl, scf, snn, soda, transform, vector
+Available Dialects: affine, arith, async, bufferization, builtin, cf, func, linalg, llvm, math, memref, ml_program, pdl, pdl_interp, scf, shape, soda, transform, vector
 USAGE: soda-opt [options] <input file>
 
 OPTIONS:
@@ -11,6 +11,7 @@ Color Options:
 
 General options:
 
+  --allow-unregistered-dialect                         - Allow operation with no registered dialects
   Compiler passes to run
     Passes:
       --affine-data-copy-generate                      -   Generate explicit copying for affine memory operations
@@ -43,13 +44,19 @@ General options:
         --unroll-full-threshold=<uint>                 - Unroll all loops with trip count less than or equal to this
         --unroll-num-reps=<uint>                       - Unroll innermost loops repeatedly this many times
         --unroll-up-to-factor                          - Allow unrolling up to the factor specified
-      --affine-scalrep                                 -   Replace affine memref acceses by scalars by forwarding stores to loads and eliminating redundant loads
+      --affine-scalrep                                 -   Replace affine memref accesses by scalars by forwarding stores to loads and eliminating redundant loads
       --arith-expand                                   -   Legalize Arith ops to be convertible to LLVM.
+        --include-bf16                                 - Enable the BF16 expansion patterns
       --canonicalize                                   -   Canonicalize operations
         --disable-patterns=<string>                    - Labels of patterns that should be filtered out during application
         --enable-patterns=<string>                     - Labels of patterns that should be used during application, all other patterns are filtered out
-        --max-iterations=<long>                        - Seed the worklist in general top-down order
-        --region-simplify                              - Seed the worklist in general top-down order
+        --max-iterations=<long>                        - Max. iterations between applying patterns / simplifying regions
+        --max-num-rewrites=<long>                      - Max. number of pattern rewrites within an iteration
+        --region-simplify=<value>                      - Perform control flow optimizations to the region tree
+    =disabled                                    -   Don't run any control-flow simplification.
+    =normal                                      -   Perform simple control-flow simplifications (e.g. dead args elimination).
+    =aggressive                                  -   Perform aggressive control-flow simplification (e.g. block merging).
+        --test-convergence                             - Test only: Fail pass on non-convergence to detect cyclic pattern
         --top-down                                     - Seed the worklist in general top-down order
       --convert-affine-for-to-soda                     -   Convert top-level AffineFor Ops to SODA kernels
       --convert-all-to-soda                            -   Convert all function contents into a SODA kernel
@@ -58,7 +65,6 @@ General options:
         --index-bitwidth=<uint>                        - Bitwidth of the index type, 0 to use size of machine word
       --convert-elementwise-to-linalg                  -   Convert ElementwiseMappable ops to linalg
       --convert-func-to-llvm                           -   Convert from the Func dialect to the LLVM dialect
-        --data-layout=<string>                         - String description (LLVM format) of the data layout that is expected on the produced module
         --index-bitwidth=<uint>                        - Bitwidth of the index type, 0 to use size of machine word
         --use-bare-ptr-memref-call-conv                - Replace FuncOp's MemRef arguments with bare pointers to the MemRef element types
       --convert-linalg-conv-to-soda                    -   Convert top-level linalg::conv Ops to SODA kernels
@@ -71,10 +77,7 @@ General options:
       --convert-linalg-to-std                          -   Convert the operations from the linalg dialect into the Standard dialect
       --convert-math-to-libm                           -   Convert Math dialect to libm calls
       --convert-math-to-llvm                           -   Convert Math dialect to LLVM dialect
-      --convert-memref-to-llvm                         -   Convert operations from the MemRef dialect to the LLVM dialect
-        --index-bitwidth=<uint>                        - Bitwidth of the index type, 0 to use size of machine word
-        --use-aligned-alloc                            - Use aligned_alloc in place of malloc for heap allocations
-        --use-generic-functions                        - Use generic allocation and deallocation functions instead of the classic 'malloc', 'aligned_alloc' and 'free' functions
+        --approximate-log1p                            - Enable approximation of Log1p.
       --convert-operation-to-soda                      -   Convert top-level selected operation to SODA kernels
         --anchor-func=<string>                         - Which func op is the anchor to latch on.
         --anchor-op=<string>                           - Which op within the func is the anchor to latch on.
@@ -82,30 +85,46 @@ General options:
       --convert-scf-to-cf                              -   Convert SCF dialect to ControlFlow dialect, replacing structured control flow with a CFG
       --cse                                            -   Eliminate common sub-expressions
       --erase-buffer-deallocation                      -   Erase all buffer deallocation ops in the IR
+      --finalize-memref-to-llvm                        -   Finalize MemRef dialect to LLVM dialect conversion
+        --index-bitwidth=<uint>                        - Bitwidth of the index type, 0 to use size of machine word
+        --use-aligned-alloc                            - Use aligned_alloc in place of malloc for heap allocations
+        --use-generic-functions                        - Use generic allocation and deallocation functions instead of the classic 'malloc', 'aligned_alloc' and 'free' functions
       --forward-linalg-fill                            -   Move non-nested linalg.fill ops the top of the function
       --forward-memref-allocations                     -   Move non-nested memref allocations to the top of the function
       --forward-memref-copy                            -   Move non-nested linalg.copy ops the top of the function
       --inline                                         -   Inline function calls
-        --default-pipeline=<string>                    - The default optimizer pipeline used for callables
+        --default-pipeline=<string>                    - The optimizer pipeline used for callables that do not have a dedicated optimizer pipeline in opPipelineList
+        --inlining-threshold=<uint>                    - If the ratio between the number of the operations in the callee and the number of the operations in the caller exceeds this value (in percentage), then the callee is not inlined even if it is legal to inline it
         --max-iterations=<uint>                        - Maximum number of iterations when inlining within an SCC
         --op-pipelines=<pass-manager>                  - Callable operation specific optimizer pipelines (in the form of `dialect.op(pipeline)`)
-      --linalg-bufferize                               -   Bufferize the linalg dialect
+      --linalg-block-pack-matmul                       -   Convert linalg matmul ops to block layout and back
+        --allow-padding                                - Allow packing padding
+        --block-factors=<long>                         - Block factors (mb, nb, kb) for relayout
+        --lhs-transpose-inner-blocks                   - Transpose LHS inner block layout [mb][kb] -> [kb][mb]
+        --lhs-transpose-outer-blocks                   - Transpose LHS outer block layout [MB][KB] -> [KB][MB]
+        --mnk-order=<long>                             - Permutation of matmul (M, N, K) dimensions order
+        --mnk-padded-multiples=<long>                  - Next multiples of the packing sizes
+        --rhs-transpose-inner-blocks                   - Transpose RHS inner block layout [kb][nb] -> [nb][kb]
+        --rhs-transpose-outer-blocks                   - Transpose RHS outer block layout [KB][NB] -> [NB][KB]
       --linalg-detensorize                             -   Detensorize linalg ops
         --aggressive-mode                              - Detensorize all ops that qualify for detensoring along with branch operands and basic-block arguments.
       --linalg-fold-unit-extent-dims                   -   Remove unit-extent dimension in Linalg ops on tensors
-        --fold-one-trip-loops-only                     - Only folds the one-trip loops from Linalg ops on tensors (for testing purposes only)
+        --use-rank-reducing-slices                     - Generate rank-reducing slices instead of reassociative reshapes
       --linalg-fuse-elementwise-ops                    -   Fuse elementwise operations on tensors
       --linalg-generalize-named-ops                    -   Convert named ops into generic ops
       --linalg-inline-scalar-operands                  -   Inline scalar operands into linalg generic ops
       --linalg-named-op-conversion                     -   Convert from one named linalg op to another.
+      --linalg-specialize-generic-ops                  -   Convert generic ops back to named ops
       --lower-affine                                   -   Lower Affine operations to a combination of Standard and SCF operations
       --memref-expand                                  -   Legalize memref operations to be convertible to LLVM.
       --promote-buffers-to-stack                       -   Promotes heap-based allocations to automatically managed stack-based allocations
         --max-alloc-size-in-bytes=<uint>               - Maximal size in bytes to promote allocations to stack.
         --max-rank-of-allocated-memref=<uint>          - Maximal memref rank to promote dynamic buffers.
       --reconcile-unrealized-casts                     -   Simplify and eliminate unrealized conversion casts
-      --snn-print-ops                                  -   Print Ops from the SNN dialect
       --soda-async-region                              -   Make SODA ops async.
+      --soda-extract-arguments-to-c-testbench          -   Generate C files for soda.launch_func and its arguments
+        --using-bare-ptr                               - If set, generate test vectors assuming bare ptrs (default: false)
+        --write-to-terminal                            - If set, write to terminal instead of a file (default: false)
       --soda-extract-arguments-to-xml                  -   Generate XML files for soda.launch_func and its arguments
         --using-bare-ptr                               - If set, generate test vectors assuming bare ptrs (default: false)
         --write-to-terminal                            - If set, write to terminal instead of a file (default: false)
@@ -122,25 +141,35 @@ General options:
       --soda-test-print-nesting                        -   Print op nesting information
         --option-name=<ulong>                          - Description of the option
       --soda-transform-erase-schedule                  -   Erase the schedule of a transform dialect program
-      --soda-transform-interpreter                     -   Interpret a transform dialect program
-        --enable-expensive-checks                      - Enable expensive checks in the pass
       --test-linalg-transform-patterns                 -   Test Linalg transformation patterns by applying them greedily.
         --loop-type=<string>                           - Specify the type of loops to generate: for, parallel or tiled_loop
         --peeled-loops=<long>                          - Loops to be peeled when test-tile-pattern
         --skip-partial                                 - Skip loops inside partial iterations during peeling
         --test-bubble-up-extract-slice-op-pattern      - Test rewrite of linalgOp + extract_slice into extract_slice + linalgOp
+        --test-decompose-winograd-ops                  - Test decompose Winograd ops
         --test-erase-unnecessary-inputs                - Test patterns to erase unnecessary inputs
         --test-erase-unused-operands-and-results       - Test patterns to erase unused operands and results
         --test-generalize-pad-tensor                   - Test transform pad tensor by copying with generic ops
+        --test-generalize-tensor-pack                  - Test transform that generalizes pack ops into a sequence of tensor and Linalg ops
+        --test-generalize-tensor-unpack                - Test transform that generalizes unpack ops into a sequence of tensor and Linalg ops
         --test-linalg-to-vector-patterns               - Test a set of patterns that rewrite a linalg contraction in vector.contract form
         --test-patterns                                - Test a mixed set of patterns
         --test-swap-extract-slice-with-fill-pattern    - Test patterns to swap tensor.extract_slice(linalg.fill())
         --test-swap-subtensor-padtensor                - Test rewrite of subtensor(tensor.pad) into tensor.pad(subtensor)
-        --test-transform-pad-tensor                    - Test transform pad tensor by copying with generic ops
         --test-vector-transfer-forwarding-patterns     - Test a fused pass that forwards memref.copy to vector.transfer
+        --test-winograd-conv2d                         - Test transform conv2d by Winograd conv2d algorithm
         --tile-sizes=<long>                            - Linalg tile sizes for test-tile-pattern
       --test-loop-permutation                          -   Tests affine loop permutation utility
         --permutation-map=<uint>                       - Specify the loop permutation
+      --transform-dialect-check-uses                   -   warn about potential use-after-free in the transform dialect
+      --transform-infer-effects                        -   infer transform side effects for symbols
+      --transform-interpreter                          -   transform dialect interpreter
+        --debug-bind-trailing-args=<string>            - Binds trailing arguments of the entry point to the payload operations with specified names.
+        --debug-payload-root-tag=<string>              - Select the operation with 'transform.target_tag' attribute having the given value as payload IR root. If empty select the pass anchor operation as the payload IR root.
+        --disable-expensive-checks                     - Disable expensive checks in the interpreter for a faster run.
+        --entry-point=<string>                         - Entry point of the pass pipeline.
+      --transform-preload-library                      -   preload transform dialect library
+        --transform-library-paths=<string>             - Optional paths to files with modules that should be merged into the transform module to provide the definitions of external named sequences.
     Pass Pipelines:
       --lower-all-to-llvm                              -   Run a pipeline of lowering steps until the llvm dialect without optimizations
         --emit-c-wrappers                              - Emit wrappers for C-compatible pointer-to-struct memref descriptors. Cannot be used with -use-bare-ptr-memref-call-conv. (default false)
@@ -173,14 +202,26 @@ General options:
         --number-of-full-unrolls=<uint>                - The number of times to apply affine-loop-unrol=unroll-full. (default 3)
         --permutation-map=<uint>                       - Specify the loop permutation. List size must match number of affine.for loops.
         --use-bare-ptr-memref-call-conv                - Replace FuncOp's MemRef arguments with bare pointers to the MemRef element types. Cannot be used with -emit-c-wrappers. (default false)
-  --allow-unregistered-dialect                         - Allow operation with no registered dialects
   --disable-i2p-p2i-opt                                - Disables inttoptr/ptrtoint roundtrip optimization
   --dump-pass-pipeline                                 - Print the pipeline that will be run
+  --elide-resource-data-from-bytecode                  - Elide resources when generating bytecode
   --emit-bytecode                                      - Emit bytecode when generating output
-  --experimental-assignment-tracking                   - 
+  --emit-bytecode-version=<value>                      - Use specified bytecode when generating output
+  --experimental-debuginfo-iterators                   - Enable communicating debuginfo positions through iterators, eliminating intrinsics. Has no effect if --preserve-input-debuginfo-format=true.
+  --irdl-file=<filename>                               - IRDL file to register before processing the input
+  --load-dialect-plugin=<string>                       - Load dialects from plugin library
+  --load-pass-plugin=<string>                          - Load passes from plugin library
+  --log-actions-to=<string>                            - Log action execution to a file, or stderr if  '-' is passed
+  --log-mlir-actions-filter=<string>                   - Comma separated list of locations to filter actions from logging
   --mlir-debug-counter=<string>                        - Comma separated list of debug counter skip and count arguments
   --mlir-disable-threading                             - Disable multi-threading within MLIR, overrides any further call to MLIRContext::enableMultiThreading()
   --mlir-elide-elementsattrs-if-larger=<uint>          - Elide ElementsAttrs with "..." that have more elements than the given upper limit
+  --mlir-elide-resource-strings-if-larger=<uint>       - Elide printing value of resources if string is too long in chars.
+  --mlir-enable-debugger-hook                          - Enable Debugger hook for debugging MLIR Actions
+  --mlir-generate-reproducer=<filename>                - Generate an mlir reproducer at the provided filename (no crash required)
+  --mlir-output-format=<value>                         - Output format for timing data
+    =text                                              -   display the results in text format
+    =json                                              -   display the results in JSON format
   --mlir-pass-pipeline-crash-reproducer=<string>       - Generate a .mlir reproducer file at the given output path if the pass manager crashes or fails
   --mlir-pass-pipeline-local-reproducer                - When generating a crash reproducer, attempt to generated a reproducer with the smallest pipeline.
   --mlir-pass-statistics                               - Display the statistics of each pass
@@ -198,9 +239,12 @@ General options:
   --mlir-print-ir-before=<pass-arg>                    - Print IR before specified passes
   --mlir-print-ir-before-all                           - Print IR before each pass
   --mlir-print-ir-module-scope                         - When printing IR for print-ir-[before|after]{-all} always print the top-level operation
+  --mlir-print-ir-tree-dir=<string>                    - When printing the IR before/after a pass, print file tree rooted at this directory
   --mlir-print-local-scope                             - Print with local scope and inline information (eliding aliases for attributes, types, and locations
   --mlir-print-op-on-diagnostic                        - When a diagnostic is emitted on an operation, also print the operation as an attached note
+  --mlir-print-skip-regions                            - Skip regions when printing ops.
   --mlir-print-stacktrace-on-diagnostic                - When a diagnostic is emitted, also print the stack trace as an attached note
+  --mlir-print-unique-ssa-ids                          - Print unique SSA ID numbers for values, block arguments and naming conflicts across all regions
   --mlir-print-value-users                             - Print users of operation results and block arguments as a comment
   --mlir-timing                                        - Display execution times
   --mlir-timing-display=<value>                        - Display method for timing data
@@ -208,12 +252,15 @@ General options:
     =tree                                              -   display the results ina with a nested tree view
   --no-implicit-module                                 - Disable implicit addition of a top-level module op during parsing
   -o <filename>                                        - Output filename
-  --opaque-pointers                                    - Use opaque pointers
+  --output-split-marker=<string>                       - Split marker to use for merging the ouput
   --pass-pipeline=<string>                             - Textual description of the pass pipeline to run
-  --show-dialects                                      - Print the list of registered dialects
-  --split-input-file                                   - Split the input file into pieces and process each chunk independently
+  --profile-actions-to=<string>                        - Profile action execution to a file, or stderr if  '-' is passed
+  --run-reproducer                                     - Run the pipeline stored in the reproducer
+  --show-dialects                                      - Print the list of registered dialects and exit
+  --split-input-file[=<string>]                          - Split the input file into chunks using the given or default marker and process each chunk independently
   --verify-diagnostics                                 - Check that emitted diagnostics match expected-* lines on the corresponding line
   --verify-each                                        - Run the verifier after each transformation pass
+  --verify-roundtrip                                   - Round-trip the IR after parsing and ensure it succeeds
 
 Generic Options:
 

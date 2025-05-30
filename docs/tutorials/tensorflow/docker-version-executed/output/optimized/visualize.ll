@@ -2,164 +2,164 @@
 source_filename = "LLVMDialectModule"
 
 ; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(argmem: readwrite)
-define void @main_kernel(float* noalias nocapture readonly %0, float* noalias nocapture readonly %1, float* noalias nocapture %2) local_unnamed_addr #0 {
-  %4 = load float, float* %0, align 4
-  %5 = getelementptr float, float* %0, i64 1
-  %6 = load float, float* %5, align 4
-  %7 = getelementptr float, float* %0, i64 2
-  %8 = load float, float* %7, align 4
-  %9 = getelementptr float, float* %0, i64 3
-  %10 = load float, float* %9, align 4
-  %11 = getelementptr float, float* %0, i64 4
-  %12 = load float, float* %11, align 4
-  %13 = getelementptr float, float* %0, i64 5
-  %14 = load float, float* %13, align 4
-  %15 = getelementptr float, float* %0, i64 6
-  %16 = load float, float* %15, align 4
-  %17 = getelementptr float, float* %0, i64 7
-  %18 = load float, float* %17, align 4
-  %19 = getelementptr float, float* %0, i64 8
-  %20 = load float, float* %19, align 4
-  %21 = getelementptr float, float* %0, i64 9
-  %22 = load float, float* %21, align 4
-  %23 = getelementptr float, float* %0, i64 10
-  %24 = load float, float* %23, align 4
-  %25 = getelementptr float, float* %0, i64 11
-  %26 = load float, float* %25, align 4
-  %27 = getelementptr float, float* %0, i64 12
-  %28 = load float, float* %27, align 4
-  %29 = getelementptr float, float* %0, i64 13
-  %30 = load float, float* %29, align 4
-  %31 = getelementptr float, float* %0, i64 14
-  %32 = load float, float* %31, align 4
-  %33 = getelementptr float, float* %0, i64 15
-  %34 = load float, float* %33, align 4
-  %35 = getelementptr float, float* %0, i64 16
-  %36 = load float, float* %35, align 4
-  %37 = getelementptr float, float* %0, i64 17
-  %38 = load float, float* %37, align 4
-  %39 = getelementptr float, float* %0, i64 18
-  %40 = load float, float* %39, align 4
-  %41 = getelementptr float, float* %0, i64 19
-  %42 = load float, float* %41, align 4
-  %43 = getelementptr float, float* %0, i64 20
-  %44 = load float, float* %43, align 4
-  %45 = getelementptr float, float* %0, i64 21
-  %46 = load float, float* %45, align 4
-  %47 = getelementptr float, float* %0, i64 22
-  %48 = load float, float* %47, align 4
-  %49 = getelementptr float, float* %0, i64 23
-  %50 = load float, float* %49, align 4
-  %51 = getelementptr float, float* %0, i64 24
-  %52 = load float, float* %51, align 4
-  %53 = getelementptr float, float* %0, i64 25
-  %54 = load float, float* %53, align 4
-  %55 = getelementptr float, float* %0, i64 26
-  %56 = load float, float* %55, align 4
-  %57 = getelementptr float, float* %0, i64 27
-  %58 = load float, float* %57, align 4
-  %59 = getelementptr float, float* %0, i64 28
-  %60 = load float, float* %59, align 4
-  %61 = getelementptr float, float* %0, i64 29
-  %62 = load float, float* %61, align 4
-  %63 = getelementptr float, float* %0, i64 30
-  %64 = load float, float* %63, align 4
-  %65 = getelementptr float, float* %0, i64 31
-  %66 = load float, float* %65, align 4
-  %67 = load float, float* %1, align 4
-  %68 = getelementptr float, float* %1, i64 1
-  %69 = load float, float* %68, align 4
-  %70 = getelementptr float, float* %1, i64 2
-  %71 = load float, float* %70, align 4
-  %72 = getelementptr float, float* %1, i64 3
-  %73 = load float, float* %72, align 4
-  %74 = getelementptr float, float* %1, i64 4
-  %75 = load float, float* %74, align 4
-  %76 = getelementptr float, float* %1, i64 5
-  %77 = load float, float* %76, align 4
-  %78 = getelementptr float, float* %1, i64 6
-  %79 = load float, float* %78, align 4
-  %80 = getelementptr float, float* %1, i64 7
-  %81 = load float, float* %80, align 4
-  %82 = getelementptr float, float* %1, i64 8
-  %83 = load float, float* %82, align 4
-  %84 = getelementptr float, float* %1, i64 9
-  %85 = load float, float* %84, align 4
-  %86 = getelementptr float, float* %1, i64 10
-  %87 = load float, float* %86, align 4
-  %88 = getelementptr float, float* %1, i64 11
-  %89 = load float, float* %88, align 4
-  %90 = getelementptr float, float* %1, i64 12
-  %91 = load float, float* %90, align 4
-  %92 = getelementptr float, float* %1, i64 13
-  %93 = load float, float* %92, align 4
-  %94 = getelementptr float, float* %1, i64 14
-  %95 = load float, float* %94, align 4
-  %96 = getelementptr float, float* %1, i64 15
-  %97 = load float, float* %96, align 4
-  %98 = getelementptr float, float* %1, i64 16
-  %99 = load float, float* %98, align 4
-  %100 = getelementptr float, float* %1, i64 17
-  %101 = load float, float* %100, align 4
-  %102 = getelementptr float, float* %1, i64 18
-  %103 = load float, float* %102, align 4
-  %104 = getelementptr float, float* %1, i64 19
-  %105 = load float, float* %104, align 4
-  %106 = getelementptr float, float* %1, i64 20
-  %107 = load float, float* %106, align 4
-  %108 = getelementptr float, float* %1, i64 21
-  %109 = load float, float* %108, align 4
-  %110 = getelementptr float, float* %1, i64 22
-  %111 = load float, float* %110, align 4
-  %112 = getelementptr float, float* %1, i64 23
-  %113 = load float, float* %112, align 4
-  %114 = getelementptr float, float* %1, i64 24
-  %115 = load float, float* %114, align 4
-  %116 = getelementptr float, float* %1, i64 25
-  %117 = load float, float* %116, align 4
-  %118 = getelementptr float, float* %1, i64 26
-  %119 = load float, float* %118, align 4
-  %120 = getelementptr float, float* %1, i64 27
-  %121 = load float, float* %120, align 4
-  %122 = getelementptr float, float* %1, i64 28
-  %123 = load float, float* %122, align 4
-  %124 = getelementptr float, float* %1, i64 29
-  %125 = load float, float* %124, align 4
-  %126 = getelementptr float, float* %1, i64 30
-  %127 = load float, float* %126, align 4
-  %128 = getelementptr float, float* %1, i64 31
-  %129 = load float, float* %128, align 4
-  %130 = load float, float* %2, align 4
-  %131 = getelementptr float, float* %2, i64 1
-  %132 = load float, float* %131, align 4
-  %133 = getelementptr float, float* %2, i64 2
-  %134 = load float, float* %133, align 4
-  %135 = getelementptr float, float* %2, i64 3
-  %136 = load float, float* %135, align 4
-  %137 = getelementptr float, float* %2, i64 4
-  %138 = load float, float* %137, align 4
-  %139 = getelementptr float, float* %2, i64 5
-  %140 = load float, float* %139, align 4
-  %141 = getelementptr float, float* %2, i64 6
-  %142 = load float, float* %141, align 4
-  %143 = getelementptr float, float* %2, i64 7
-  %144 = load float, float* %143, align 4
-  %145 = getelementptr float, float* %2, i64 8
-  %146 = load float, float* %145, align 4
-  %147 = getelementptr float, float* %2, i64 9
-  %148 = load float, float* %147, align 4
-  %149 = getelementptr float, float* %2, i64 10
-  %150 = load float, float* %149, align 4
-  %151 = getelementptr float, float* %2, i64 11
-  %152 = load float, float* %151, align 4
-  %153 = getelementptr float, float* %2, i64 12
-  %154 = load float, float* %153, align 4
-  %155 = getelementptr float, float* %2, i64 13
-  %156 = load float, float* %155, align 4
-  %157 = getelementptr float, float* %2, i64 14
-  %158 = load float, float* %157, align 4
-  %159 = getelementptr float, float* %2, i64 15
-  %160 = load float, float* %159, align 4
+define void @main_kernel(ptr noalias nocapture readonly %0, ptr noalias nocapture readonly %1, ptr noalias nocapture %2) local_unnamed_addr #0 {
+  %4 = load float, ptr %0, align 4
+  %5 = getelementptr i8, ptr %0, i64 4
+  %6 = load float, ptr %5, align 4
+  %7 = getelementptr i8, ptr %0, i64 8
+  %8 = load float, ptr %7, align 4
+  %9 = getelementptr i8, ptr %0, i64 12
+  %10 = load float, ptr %9, align 4
+  %11 = getelementptr i8, ptr %0, i64 16
+  %12 = load float, ptr %11, align 4
+  %13 = getelementptr i8, ptr %0, i64 20
+  %14 = load float, ptr %13, align 4
+  %15 = getelementptr i8, ptr %0, i64 24
+  %16 = load float, ptr %15, align 4
+  %17 = getelementptr i8, ptr %0, i64 28
+  %18 = load float, ptr %17, align 4
+  %19 = getelementptr i8, ptr %0, i64 32
+  %20 = load float, ptr %19, align 4
+  %21 = getelementptr i8, ptr %0, i64 36
+  %22 = load float, ptr %21, align 4
+  %23 = getelementptr i8, ptr %0, i64 40
+  %24 = load float, ptr %23, align 4
+  %25 = getelementptr i8, ptr %0, i64 44
+  %26 = load float, ptr %25, align 4
+  %27 = getelementptr i8, ptr %0, i64 48
+  %28 = load float, ptr %27, align 4
+  %29 = getelementptr i8, ptr %0, i64 52
+  %30 = load float, ptr %29, align 4
+  %31 = getelementptr i8, ptr %0, i64 56
+  %32 = load float, ptr %31, align 4
+  %33 = getelementptr i8, ptr %0, i64 60
+  %34 = load float, ptr %33, align 4
+  %35 = getelementptr i8, ptr %0, i64 64
+  %36 = load float, ptr %35, align 4
+  %37 = getelementptr i8, ptr %0, i64 68
+  %38 = load float, ptr %37, align 4
+  %39 = getelementptr i8, ptr %0, i64 72
+  %40 = load float, ptr %39, align 4
+  %41 = getelementptr i8, ptr %0, i64 76
+  %42 = load float, ptr %41, align 4
+  %43 = getelementptr i8, ptr %0, i64 80
+  %44 = load float, ptr %43, align 4
+  %45 = getelementptr i8, ptr %0, i64 84
+  %46 = load float, ptr %45, align 4
+  %47 = getelementptr i8, ptr %0, i64 88
+  %48 = load float, ptr %47, align 4
+  %49 = getelementptr i8, ptr %0, i64 92
+  %50 = load float, ptr %49, align 4
+  %51 = getelementptr i8, ptr %0, i64 96
+  %52 = load float, ptr %51, align 4
+  %53 = getelementptr i8, ptr %0, i64 100
+  %54 = load float, ptr %53, align 4
+  %55 = getelementptr i8, ptr %0, i64 104
+  %56 = load float, ptr %55, align 4
+  %57 = getelementptr i8, ptr %0, i64 108
+  %58 = load float, ptr %57, align 4
+  %59 = getelementptr i8, ptr %0, i64 112
+  %60 = load float, ptr %59, align 4
+  %61 = getelementptr i8, ptr %0, i64 116
+  %62 = load float, ptr %61, align 4
+  %63 = getelementptr i8, ptr %0, i64 120
+  %64 = load float, ptr %63, align 4
+  %65 = getelementptr i8, ptr %0, i64 124
+  %66 = load float, ptr %65, align 4
+  %67 = load float, ptr %1, align 4
+  %68 = getelementptr i8, ptr %1, i64 4
+  %69 = load float, ptr %68, align 4
+  %70 = getelementptr i8, ptr %1, i64 8
+  %71 = load float, ptr %70, align 4
+  %72 = getelementptr i8, ptr %1, i64 12
+  %73 = load float, ptr %72, align 4
+  %74 = getelementptr i8, ptr %1, i64 16
+  %75 = load float, ptr %74, align 4
+  %76 = getelementptr i8, ptr %1, i64 20
+  %77 = load float, ptr %76, align 4
+  %78 = getelementptr i8, ptr %1, i64 24
+  %79 = load float, ptr %78, align 4
+  %80 = getelementptr i8, ptr %1, i64 28
+  %81 = load float, ptr %80, align 4
+  %82 = getelementptr i8, ptr %1, i64 32
+  %83 = load float, ptr %82, align 4
+  %84 = getelementptr i8, ptr %1, i64 36
+  %85 = load float, ptr %84, align 4
+  %86 = getelementptr i8, ptr %1, i64 40
+  %87 = load float, ptr %86, align 4
+  %88 = getelementptr i8, ptr %1, i64 44
+  %89 = load float, ptr %88, align 4
+  %90 = getelementptr i8, ptr %1, i64 48
+  %91 = load float, ptr %90, align 4
+  %92 = getelementptr i8, ptr %1, i64 52
+  %93 = load float, ptr %92, align 4
+  %94 = getelementptr i8, ptr %1, i64 56
+  %95 = load float, ptr %94, align 4
+  %96 = getelementptr i8, ptr %1, i64 60
+  %97 = load float, ptr %96, align 4
+  %98 = getelementptr i8, ptr %1, i64 64
+  %99 = load float, ptr %98, align 4
+  %100 = getelementptr i8, ptr %1, i64 68
+  %101 = load float, ptr %100, align 4
+  %102 = getelementptr i8, ptr %1, i64 72
+  %103 = load float, ptr %102, align 4
+  %104 = getelementptr i8, ptr %1, i64 76
+  %105 = load float, ptr %104, align 4
+  %106 = getelementptr i8, ptr %1, i64 80
+  %107 = load float, ptr %106, align 4
+  %108 = getelementptr i8, ptr %1, i64 84
+  %109 = load float, ptr %108, align 4
+  %110 = getelementptr i8, ptr %1, i64 88
+  %111 = load float, ptr %110, align 4
+  %112 = getelementptr i8, ptr %1, i64 92
+  %113 = load float, ptr %112, align 4
+  %114 = getelementptr i8, ptr %1, i64 96
+  %115 = load float, ptr %114, align 4
+  %116 = getelementptr i8, ptr %1, i64 100
+  %117 = load float, ptr %116, align 4
+  %118 = getelementptr i8, ptr %1, i64 104
+  %119 = load float, ptr %118, align 4
+  %120 = getelementptr i8, ptr %1, i64 108
+  %121 = load float, ptr %120, align 4
+  %122 = getelementptr i8, ptr %1, i64 112
+  %123 = load float, ptr %122, align 4
+  %124 = getelementptr i8, ptr %1, i64 116
+  %125 = load float, ptr %124, align 4
+  %126 = getelementptr i8, ptr %1, i64 120
+  %127 = load float, ptr %126, align 4
+  %128 = getelementptr i8, ptr %1, i64 124
+  %129 = load float, ptr %128, align 4
+  %130 = load float, ptr %2, align 4
+  %131 = getelementptr i8, ptr %2, i64 4
+  %132 = load float, ptr %131, align 4
+  %133 = getelementptr i8, ptr %2, i64 8
+  %134 = load float, ptr %133, align 4
+  %135 = getelementptr i8, ptr %2, i64 12
+  %136 = load float, ptr %135, align 4
+  %137 = getelementptr i8, ptr %2, i64 16
+  %138 = load float, ptr %137, align 4
+  %139 = getelementptr i8, ptr %2, i64 20
+  %140 = load float, ptr %139, align 4
+  %141 = getelementptr i8, ptr %2, i64 24
+  %142 = load float, ptr %141, align 4
+  %143 = getelementptr i8, ptr %2, i64 28
+  %144 = load float, ptr %143, align 4
+  %145 = getelementptr i8, ptr %2, i64 32
+  %146 = load float, ptr %145, align 4
+  %147 = getelementptr i8, ptr %2, i64 36
+  %148 = load float, ptr %147, align 4
+  %149 = getelementptr i8, ptr %2, i64 40
+  %150 = load float, ptr %149, align 4
+  %151 = getelementptr i8, ptr %2, i64 44
+  %152 = load float, ptr %151, align 4
+  %153 = getelementptr i8, ptr %2, i64 48
+  %154 = load float, ptr %153, align 4
+  %155 = getelementptr i8, ptr %2, i64 52
+  %156 = load float, ptr %155, align 4
+  %157 = getelementptr i8, ptr %2, i64 56
+  %158 = load float, ptr %157, align 4
+  %159 = getelementptr i8, ptr %2, i64 60
+  %160 = load float, ptr %159, align 4
   %161 = fmul float %4, %67
   %162 = fadd float %161, %130
   %163 = fmul float %6, %75
@@ -416,22 +416,22 @@ define void @main_kernel(float* noalias nocapture readonly %0, float* noalias no
   %414 = fadd float %413, %412
   %415 = fmul float %66, %129
   %416 = fadd float %415, %414
-  store float %176, float* %2, align 4
-  store float %192, float* %131, align 4
-  store float %208, float* %133, align 4
-  store float %224, float* %135, align 4
-  store float %240, float* %137, align 4
-  store float %256, float* %139, align 4
-  store float %272, float* %141, align 4
-  store float %288, float* %143, align 4
-  store float %304, float* %145, align 4
-  store float %320, float* %147, align 4
-  store float %336, float* %149, align 4
-  store float %352, float* %151, align 4
-  store float %368, float* %153, align 4
-  store float %384, float* %155, align 4
-  store float %400, float* %157, align 4
-  store float %416, float* %159, align 4
+  store float %176, ptr %2, align 4
+  store float %192, ptr %131, align 4
+  store float %208, ptr %133, align 4
+  store float %224, ptr %135, align 4
+  store float %240, ptr %137, align 4
+  store float %256, ptr %139, align 4
+  store float %272, ptr %141, align 4
+  store float %288, ptr %143, align 4
+  store float %304, ptr %145, align 4
+  store float %320, ptr %147, align 4
+  store float %336, ptr %149, align 4
+  store float %352, ptr %151, align 4
+  store float %368, ptr %153, align 4
+  store float %384, ptr %155, align 4
+  store float %400, ptr %157, align 4
+  store float %416, ptr %159, align 4
   ret void
 }
 

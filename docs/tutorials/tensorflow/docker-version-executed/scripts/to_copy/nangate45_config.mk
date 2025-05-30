@@ -4,8 +4,8 @@ export DESIGN_NICKNAME = kernelname
 export DESIGN_NAME = kernelname
 export PLATFORM    = nangate45
 
-export VERILOG_FILES = ./kernelname.v 
-export SDC_FILE      = ./HLS_output/Synthesis/nangate45_constraints.sdc 
+export VERILOG_FILES = ./kernelname.v
+export SDC_FILE      = ./HLS_output/Synthesis/nangate45_constraints.sdc
 
 # These values must be multiples of placement site
 # x=0.19 y=1.4
@@ -29,7 +29,7 @@ export SDC_FILE      = ./HLS_output/Synthesis/nangate45_constraints.sdc
 export CORE_UTILIZATION       = 10
 export CORE_ASPECT_RATIO      = 1
 export CORE_MARGIN            = 2
-export PLACE_DENSITY          = 0.10
+export PLACE_DENSITY          = 0.11
 
 # DID NOT RUN
 # export CORE_UTILIZATION       = 15

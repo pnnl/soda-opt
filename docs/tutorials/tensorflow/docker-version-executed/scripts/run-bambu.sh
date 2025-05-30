@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -e
+set -o pipefail
+
 if [ -d output/$1 ] 
 then
     rm -rf output/$1
@@ -16,16 +19,20 @@ fi
 PLATFORM=nangate45
 DEVICE=nangate45
 
+# Check if docker is available or if the needed binaries are available
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+source $SCRIPT_DIR/check_docker.sh
+
 cp output/05$1.ll output/$1/input.ll
-cp main_kernel_test.xml output/$1/main_kernel_test.xml
+cp main_kernel_testbench.c output/$1/main_kernel_testbench.c
 
 pushd output/$1;
 
-docker run -u $(id -u):$(id -g) -v $(pwd):/working_dir --rm agostini01/soda \
+$DOCKER_RUN \
 opt -O2 -strip-debug input.ll \
   -S -o visualize.ll
 
-docker run -u $(id -u):$(id -g) -v $(pwd):/working_dir --rm agostini01/soda \
+$DOCKER_RUN \
 bambu -v3 --print-dot \
   -lm --soft-float \
 --compiler=I386_CLANG16  \
@@ -35,8 +42,8 @@ bambu -v3 --print-dot \
 --channels-number=2 \
 --memory-allocation-policy=ALL_BRAM \
 --disable-function-proxy \
---generate-tb=main_kernel_test.xml \
---simulate --simulator=VERILATOR \
+--generate-tb=main_kernel_testbench.c \
+--simulate --simulator=VERILATOR --verilator-parallel \
 --top-fname=main_kernel \
 input.ll 2>&1 | tee bambu-log
 
