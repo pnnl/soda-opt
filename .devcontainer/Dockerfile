@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 agostini01/soda-bookworm:v19.01 as base
+FROM --platform=linux/amd64 agostini01/soda-bookworm:v19.02 as base
 ARG DEBIAN_FRONTEND=noninteractive
 
 FROM base as devcontainer
