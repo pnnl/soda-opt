@@ -4,8 +4,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef AFFINE_TRANSFORM_OPS
-#define AFFINE_TRANSFORM_OPS
+#ifndef SODAAFFINE_TRANSFORM_OPS
+#define SODAAFFINE_TRANSFORM_OPS
 
 include "mlir/Dialect/Transform/IR/TransformDialect.td"
 include "mlir/Dialect/Transform/Interfaces/TransformInterfaces.td"
@@ -23,7 +23,7 @@ def FullLoopUnrollOp : Op<Transform_Dialect, "loop.fullunroll",
 
     #### Return modes
 
-    This operation ignores non-`scf.for`, non-`affine.for` ops and drops them
+    This operation ignores non-`affine.for` ops and drops them
     in the return. If all the operations referred to by the `target` operand
     unroll properly, the transform succeeds. Otherwise the transform produces a
     silenceable failure.
@@ -45,4 +45,4 @@ def FullLoopUnrollOp : Op<Transform_Dialect, "loop.fullunroll",
   }];
 }
 
-#endif // AFFINE_TRANSFORM_OPS
+#endif // SODAAFFINE_TRANSFORM_OPS

@@ -13,7 +13,5 @@ add_mlir_dialect_library(SODAAffineTransformOps
   MLIRIR
   MLIRLoopLikeInterface
   MLIRAffineUtils
-  MLIRSCFTransforms
-  MLIRSCFUtils
   MLIRTransformDialect
 )

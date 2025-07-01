@@ -1,8 +1,6 @@
 //===- AffineTransformOps.h - Affine transformation ops ---------*- C++ -*-===//
 //
-// Part of the SODA-OPT Project
-// See https://llvm.org/LICENSE.txt for license information.
-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+// Part of the SODA-OPT Project.
 //
 //===----------------------------------------------------------------------===//
 
@@ -20,9 +18,7 @@ namespace func {
 class FuncOp;
 } // namespace func
 namespace scf {
-class ForallOp;
 class ForOp;
-class IfOp;
 } // namespace scf
 } // namespace mlir
 
