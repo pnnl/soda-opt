@@ -4,9 +4,11 @@ module attributes {transform.with_named_sequence} {
   transform.named_sequence @__transform_main(%arg1: !transform.any_op {transform.readonly}) {
     %0 = transform.structured.match ops{["arith.mulf"]} in %arg1 : (!transform.any_op) -> !transform.any_op
     %innermost = transform.get_parent_op %0 {op_name = "affine.for"} : (!transform.any_op) -> !transform.op<"affine.for"> 
+    %second = transform.get_parent_op %innermost {op_name = "affine.for"} : (!transform.op<"affine.for"> ) -> !transform.op<"affine.for"> 
     // transform.debug.emit_remark_at %innermost, "Innermost affine loop: " : !transform.op<"affine.for"> 
     // transform.loop.unroll %innermost { factor =1} : !transform.op<"affine.for"> 
     transform.loop.fullunroll %innermost : !transform.op<"affine.for"> 
+    transform.loop.fullunroll %second : !transform.op<"affine.for"> 
     transform.yield
   }
 }
@@ -59,10 +61,10 @@ func.func @conv(%arg0: memref<4x36x36x1xf32>, %arg1: memref<1x5x5x1xf32>, %arg2:
 }
 
 // Should find 6 loops instead of 7
-// CHECK-LABEL: affine.for 
-// CHECK-NEXT: affine.for 
-// CHECK-NEXT: affine.for 
-// CHECK-NEXT: affine.for 
-// CHECK-NEXT: affine.for 
-// CHECK-NEXT: affine.for 
+// CHECK-LABEL: func.func @conv
+// CHECK: affine.for 
+// CHECK: affine.for 
+// CHECK: affine.for 
+// CHECK: affine.for 
+// CHECK: affine.for 
 // CHECK-NOT: affine.for 

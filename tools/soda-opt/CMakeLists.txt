@@ -63,6 +63,9 @@ set(LIBS
   MLIRTransformLoopExtension
   MLIRTransformDialectTransforms
 
+  # SODATransforms
+  SODAAffineTransformOps
+
   # Test Passes
   MLIRLinalgTestPasses
   MLIRAffineTransformsTestPasses

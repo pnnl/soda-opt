@@ -37,11 +37,11 @@ DiagnosedSilenceableFailure transform::FullLoopUnrollOp::applyToOne(
     transform::ApplyToEachResultList &results,
     transform::TransformState &state) {
   LogicalResult result(failure());
-  if (scf::ForOp scfFor = dyn_cast<scf::ForOp>(op))
+  if (AffineForOp affineFor = dyn_cast<AffineForOp>(op))
+    result = loopUnrollFull(affineFor);
+  else if (scf::ForOp scfFor = dyn_cast<scf::ForOp>(op))
     return emitSilenceableError()
            << "failed to unroll, incorrect type of payload";
-  else if (AffineForOp affineFor = dyn_cast<AffineForOp>(op))
-    result = loopUnrollByFactor(affineFor, 1);
   else
     return emitSilenceableError()
            << "failed to unroll, incorrect type of payload";
