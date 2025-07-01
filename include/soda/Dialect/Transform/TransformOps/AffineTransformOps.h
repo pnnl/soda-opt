@@ -27,7 +27,7 @@ class IfOp;
 } // namespace mlir
 
 #define GET_OP_CLASSES
-#include "soda/Dialect/Transform/Transforms/AffineTransformOps.h.inc"
+#include "soda/Dialect/Transform/TransformOps/AffineTransformOps.h.inc"
 
 namespace mlir {
 class DialectRegistry;
