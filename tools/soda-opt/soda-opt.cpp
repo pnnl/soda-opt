@@ -26,6 +26,7 @@
 // #include "soda/Dialect/SNN/Transforms/Passes.h"
 #include "soda/Dialect/SODA/Passes.h"
 #include "soda/Dialect/SODA/SODADialect.h"
+#include "soda/Dialect/Transform/TransformOps/AffineTransformOps.h"
 #include "soda/Dialect/Transform/Transforms/Passes.h"
 #include "soda/Misc/Passes.h"
 #include "soda/Misc/Pipelines.h"
@@ -38,13 +39,13 @@
 
 #include "mlir/Dialect/Linalg/Transforms/AllInterfaces.h"
 
-#include "mlir/Dialect/Func/TransformOps/FuncTransformOps.h"
-#include "mlir/Dialect/Linalg/TransformOps/DialectExtension.h"
-#include "mlir/Dialect/Transform/LoopExtension/LoopExtension.h"
-#include "mlir/Dialect/Transform/DebugExtension/DebugExtension.h"
-#include "mlir/Dialect/SCF/TransformOps/SCFTransformOps.h"
 #include "mlir/Dialect/Affine/TransformOps/AffineTransformOps.h"
 #include "mlir/Dialect/Bufferization/TransformOps/BufferizationTransformOps.h"
+#include "mlir/Dialect/Func/TransformOps/FuncTransformOps.h"
+#include "mlir/Dialect/Linalg/TransformOps/DialectExtension.h"
+#include "mlir/Dialect/SCF/TransformOps/SCFTransformOps.h"
+#include "mlir/Dialect/Transform/DebugExtension/DebugExtension.h"
+#include "mlir/Dialect/Transform/LoopExtension/LoopExtension.h"
 
 // Defined in the test directory, no public header.
 namespace mlir {
@@ -83,7 +84,6 @@ int main(int argc, char **argv) {
   // Register mlir dialects and passes
   //===--------------------------------------------------------------------===//
 
-
   transform::registerTransformPasses();
 
   mlir::registerInlinerPass();
@@ -114,8 +114,7 @@ int main(int argc, char **argv) {
 
   mlir::registerUpstreamDialects(registry);
 
-
-  // Interfaces  
+  // Interfaces
   linalg::registerAllDialectInterfaceImplementations(registry);
 
   // Register dialect extensions
@@ -127,6 +126,9 @@ int main(int argc, char **argv) {
   transform::registerDebugExtension(registry);
   transform::registerLoopExtension(registry);
   cf::registerConvertControlFlowToLLVMInterface(registry);
+
+  // SODA
+  soda::transform::registerTransformDialectExtension(registry);
 
   // Register external models
   // linalg::registerTilingInterfaceExternalModels(registry);
