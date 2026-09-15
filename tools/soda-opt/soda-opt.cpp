@@ -68,6 +68,7 @@ inline void registerAffinePassesForSoda() {
   mlir::affine::registerAffineLoopInvariantCodeMotionPass();
   mlir::affine::registerAffineLoopTilingPass();
   mlir::affine::registerAffineLoopFusionPass();
+  mlir::affine::registerAffineLoopNormalizePass();
   mlir::affine::registerAffineLoopUnrollPass();
   mlir::affine::registerAffineScalarReplacementPass();
 
@@ -99,6 +100,7 @@ int main(int argc, char **argv) {
   mlir::registerConvertLinalgToAffineLoopsPass();
   mlir::registerConvertFuncToLLVMPass();
   mlir::registerFinalizeMemRefToLLVMConversionPass();
+  mlir::memref::registerFoldMemRefAliasOps();
   mlir::registerSCFToControlFlowPass();
   mlir::registerConvertAffineToStandardPass();
   mlir::registerConvertMathToLLVMPass();
