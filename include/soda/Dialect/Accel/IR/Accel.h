@@ -9,18 +9,23 @@
 #ifndef SODA_DIALECT_ACCEL_IR_ACCEL_H_
 #define SODA_DIALECT_ACCEL_IR_ACCEL_H_
 
+#include "mlir/Bytecode/BytecodeOpInterface.h"
 #include "mlir/IR/BuiltinTypes.h"
 #include "mlir/IR/Dialect.h"
 #include "mlir/IR/OpDefinition.h"
 #include "mlir/IR/OpImplementation.h"
-#include "mlir/Interfaces/SideEffectInterfaces.h"
-#include "mlir/Interfaces/VectorInterfaces.h"
 
 //===----------------------------------------------------------------------===//
 // Accel Dialect
 //===----------------------------------------------------------------------===//
 
 #include "soda/Dialect/Accel/IR/AccelOpsDialect.h.inc"
+
+//===----------------------------------------------------------------------===//
+// Accel Dialect Attributes and Enums
+//===----------------------------------------------------------------------===//
+
+#include "soda/Dialect/Accel/IR/AccelAttributes.h"
 
 //===----------------------------------------------------------------------===//
 // Accel Dialect Operations
