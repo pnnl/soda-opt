@@ -20,8 +20,7 @@ set(SODA_TEST_DEPENDS
         # TODO(VitisHLS): Currently the passes dont trigger from commandline
         # VhlsLLVMRewriter
         # MemRefToArray
-        # TODO(accel): Skipping axi4mlir infra for now
-        #mlir_mockaxi_runner_utils
+        soda_axi_runtime_mock
         )
 
 if(MLIR_ENABLE_BINDINGS_PYTHON)
