@@ -67,11 +67,14 @@ protected:
 /// The backend of this library.
 DmaBackend &getDmaBackend();
 
-/// Prints an error and aborts.
+/// Prints an error and exits. It does not abort, so that the error is not
+/// buried under the stack trace of the JIT's crash handler, and it skips
+/// static destructors, which the SystemC models do not support mid-run.
 [[noreturn]] inline void fatalError(const char *message) {
+  std::fflush(stdout);
   std::fprintf(stderr, "soda axi runtime error: %s\n", message);
   std::fflush(stderr);
-  std::abort();
+  std::_Exit(EXIT_FAILURE);
 }
 
 } // namespace axi
