@@ -34,6 +34,23 @@ config.substitutions.append(('%sodashlibdir', config.soda_lib_root))
 config.substitutions.append(('%shlibext', config.llvm_shlib_ext))
 config.substitutions.append(('%mlir_lib_dir', config.mlir_lib_root))
 
+# AXI4MLIR runtime tests. %axi_lower_to_llvm lowers accel ops (and the rest of
+# the program) to the LLVM dialect, and %axi_runner_libs links the MLIR runner
+# utilities; tests add the AXI runtime library of the backend they use.
+config.substitutions.append(('%axi_lower_to_llvm', ' '.join([
+    '--convert-accel-to-axi-runtime', '--canonicalize', '--cse',
+    '--convert-linalg-to-loops', '--expand-strided-metadata', '--lower-affine',
+    '--convert-scf-to-cf', '--arith-expand', '--memref-expand',
+    '--convert-arith-to-llvm', '--finalize-memref-to-llvm',
+    '--convert-func-to-llvm', '--reconcile-unrealized-casts'])))
+config.substitutions.append(('%axi_runner_libs', ' '.join([
+    '-shared-libs=' + os.path.join(config.mlir_lib_root,
+                                   'libmlir_runner_utils' + config.llvm_shlib_ext),
+    '-shared-libs=' + os.path.join(config.mlir_lib_root,
+                                   'libmlir_c_runner_utils' + config.llvm_shlib_ext)])))
+config.substitutions.append(('%axi_mock_lib', os.path.join(
+    config.soda_lib_root, 'libsoda_axi_runtime_mock' + config.llvm_shlib_ext)))
+
 llvm_config.with_system_environment(
     ['HOME', 'INCLUDE', 'LIB', 'TMP', 'TEMP'])
 
