@@ -17,6 +17,7 @@ set(SODA_LIB_DIR ${CMAKE_BINARY_DIR}/lib)
 
 list(APPEND CMAKE_MODULE_PATH "${MLIR_CMAKE_DIR}")
 list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 include(TableGen)
 include(AddLLVM)
 include(AddMLIR)
@@ -40,6 +41,20 @@ if(MLIR_ENABLE_BINDINGS_PYTHON)
   add_subdirectory(python)
 else()
   message(STATUS "SODA-OPT Python bindings are disabled.")
+endif()
+
+# SystemC is optional: it simulates the accelerators driven by the AXI runtime.
+option(SODA_ENABLE_SYSTEMC
+  "Build the SystemC AXI runtime backends and their tests if SystemC is found" ON)
+set(SODA_HAVE_SYSTEMC OFF)
+if(SODA_ENABLE_SYSTEMC)
+  find_package(SystemC)
+  if(SystemC_FOUND)
+    set(SODA_HAVE_SYSTEMC ON)
+    message(STATUS "SystemC ${SystemC_VERSION} found: building the SystemC AXI runtime backends")
+  else()
+    message(STATUS "SystemC not found: skipping the SystemC AXI runtime backends (set SYSTEMC_HOME or CMAKE_PREFIX_PATH)")
+  endif()
 endif()
 
 add_subdirectory(include/soda)

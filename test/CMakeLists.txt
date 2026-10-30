@@ -1,5 +1,6 @@
 llvm_canonicalize_cmake_booleans(
         MLIR_ENABLE_BINDINGS_PYTHON
+        SODA_HAVE_SYSTEMC
 )
 
 configure_lit_site_cfg(
@@ -25,6 +26,10 @@ set(SODA_TEST_DEPENDS
 
 if(MLIR_ENABLE_BINDINGS_PYTHON)
         list(APPEND SODA_TEST_DEPENDS SODAPythonModules)
+endif()
+
+if(SODA_HAVE_SYSTEMC)
+        list(APPEND SODA_TEST_DEPENDS ${SODA_AXI_SYSC_RUNTIME_LIBS})
 endif()
 
 add_lit_testsuite(check-soda "Running the soda-opt regression tests"
