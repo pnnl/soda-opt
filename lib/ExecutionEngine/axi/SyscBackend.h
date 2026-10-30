@@ -31,6 +31,7 @@
 
 #include "soda/ExecutionEngine/axi/accelerators/dma_engine.sc.h"
 
+#include <exception>
 #include <vector>
 
 namespace soda {
@@ -121,7 +122,17 @@ private:
                       name, what, getSyscBudgetNs());
         fatalError(message);
       }
-      sc_core::sc_start(budget - elapsed);
+      // SystemC reports errors, e.g. of a model that receives words it does
+      // not expect, with exceptions; turn them into runtime errors.
+      try {
+        sc_core::sc_start(budget - elapsed);
+      } catch (const std::exception &error) {
+        char message[1024];
+        std::snprintf(message, sizeof(message),
+                      "the %s simulation failed during a %s:\n%s", name, what,
+                      error.what());
+        fatalError(message);
+      }
     }
   }
 
