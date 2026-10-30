@@ -88,7 +88,6 @@ set(LIBS
   # Conversion SODA
   SODAKERNELToSODA
   SODAFuncToLLVM
-  # SODALinalgToAccel
 
   # SODA
   SODALinalgTransforms
