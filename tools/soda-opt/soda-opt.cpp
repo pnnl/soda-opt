@@ -16,6 +16,7 @@
 
 #include "soda/InitUpstreamDialects.h"
 
+#include "soda/Conversion/AccelPasses.h"
 #include "soda/Conversion/Passes.h"
 #include "soda/Dialect/Accel/IR/Accel.h"
 #include "soda/Dialect/Linalg/Reports/Passes.h"
@@ -100,6 +101,7 @@ int main(int argc, char **argv) {
   mlir::registerConvertFuncToLLVMPass();
   mlir::registerFinalizeMemRefToLLVMConversionPass();
   mlir::memref::registerFoldMemRefAliasOps();
+  mlir::memref::registerExpandStridedMetadataPass();
   mlir::registerSCFToControlFlowPass();
   mlir::registerConvertAffineToStandardPass();
   mlir::registerConvertMathToLLVMPass();
@@ -179,8 +181,7 @@ int main(int argc, char **argv) {
   mlir::soda::registerOptimizedForVitisHLSPass();
 
   // Conversion passes
-  // WIP: AXI4MLIR integration
-  // mlir::soda::registerConvertAccelToAXI4MLIR();
+  mlir::accel::registerAccelConversionPasses();
 
   // ----- SNN -----
   // WIP: Remove SNN dialect
