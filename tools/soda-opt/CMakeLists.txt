@@ -106,6 +106,7 @@ set(LIBS
   # ACCEL
   SODAAccelDialect
   SODAAccelToRuntime
+  SODALinalgToAccel
 )
 
 set(SOURCES
