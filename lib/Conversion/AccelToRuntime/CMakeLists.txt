@@ -1,11 +1,19 @@
-add_mlir_dialect_library(SODAAccelToRuntime
-  AccelToAXI4MLIR.cpp
+add_mlir_conversion_library(SODAAccelToRuntime
+  AccelToAXIRuntime.cpp
 
   ADDITIONAL_HEADER_DIRS
-  ${PROJ_INCLUDE_DIR}/soda/Conversion/AccelToRuntime
+  ${PROJECT_SOURCE_DIR}/include/soda/Conversion
+
+  DEPENDS
+  SODAAccelConversionPassIncGen
 
   LINK_LIBS PUBLIC
+  MLIRArithDialect
+  MLIRArithUtils
+  MLIRFuncDialect
   MLIRIR
+  MLIRMemRefDialect
   MLIRPass
+  MLIRSideEffectInterfaces
+  SODAAccelDialect
 )
- 

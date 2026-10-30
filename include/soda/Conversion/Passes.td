@@ -81,20 +81,4 @@ def ConvertAllToSODA : Pass<"convert-all-to-soda", "func::FuncOp"> {
   ];
 }
 
-//===----------------------------------------------------------------------===//
-// AccelToAXI4MLIR
-// WIP: AXI4MLIR integration
-//===----------------------------------------------------------------------===//
-
-// def ConvertAccelToAXI4MLIR : Pass<"test-accel-to-axi4mlir", "ModuleOp"> {
-//   let summary = "Convert accel ops into AXI4MLIR runtime calls";
-//   let constructor = "mlir::createConvertAccelToAXI4MLIRPass()";
-//   let dependentDialects = [
-//     "AffineDialect",
-//     "memref::MemRefDialect",
-//     "scf::SCFDialect",
-//     "LLVM::LLVMDialect",
-//   ];
-// }
-
 #endif // SODA_CONVERSION_PASSES
