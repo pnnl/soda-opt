@@ -38,6 +38,7 @@ config.mlir_tools_dir = "@MLIR_TOOLS_DIR@"
 config.soda_src_root = "@CMAKE_SOURCE_DIR@"
 config.soda_obj_root = "@CMAKE_BINARY_DIR@"
 config.soda_lib_root = "@SODA_LIB_DIR@"
+config.soda_have_systemc = @SODA_HAVE_SYSTEMC@
 
 # Support substitution of the tools_dir with user parameters. This is
 # used when we can't determine the tool dir at configuration time.

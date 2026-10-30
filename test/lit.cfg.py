@@ -51,6 +51,13 @@ config.substitutions.append(('%axi_runner_libs', ' '.join([
 config.substitutions.append(('%axi_mock_lib', os.path.join(
     config.soda_lib_root, 'libsoda_axi_runtime_mock' + config.llvm_shlib_ext)))
 
+# SystemC simulations of the accelerators (%axi_sysc_lib_dir holds
+# libsoda_axi_runtime_sysc_<model>).
+if config.soda_have_systemc:
+    config.available_features.add('systemc')
+config.substitutions.append(('%axi_sysc_lib_dir', config.soda_lib_root))
+config.environment['SYSC_DISABLE_COPYRIGHT_MESSAGE'] = '1'
+
 llvm_config.with_system_environment(
     ['HOME', 'INCLUDE', 'LIB', 'TMP', 'TEMP'])
 
