@@ -19,6 +19,10 @@
 namespace mlir {
 class ModuleOp;
 
+namespace affine {
+class AffineDialect;
+} // namespace affine
+
 namespace arith {
 class ArithDialect;
 } // namespace arith
@@ -31,7 +35,12 @@ namespace memref {
 class MemRefDialect;
 } // namespace memref
 
+namespace scf {
+class SCFDialect;
+} // namespace scf
+
 namespace accel {
+class AccelDialect;
 
 #define GEN_PASS_DECL
 #include "soda/Conversion/AccelPasses.h.inc"
